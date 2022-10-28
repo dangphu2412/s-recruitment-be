@@ -25,6 +25,9 @@ export interface UserService {
 
   findMyProfile(id: string): Promise<MyProfile>;
 
+  /**
+   * @throws {InsertUserFailedException}
+   */
   create(dto: CreateUserDto): Promise<InsertResult>;
   updateRolesForUser(user: User, roles: Role[]): Promise<void>;
   toggleUserIsActive(id: string): Promise<void>;
