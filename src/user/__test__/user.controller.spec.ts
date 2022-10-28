@@ -35,7 +35,7 @@ describe('AuthController', () => {
       jest.spyOn(userService, 'findMyProfile').mockResolvedValue(result);
 
       expect(
-        await userController.getMyProfile({
+        await userController.findMyProfile({
           sub: '1',
         }),
       ).toBe(result);

@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
 import { AuthController } from '../internal/auth.controller';
-
 import { RoleStorage, RoleStorageToken } from '../../authorization';
 import { extractJwtPayload } from '../internal/utils/jwt.utils';
 import { AuthService, AuthServiceToken, LoginCredentials } from '../client';
@@ -38,23 +37,6 @@ describe('AuthController', () => {
     authController = moduleRef.get<AuthController>(AuthController);
     authService = moduleRef.get<AuthService>(AuthServiceToken);
     roleStorage = moduleRef.get<RoleStorage>(RoleStorageToken);
-  });
-
-  describe('register', () => {
-    it('should return FinishLoginResponseDto', async () => {
-      const result: LoginCredentials = {
-        tokens: [],
-      };
-      jest.spyOn(authService, 'register').mockResolvedValue(result);
-
-      expect(
-        await authController.register({
-          username: '',
-          password: '',
-        }),
-      ).toBe(result);
-      expect(authService.register).toBeCalledTimes(1);
-    });
   });
 
   describe('login', () => {

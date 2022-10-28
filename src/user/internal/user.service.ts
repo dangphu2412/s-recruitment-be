@@ -1,5 +1,5 @@
 import { Role } from '../../authorization';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import {
   CreateUserDto,
@@ -11,6 +11,8 @@ import {
   UserService,
 } from '../client';
 import { MyProfile } from '../../authentication';
+import { InsertResult } from 'typeorm';
+import { InsertUserFailedException } from '../client/exceptions/insert-user-failed.exception';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -56,14 +58,21 @@ export class UserServiceImpl implements UserService {
     });
   }
 
-  async create(dto: CreateUserDto): Promise<User> {
-    const entity = new User();
+  async create(dto: CreateUserDto): Promise<InsertResult> {
+    const newUser = new User();
 
-    entity.username = dto.username;
-    entity.email = '';
-    entity.password = dto.password;
+    newUser.username = dto.email;
+    newUser.email = dto.email;
+    newUser.password = '';
+    newUser.birthday = new Date(dto.birthday);
+    newUser.joinedAt = null;
 
-    return this.userRepository.save(entity);
+    try {
+      return await this.userRepository.insert(newUser);
+    } catch (error) {
+      Logger.error(error.message, error.stack, UserServiceImpl.name);
+      throw new InsertUserFailedException();
+    }
   }
 
   async updateRolesForUser(user: User, roles: Role[]) {

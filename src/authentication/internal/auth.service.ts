@@ -1,12 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { BcryptService } from '../../shared/services/bcrypt.service';
 import { extractJwtPayload } from './utils/jwt.utils';
 import {
   AuthService,
   BasicLoginDto,
-  BasicRegisterDto,
   JwtPayload,
   LoginCredentials,
   TokenGenerator,
@@ -38,50 +36,13 @@ export class AuthServiceImpl implements AuthService {
     private readonly bcryptService: BcryptService,
   ) {}
 
-  @Transactional()
-  async register(
-    basicRegisterRequestDto: BasicRegisterDto,
-  ): Promise<LoginCredentials> {
-    // TODO: Retrieve record of user service and throw own auth service exception code
-    await this.userService.assertUsernameNotDuplicated(
-      basicRegisterRequestDto.username,
-    );
-
-    const hashedPassword = await this.bcryptService.hash(
-      basicRegisterRequestDto.password,
-    );
-
-    const [createdUser, roles] = await Promise.all([
-      this.userService.create({
-        username: basicRegisterRequestDto.username,
-        password: hashedPassword,
-      }),
-      this.roleService.getNewUserRoles(),
+  async login(basicLoginDto: BasicLoginDto): Promise<LoginCredentials> {
+    const user = await this.userService.findByUsername(basicLoginDto.username, [
+      'roles',
     ]);
-
-    await this.userService.updateRolesForUser(createdUser, roles);
-
-    const [tokens] = await Promise.all([
-      this.tokenGenerator.generate(createdUser.id),
-      this.roleStorage.set(createdUser.id, roles),
-    ]);
-
-    return {
-      tokens,
-    };
-  }
-
-  async login(basicLoginRequestDto: BasicLoginDto): Promise<LoginCredentials> {
-    const user = await this.userService.findByUsername(
-      basicLoginRequestDto.username,
-      ['roles'],
-    );
     const cannotLogin =
       !user ||
-      (await this.bcryptService.compare(
-        basicLoginRequestDto.password,
-        user.password,
-      ));
+      (await this.bcryptService.compare(basicLoginDto.password, user.password));
 
     if (cannotLogin) {
       throw new IncorrectUsernamePasswordException();

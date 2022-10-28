@@ -21,6 +21,7 @@ export class User {
   @Column({
     name: 'username',
     nullable: false,
+    unique: true,
   })
   username: string;
 
@@ -28,6 +29,7 @@ export class User {
     name: 'email',
     type: 'varchar',
     nullable: true,
+    unique: true,
   })
   email: string;
 
@@ -39,19 +41,16 @@ export class User {
   @Exclude({ toPlainOnly: true })
   password: string;
 
-  @ManyToMany(() => Role)
-  @JoinTable({
-    name: 'users_roles',
-    joinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'role_id',
-      referencedColumnName: 'id',
-    },
+  @Column({
+    name: 'joined_at',
   })
-  roles: Role[];
+  joinedAt: Date;
+
+  @Column({
+    name: 'birthday',
+    nullable: true,
+  })
+  birthday?: Date;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -67,4 +66,18 @@ export class User {
     name: 'deleted_at',
   })
   deletedAt: Date;
+
+  @ManyToMany(() => Role)
+  @JoinTable({
+    name: 'users_roles',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'id',
+    },
+  })
+  roles: Role[];
 }

@@ -3,7 +3,6 @@ import {
   AuthService,
   AuthServiceToken,
   BasicLoginDto,
-  BasicRegisterDto,
   RenewTokensDto,
 } from '../client';
 import { RoleStorage, RoleStorageToken } from '../../authorization';
@@ -23,14 +22,6 @@ export class AuthController {
     private readonly roleStorage: RoleStorage,
   ) {}
 
-  @Post('register')
-  @ApiResponse({
-    status: 201,
-  })
-  public register(@Body() basicRegisterRequestDto: BasicRegisterDto) {
-    return this.authService.register(basicRegisterRequestDto);
-  }
-
   @Post('login')
   @ApiResponse({
     status: 201,
@@ -39,22 +30,23 @@ export class AuthController {
     status: 422,
     description: 'AUTH__INCORRECT_USERNAME_OR_PASSWORD',
   })
-  public login(@Body() basicLoginRequestDto: BasicLoginDto) {
-    return this.authService.login(basicLoginRequestDto);
+  public login(@Body() basicLoginDto: BasicLoginDto) {
+    return this.authService.login(basicLoginDto);
   }
 
   @Post('tokens/renew')
-  public renewAccessToken(@Body() renewTokensRequestDto: RenewTokensDto) {
-    return this.authService.renewTokens(renewTokensRequestDto.refreshToken);
+  public renewAccessToken(@Body() renewTokensDto: RenewTokensDto) {
+    return this.authService.renewTokens(renewTokensDto.refreshToken);
   }
 
   @ApiNoContentResponse()
   @Delete('logout')
-  public logout(@Body() renewTokensRequestDto: RenewTokensDto) {
-    const jwtPayload = extractJwtPayload(renewTokensRequestDto.refreshToken);
+  public logout(@Body() renewTokensDto: RenewTokensDto) {
+    const jwtPayload = extractJwtPayload(renewTokensDto.refreshToken);
     if (!jwtPayload) {
       return;
     }
+
     return this.roleStorage.clean(jwtPayload.sub);
   }
 }

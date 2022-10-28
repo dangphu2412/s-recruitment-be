@@ -38,7 +38,7 @@ export class UserController {
   @Identified
   @Get('/me')
   @ApiOkResponse()
-  getMyProfile(@CurrentUser() user: JwtPayload) {
+  findMyProfile(@CurrentUser() user: JwtPayload) {
     return this.userService.findMyProfile(user.sub);
   }
 
@@ -60,7 +60,7 @@ export class UserController {
   @Post('/')
   @ApiCreatedResponse()
   async createUser(@Body() createUserDto: CreateUserDto) {
-    await this.userService.assertUsernameNotDuplicated(createUserDto.username);
+    await this.userService.assertUsernameNotDuplicated(createUserDto.email);
 
     return this.userService.create(createUserDto);
   }
