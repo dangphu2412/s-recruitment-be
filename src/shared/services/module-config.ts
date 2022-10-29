@@ -7,6 +7,7 @@ import { User } from '../../user';
 import { Role } from '../../authorization';
 import { Menu } from '../../menu';
 import { Province } from '../../location';
+import { MonthlyMoneyConfig, OperationFee } from '../../monthly-money';
 
 @Injectable()
 export class ModuleConfig {
@@ -66,7 +67,7 @@ export class ModuleConfig {
       password: this.getString('DB_PASSWORD'),
       port: this.getNumber('DB_PORT'),
       database: this.getString('DB_DATABASE'),
-      entities: [User, Role, Menu, Province],
+      entities: [User, Role, Menu, Province, MonthlyMoneyConfig, OperationFee],
       synchronize: !this.isProduction(),
       logging: !this.isProduction(),
       migrationsRun: false,

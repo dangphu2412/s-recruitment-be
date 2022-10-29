@@ -4,6 +4,8 @@ import { User } from '../../user';
 import { Role } from '../../authorization';
 import { Menu } from '../../menu';
 import { Province } from '../../location';
+import { MonthlyMoneyConfig } from '../../monthly-money';
+import { OperationFee } from '../../monthly-money';
 
 dotenv.config();
 
@@ -14,7 +16,7 @@ export const connectionConfig: TypeOrmModuleOptions = {
   password: process.env.DB_PASSWORD,
   port: parseInt(process.env.DB_PORT),
   database: process.env.DB_DATABASE,
-  entities: [User, Role, Menu, Province],
+  entities: [User, Role, Menu, Province, MonthlyMoneyConfig, OperationFee],
   synchronize: process.env.DB_SYNC ? process.env.DB_SYNC === 'true' : false,
   logging: true,
   migrationsRun: process.env.DB_MIGRATION_RUN

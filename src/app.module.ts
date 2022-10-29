@@ -6,6 +6,7 @@ import { AuthorizationModule } from './authorization/internal/authorization.modu
 import { SharedModule } from './shared/shared.module';
 import { MenuModule } from './menu/internal/menu.module';
 import { LocationModule } from './location/internal/location.module';
+import { MonthlyMoneyModule } from './monthly-money/internal/monthly-money.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LocationModule } from './location/internal/location.module';
     SharedModule,
     MenuModule,
     LocationModule,
+    MonthlyMoneyModule,
   ],
 })
 export class AppModule {}
