@@ -1,7 +1,7 @@
 import { Role } from '../entities/role.entity';
-import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
+import { createInterfaceToken } from '../../../utils';
 
-export const RoleServiceToken = randomStringGenerator();
+export const RoleServiceToken = createInterfaceToken('RoleService');
 
 export interface RoleService {
   getNewUserRoles(): Promise<Role[]>;

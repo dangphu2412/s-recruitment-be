@@ -1,6 +1,7 @@
 import { INestApplication, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EnvLoaderUtils } from './env-loader.utils';
+import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
 
 export function extractOrigins(rawConfigString: string | undefined) {
   const ALLOW_ALL_ORIGINS = '*';
@@ -29,4 +30,8 @@ export function logAppScaffold(app: INestApplication) {
       process.cpuUsage().user / 1000 +
       '%',
   );
+}
+
+export function createInterfaceToken(name: string): string {
+  return name + randomStringGenerator();
 }

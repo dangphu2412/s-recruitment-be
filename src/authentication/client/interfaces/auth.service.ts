@@ -1,8 +1,8 @@
-import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
 import { LoginCredentials } from '../types';
 import { BasicLoginDto } from '../dtos';
+import { createInterfaceToken } from '../../../utils';
 
-export const AuthServiceToken = randomStringGenerator();
+export const AuthServiceToken = createInterfaceToken('AuthService');
 
 export interface AuthService {
   login(basicLoginRequestDto: BasicLoginDto): Promise<LoginCredentials>;

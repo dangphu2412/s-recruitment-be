@@ -1,4 +1,3 @@
-import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
 import { User } from '../entities/user.entity';
 import { UserManagementView } from '../types/user-management-view.types';
 import { UserManagementQuery } from '../dtos/user-management-query.dto';
@@ -6,8 +5,9 @@ import { Role } from '../../../authorization';
 import { MyProfile } from '../../../authentication';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { InsertResult } from 'typeorm';
+import { createInterfaceToken } from '../../../utils';
 
-export const UserServiceToken = randomStringGenerator();
+export const UserServiceToken = createInterfaceToken('UserService');
 
 export interface UserService {
   find(query: UserManagementQuery): Promise<UserManagementView>;

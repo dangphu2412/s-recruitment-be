@@ -1,8 +1,8 @@
-import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
 import { Role } from '../entities/role.entity';
 import { RoleMapByActiveState } from '../types/role.types';
+import { createInterfaceToken } from '../../../utils';
 
-export const RoleStorageToken = randomStringGenerator();
+export const RoleStorageToken = createInterfaceToken('RoleStorage');
 
 export interface RoleStorage {
   set(userId: string, roles: Role[]): Promise<void>;

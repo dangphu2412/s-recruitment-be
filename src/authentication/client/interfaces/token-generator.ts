@@ -1,7 +1,7 @@
-import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
 import { TokenDto } from '../types';
+import { createInterfaceToken } from '../../../utils';
 
-export const TokenGeneratorToken = randomStringGenerator();
+export const TokenGeneratorToken = createInterfaceToken('TokenGenerator');
 
 export interface TokenGenerator {
   generate(userId: string): Promise<TokenDto[]>;
