@@ -3,11 +3,15 @@ import {
   QueryRunner,
   Table,
   TableForeignKey,
+  TableIndex,
 } from 'typeorm';
 
 export class CreateReferenceUserRole1650749459918
   implements MigrationInterface
 {
+  private INDEX_USER_KEY = 'IDX_FK_users_key';
+  private INDEX_ROLE_KEY = 'IDX_FK_roles_key';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -45,6 +49,17 @@ export class CreateReferenceUserRole1650749459918
         onUpdate: 'CASCADE',
       }),
     ]);
+
+    await queryRunner.createIndices('users_roles', [
+      new TableIndex({
+        name: this.INDEX_USER_KEY,
+        columnNames: ['user_id'],
+      }),
+      new TableIndex({
+        name: this.INDEX_ROLE_KEY,
+        columnNames: ['role_id'],
+      }),
+    ]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -64,6 +79,18 @@ export class CreateReferenceUserRole1650749459918
         onDelete: 'CASCADE',
       }),
     ]);
+
+    await queryRunner.dropIndices('users_roles', [
+      new TableIndex({
+        name: this.INDEX_USER_KEY,
+        columnNames: ['user_id'],
+      }),
+      new TableIndex({
+        name: this.INDEX_ROLE_KEY,
+        columnNames: ['role_id'],
+      }),
+    ]);
+
     await queryRunner.dropTable('users_roles');
   }
 }

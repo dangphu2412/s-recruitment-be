@@ -7,8 +7,6 @@ import { Province } from '../../location';
 
 dotenv.config();
 
-const isNotProd = process.env.NODE_ENV !== 'production';
-
 export const connectionConfig: TypeOrmModuleOptions = {
   type: 'postgres',
   host: process.env.DB_HOST,
@@ -17,9 +15,11 @@ export const connectionConfig: TypeOrmModuleOptions = {
   port: parseInt(process.env.DB_PORT),
   database: process.env.DB_DATABASE,
   entities: [User, Role, Menu, Province],
-  synchronize: isNotProd,
+  synchronize: process.env.DB_SYNC ? process.env.DB_SYNC === 'true' : false,
   logging: true,
-  migrationsRun: false,
+  migrationsRun: process.env.DB_MIGRATION_RUN
+    ? process.env.DB_MIGRATION_RUN === 'true'
+    : true,
   cli: {
     migrationsDir: 'src/database/migrations',
   },

@@ -3,15 +3,18 @@ import {
   QueryRunner,
   Table,
   TableForeignKey,
+  TableUnique,
 } from 'typeorm';
+import { ProvinceType } from '../../location/client/constants';
 
-export class CreateMenu1650750048744 implements MigrationInterface {
-  private FK_PARENT_KEY = 'FK_menus_parent_id_key';
+export class CreateProvinceTable1667016972234 implements MigrationInterface {
+  private TREE_FOREIGN_KEY = 'FK_province_tree_key';
+  private UNIQUE_CODE_KEY = 'UQ_province_code_key';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'menus',
+        name: 'provinces',
         columns: [
           {
             name: 'id',
@@ -24,22 +27,18 @@ export class CreateMenu1650750048744 implements MigrationInterface {
             name: 'name',
             type: 'varchar',
             isNullable: false,
-            isUnique: true,
           },
           {
             name: 'code',
             type: 'varchar',
+            isUnique: true,
             isNullable: false,
           },
           {
-            name: 'icon_code',
-            type: 'varchar',
-            isNullable: true,
-          },
-          {
-            name: 'access_link',
-            type: 'varchar',
-            isNullable: true,
+            name: 'type',
+            type: 'enum',
+            isNullable: false,
+            enum: Object.values(ProvinceType),
           },
           {
             name: 'mpath',
@@ -57,18 +56,26 @@ export class CreateMenu1650750048744 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'menus',
+      'provinces',
       new TableForeignKey({
-        name: this.FK_PARENT_KEY,
+        name: this.TREE_FOREIGN_KEY,
         columnNames: ['parent_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'menus',
+        referencedTableName: 'provinces',
+      }),
+    );
+
+    await queryRunner.createUniqueConstraint(
+      'provinces',
+      new TableUnique({
+        name: this.UNIQUE_CODE_KEY,
+        columnNames: ['code'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('menus', this.FK_PARENT_KEY);
-    await queryRunner.dropTable('menus');
+    await queryRunner.dropForeignKey('provinces', this.TREE_FOREIGN_KEY);
+    await queryRunner.dropTable('provinces');
   }
 }

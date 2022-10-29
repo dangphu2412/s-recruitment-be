@@ -1,6 +1,16 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableIndex,
+  TableUnique,
+} from 'typeorm';
 
 export class CreateUserTable1640749365859 implements MigrationInterface {
+  private UNIQUE_USERNAME_KEY = 'UQ_users_username_key';
+  private UNIQUE_EMAIL_KEY = 'UQ_users_email_key';
+  private INDEX_USERNAME_KEY = 'IDX_users_username_key';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -16,14 +26,10 @@ export class CreateUserTable1640749365859 implements MigrationInterface {
           {
             name: 'username',
             type: 'varchar',
-            isUnique: true,
-            isNullable: false,
           },
           {
             name: 'email',
             type: 'varchar',
-            isUnique: true,
-            isNullable: false,
           },
           {
             name: 'password',
@@ -33,6 +39,7 @@ export class CreateUserTable1640749365859 implements MigrationInterface {
           {
             name: 'joined_at',
             type: 'timestamp',
+            default: 'now()',
             isNullable: false,
           },
           {
@@ -58,9 +65,45 @@ export class CreateUserTable1640749365859 implements MigrationInterface {
         ],
       }),
     );
+
+    await queryRunner.createUniqueConstraints('users', [
+      new TableUnique({
+        name: this.UNIQUE_USERNAME_KEY,
+        columnNames: ['username'],
+      }),
+      new TableUnique({
+        name: this.UNIQUE_EMAIL_KEY,
+        columnNames: ['email'],
+      }),
+    ]);
+
+    await queryRunner.createIndices('users', [
+      new TableIndex({
+        name: this.INDEX_USERNAME_KEY,
+        columnNames: ['username'],
+      }),
+    ]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.dropUniqueConstraints('users', [
+      new TableUnique({
+        name: this.UNIQUE_USERNAME_KEY,
+        columnNames: ['username'],
+      }),
+      new TableUnique({
+        name: this.UNIQUE_EMAIL_KEY,
+        columnNames: ['email'],
+      }),
+    ]);
+
+    await queryRunner.dropIndices('users', [
+      new TableIndex({
+        name: this.INDEX_USERNAME_KEY,
+        columnNames: ['username'],
+      }),
+    ]);
+
     await queryRunner.dropTable('users');
   }
 }

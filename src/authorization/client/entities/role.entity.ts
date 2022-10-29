@@ -12,6 +12,7 @@ export class Role {
     name: 'key',
     type: 'varchar',
     nullable: false,
+    unique: true,
   })
   key: string;
 
@@ -19,6 +20,7 @@ export class Role {
     name: 'name',
     type: 'varchar',
     nullable: false,
+    unique: true,
   })
   name: string;
 

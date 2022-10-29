@@ -24,7 +24,7 @@ export class Province {
   name: string;
 
   @Column({
-    name: 'name',
+    name: 'code',
     nullable: false,
     unique: true,
   })
