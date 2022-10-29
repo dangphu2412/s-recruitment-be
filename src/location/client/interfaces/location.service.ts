@@ -1,6 +1,9 @@
 import { createInterfaceToken } from '../../../utils';
+import { Province } from '../entities/province.entity';
+import { LocationQuery } from '../types/location-query.types';
 
 export const LocationServiceToken = createInterfaceToken('LocationService');
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface LocationService {}
+export interface LocationService {
+  find(query: LocationQuery): Promise<Province[]>;
+}

@@ -15,7 +15,7 @@ import { ProvinceType } from '../constants';
 @Tree('materialized-path')
 export class Province {
   @PrimaryGeneratedColumn('increment')
-  id: string;
+  id: number;
 
   @Column({
     name: 'name',
