@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { OperationFee } from './operation-fee.entity';
 
 @Entity({
   name: 'monthly_money_configs',
@@ -20,4 +21,7 @@ export class MonthlyMoneyConfig {
     type: 'smallint',
   })
   monthRange: number;
+
+  @OneToMany(() => OperationFee, (operationFee) => operationFee.monthlyConfig)
+  operationFees: OperationFee[];
 }
