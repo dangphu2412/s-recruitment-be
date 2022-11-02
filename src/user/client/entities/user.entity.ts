@@ -43,7 +43,6 @@ export class User {
 
   @Column({
     name: 'joined_at',
-    default: '"now()"',
   })
   joinedAt: Date;
 
@@ -68,7 +67,7 @@ export class User {
   })
   deletedAt: Date;
 
-  @ManyToMany(() => Role)
+  @ManyToMany(() => Role, (role) => role.users)
   @JoinTable({
     name: 'users_roles',
     joinColumn: {

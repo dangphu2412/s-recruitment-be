@@ -1,2 +1,2 @@
-export * from './duplicated-username.exception';
 export * from './not-found-user.exception';
+export * from './insert-user-failed.exception';

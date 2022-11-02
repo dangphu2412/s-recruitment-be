@@ -34,7 +34,7 @@ export class ModuleConfig {
       throw new Error(`${key} environment variable is not a boolean`);
     }
 
-    return Boolean(value);
+    return value === 'true';
   }
 
   private getString(key: string): string {
@@ -68,9 +68,9 @@ export class ModuleConfig {
       port: this.getNumber('DB_PORT'),
       database: this.getString('DB_DATABASE'),
       entities: [User, Role, Menu, Province, MonthlyMoneyConfig, OperationFee],
-      synchronize: !this.isProduction(),
-      logging: !this.isProduction(),
-      migrationsRun: false,
+      synchronize: this.getBoolean('DB_SYNC'),
+      logging: true,
+      migrationsRun: this.getBoolean('DB_MIGRATION_RUN'),
     };
   }
 

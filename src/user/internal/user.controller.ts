@@ -56,11 +56,13 @@ export class UserController {
     await this.userService.toggleUserIsActive(id);
   }
 
-  @CanAccessBy(RoleDef.ADMIN)
+  // @CanAccessBy(RoleDef.ADMIN)
   @Post('/')
   @ApiCreatedResponse()
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    await this.userService.assertUsernameNotDuplicated(createUserDto.email);
+  async createUser(@Body() createUserDto: CreateUserDto[]) {
+    const emails = createUserDto.map((dto) => dto.email);
+
+    await this.userService.assertEmails(emails);
 
     return this.userService.create(createUserDto);
   }

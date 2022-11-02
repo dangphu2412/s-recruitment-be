@@ -49,6 +49,7 @@
     "fastify-compress": "^4.1.0",
     "fastify-swagger": "^5.2.0",
     "lodash.isempty": "^4.4.0",
+    "lodash.uniqby": "^4.7.0",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "pg": "8.7.1",

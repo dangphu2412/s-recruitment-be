@@ -18,17 +18,20 @@ export interface UserService {
   findByUsername(username: string): Promise<User>;
   findByUsername(username: string, relations: string[]): Promise<User>;
 
-  /**
-   * @throws {DuplicatedUsernameException}
-   */
-  assertUsernameNotDuplicated(username: string): Promise<void>;
-
   findMyProfile(id: string): Promise<MyProfile>;
+
+  /**
+   * throws {EmailDuplicatedException}
+   */
+  assertEmails(emails: string[]): Promise<void>;
 
   /**
    * @throws {InsertUserFailedException}
    */
   create(dto: CreateUserDto): Promise<InsertResult>;
+  create(dto: CreateUserDto[]): Promise<InsertResult>;
+  create(dto: CreateUserDto | CreateUserDto[]): Promise<InsertResult>;
+
   updateRolesForUser(user: User, roles: Role[]): Promise<void>;
   toggleUserIsActive(id: string): Promise<void>;
 }

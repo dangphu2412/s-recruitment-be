@@ -3,31 +3,29 @@ import { Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import {
   CreateUserDto,
-  DuplicatedUsernameException,
   NotFoundUserException,
   User,
   UserManagementQuery,
   UserManagementView,
   UserService,
+  InsertUserFailedException,
 } from '../client';
 import { MyProfile } from '../../authentication';
-import { InsertResult } from 'typeorm';
-import { InsertUserFailedException } from '../client/exceptions/insert-user-failed.exception';
+import { In, InsertResult } from 'typeorm';
+import { EmailDuplicatedException } from '../client/exceptions/email-duplicated.exception';
+import uniqBy from 'lodash/uniqBy';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async assertUsernameNotDuplicated(username: string): Promise<void> {
-    const isUsernameExisted =
-      (await this.userRepository.count({
-        where: {
-          username,
-        },
-      })) > 0;
+  async assertEmails(emails: string[]): Promise<void> {
+    const emailCount = await this.userRepository.count({
+      where: In(emails),
+    });
 
-    if (isUsernameExisted) {
-      throw new DuplicatedUsernameException();
+    if (emailCount !== emails.length) {
+      throw new EmailDuplicatedException();
     }
   }
 
@@ -58,21 +56,25 @@ export class UserServiceImpl implements UserService {
     });
   }
 
-  async create(dto: CreateUserDto): Promise<InsertResult> {
-    const newUser = new User();
-
-    newUser.username = dto.email;
-    newUser.email = dto.email;
-    newUser.password = '';
-    newUser.birthday = new Date(dto.birthday);
-    newUser.joinedAt = null;
+  async create(dto: CreateUserDto | CreateUserDto[]): Promise<InsertResult> {
+    const newUsers = Array.isArray(dto)
+      ? uniqBy(dto, 'email').map(this.toUser)
+      : [this.toUser(dto)];
 
     try {
-      return await this.userRepository.insert(newUser);
+      return await this.userRepository.insert(newUsers);
     } catch (error) {
       Logger.error(error.message, error.stack, UserServiceImpl.name);
       throw new InsertUserFailedException();
     }
+  }
+
+  private toUser(dto: CreateUserDto): User {
+    return this.userRepository.create({
+      ...dto,
+      birthday: new Date(dto.birthday),
+      joinedAt: null,
+    });
   }
 
   async updateRolesForUser(user: User, roles: Role[]) {
