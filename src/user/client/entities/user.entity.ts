@@ -43,6 +43,7 @@ export class User {
 
   @Column({
     name: 'joined_at',
+    default: 'now()',
   })
   joinedAt: Date;
 

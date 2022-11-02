@@ -56,7 +56,7 @@ export class UserController {
     await this.userService.toggleUserIsActive(id);
   }
 
-  // @CanAccessBy(RoleDef.ADMIN)
+  @CanAccessBy(RoleDef.ADMIN)
   @Post('/')
   @ApiCreatedResponse()
   async createUser(@Body() createUserDto: CreateUserDto[]) {

@@ -21,10 +21,12 @@ export class UserServiceImpl implements UserService {
 
   async assertEmails(emails: string[]): Promise<void> {
     const emailCount = await this.userRepository.count({
-      where: In(emails),
+      where: {
+        email: In(emails),
+      },
     });
 
-    if (emailCount !== emails.length) {
+    if (emailCount > 0) {
       throw new EmailDuplicatedException();
     }
   }
@@ -69,13 +71,13 @@ export class UserServiceImpl implements UserService {
     }
   }
 
-  private toUser(dto: CreateUserDto): User {
+  private toUser = (dto: CreateUserDto): User => {
     return this.userRepository.create({
       ...dto,
-      birthday: new Date(dto.birthday),
-      joinedAt: null,
+      username: dto.email,
+      birthday: dto.birthday ? new Date(dto.birthday) : null,
     });
-  }
+  };
 
   async updateRolesForUser(user: User, roles: Role[]) {
     user.roles = roles;

@@ -40,7 +40,6 @@ export class CreateUserTable1640749365859 implements MigrationInterface {
             name: 'joined_at',
             type: 'timestamp',
             default: 'now()',
-            isNullable: false,
           },
           {
             name: 'birthday',
