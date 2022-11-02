@@ -1,8 +1,10 @@
 import { createInterfaceToken } from '../../../utils';
+import { CreateMoneyFee } from '../types/create-money-fee.types';
 
 export const MonthlyMoneyOperationServiceToken = createInterfaceToken(
   'MonthlyMoneyOperationService',
 );
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface MonthlyMoneyOperationService {}
+export interface MonthlyMoneyOperationService {
+  createOperationFee(createMoneyFee: CreateMoneyFee): Promise<void>;
+}

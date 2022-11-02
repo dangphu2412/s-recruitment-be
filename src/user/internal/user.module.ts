@@ -4,9 +4,10 @@ import { UserController } from './user.controller';
 import { UserServiceToken } from '../client';
 import { UserServiceImpl } from './user.service';
 import { UserRepository } from './user.repository';
+import { MonthlyMoneyModule } from '../../monthly-money/internal/monthly-money.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserRepository])],
+  imports: [MonthlyMoneyModule, TypeOrmModule.forFeature([UserRepository])],
   controllers: [UserController],
   providers: [
     {

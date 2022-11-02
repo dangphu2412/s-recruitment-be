@@ -23,5 +23,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       useClass: MonthlyMoneyOperationServiceImpl,
     },
   ],
+  exports: [MonthlyMoneyConfigServiceToken, MonthlyMoneyOperationServiceToken],
 })
 export class MonthlyMoneyModule {}

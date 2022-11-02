@@ -36,13 +36,11 @@ export class TokenGeneratorImpl implements TokenGenerator {
       expiresIn: this.accessTokenExpiration,
     });
 
-    let refreshToken = providedRefreshToken;
-
-    if (!providedRefreshToken) {
-      refreshToken = await this.jwtService.signAsync(jwtPayload, {
-        expiresIn: this.refreshTokenExpiration,
-      });
-    }
+    const refreshToken = providedRefreshToken
+      ? providedRefreshToken
+      : await this.jwtService.signAsync(jwtPayload, {
+          expiresIn: this.refreshTokenExpiration,
+        });
 
     return [
       {

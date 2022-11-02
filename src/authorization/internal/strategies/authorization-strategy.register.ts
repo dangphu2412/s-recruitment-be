@@ -12,7 +12,6 @@ export function useAuthorizationStrategy(
   identify: string,
   strategy: AuthorizationStrategy,
 ) {
-  const logger = new Logger('AuthorizationStrategy');
-  logger.log(`Initializing strategy ${identify}`);
+  Logger.log(`Initializing strategy ${identify}`, 'AuthorizationStrategy');
   StrategiesKeyById[identify] = strategy;
 }

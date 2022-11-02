@@ -7,4 +7,9 @@ export const MonthlyMoneyConfigServiceToken = createInterfaceToken(
 
 export interface MonthlyMoneyConfigService {
   find(): Promise<MonthlyMoneyConfig[]>;
+
+  /**
+   * @throws {NoMonthlyMoneyConfigFoundException}
+   */
+  findById(id: string): Promise<MonthlyMoneyConfig>;
 }

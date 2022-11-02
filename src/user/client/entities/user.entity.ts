@@ -5,11 +5,13 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Role } from '../../../authorization';
 import { Exclude } from 'class-transformer';
+import { OperationFee } from '../../../monthly-money';
 
 @Entity({
   name: 'users',
@@ -81,4 +83,7 @@ export class User {
     },
   })
   roles: Role[];
+
+  @OneToOne(() => OperationFee, (operationFee) => operationFee.user)
+  operationFee: OperationFee;
 }

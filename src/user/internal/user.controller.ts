@@ -22,6 +22,8 @@ import {
   UserManagementView,
   UserService,
   UserServiceToken,
+  TurnToMembersDto,
+  ExtractNewUserQueryDto,
 } from '../client';
 
 @ApiTags('users')
@@ -59,11 +61,23 @@ export class UserController {
   @CanAccessBy(RoleDef.ADMIN)
   @Post('/')
   @ApiCreatedResponse()
-  async createUser(@Body() createUserDto: CreateUserDto[]) {
-    const emails = createUserDto.map((dto) => dto.email);
+  async createUsers(@Body() createUserDto: CreateUserDto[]) {
+    await this.userService.create(createUserDto);
+  }
 
-    await this.userService.assertEmails(emails);
+  @CanAccessBy(RoleDef.ADMIN)
+  @Get('/extract-new-values')
+  @ApiCreatedResponse()
+  extractNewUserEmails(
+    @Query() extractNewUserQueryDto: ExtractNewUserQueryDto,
+  ) {
+    return this.userService.extractNewUserEmails(extractNewUserQueryDto.value);
+  }
 
-    return this.userService.create(createUserDto);
+  @CanAccessBy(RoleDef.ADMIN)
+  @Post('/members')
+  @ApiCreatedResponse()
+  turnUsersIntoMembers(@Body() turnToMembersDto: TurnToMembersDto) {
+    return this.userService.turnToMembers(turnToMembersDto);
   }
 }

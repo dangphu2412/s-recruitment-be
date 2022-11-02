@@ -6,6 +6,7 @@ import { MyProfile } from '../../../authentication';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { InsertResult } from 'typeorm';
 import { createInterfaceToken } from '../../../utils';
+import { TurnToMembersDto } from '../dtos/turn-to-members.dto';
 
 export const UserServiceToken = createInterfaceToken('UserService');
 
@@ -20,10 +21,12 @@ export interface UserService {
 
   findMyProfile(id: string): Promise<MyProfile>;
 
+  extractNewUserEmails(emails: string[]): Promise<string[]>;
+
   /**
-   * throws {EmailDuplicatedException}
+   * @throws {EmailExistedException}
    */
-  assertEmails(emails: string[]): Promise<void>;
+  assertEmailsNotExist(emails: string[]): Promise<void>;
 
   /**
    * @throws {InsertUserFailedException}
@@ -34,4 +37,6 @@ export interface UserService {
 
   updateRolesForUser(user: User, roles: Role[]): Promise<void>;
   toggleUserIsActive(id: string): Promise<void>;
+
+  turnToMembers(turnToMembersDto: TurnToMembersDto): Promise<void>;
 }
