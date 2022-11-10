@@ -6,6 +6,7 @@ import {
 } from '../../client';
 import { JwtPayload } from '../../../authentication';
 import { useAuthorizationStrategy } from './authorization-strategy.register';
+import { LogoutRequiredException } from '../../../authentication/client/exceptions/logout-required.exception';
 
 @Injectable()
 export class RoleAuthorizationStrategy
@@ -19,13 +20,15 @@ export class RoleAuthorizationStrategy
   }
 
   async canAccess(
-    providedData: JwtPayload,
+    { sub }: JwtPayload,
     requiredRoles: string[],
   ): Promise<boolean> {
-    const userRoles = await this.roleStorage.get(providedData.sub);
+    const userRoles = await this.roleStorage.get(sub);
+
     if (!userRoles) {
-      return false;
+      throw new LogoutRequiredException();
     }
+
     return requiredRoles.some((role) => userRoles[role]);
   }
 }

@@ -1,5 +1,4 @@
 import { User } from '../entities/user.entity';
-import { UserManagementView } from '../types/user-management-view.types';
 import { UserManagementQuery } from '../dtos/user-management-query.dto';
 import { Role } from '../../../authorization';
 import { MyProfile } from '../../../authentication';
@@ -11,7 +10,7 @@ import { TurnToMembersDto } from '../dtos/turn-to-members.dto';
 export const UserServiceToken = createInterfaceToken('UserService');
 
 export interface UserService {
-  find(query: UserManagementQuery): Promise<UserManagementView>;
+  find(query: UserManagementQuery): Promise<User[]>;
 
   findById(id: string): Promise<User | null>;
   findById(id: string, relations: string[]): Promise<User | null>;

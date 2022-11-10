@@ -1,9 +1,10 @@
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
+import { ToManyString } from '../../../shared/transformer';
 
 export class ExtractNewUserQueryDto {
   field: string;
 
   @Type(() => String)
-  @Transform((params) => params.value.split(','))
+  @ToManyString()
   value: string[];
 }

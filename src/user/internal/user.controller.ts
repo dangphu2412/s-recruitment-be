@@ -18,13 +18,14 @@ import { CurrentUser, Identified, JwtPayload } from '../../authentication';
 import { CanAccessBy, RoleDef } from '../../authorization';
 import {
   CreateUserDto,
+  ExtractNewUserQueryDto,
+  TurnToMembersDto,
   UserManagementQuery,
   UserManagementView,
   UserService,
   UserServiceToken,
-  TurnToMembersDto,
-  ExtractNewUserQueryDto,
 } from '../client';
+import { createPage } from '../../shared/query-shape/pagination/factories/page.factory';
 
 @ApiTags('users')
 @Controller({
@@ -47,8 +48,14 @@ export class UserController {
   @CanAccessBy(RoleDef.ADMIN)
   @Get('/')
   @ApiOkResponse()
-  find(@Query() query: UserManagementQuery): Promise<UserManagementView> {
-    return this.userService.find(query);
+  async find(@Query() query: UserManagementQuery): Promise<UserManagementView> {
+    const users = await this.userService.find(query);
+
+    return createPage({
+      items: users,
+      totalRecords: 100,
+      query,
+    });
   }
 
   @CanAccessBy(RoleDef.ADMIN)

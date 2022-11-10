@@ -9,7 +9,6 @@ import {
   TurnToMembersDto,
   User,
   UserManagementQuery,
-  UserManagementView,
   UserService,
 } from '../client';
 import { MyProfile } from '../../authentication';
@@ -53,7 +52,7 @@ export class UserServiceImpl implements UserService {
     });
   }
 
-  find(query: UserManagementQuery): Promise<UserManagementView> {
+  find(query: UserManagementQuery): Promise<User[]> {
     const offset = (query.page - 1) * query.size;
 
     return this.userRepository.find({
