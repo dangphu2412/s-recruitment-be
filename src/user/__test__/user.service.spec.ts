@@ -5,12 +5,12 @@ import { UserRepository } from '../internal/user.repository';
 import { UserServiceImpl } from '../internal/user.service';
 import { UserController } from '../internal/user.controller';
 import {
-  CreateUserDto,
   User,
   UserManagementQuery,
   UserManagementView,
   UserService,
   UserServiceToken,
+  CreateUserPayload,
 } from '../client';
 
 describe('UserService', () => {
@@ -185,7 +185,7 @@ describe('UserService', () => {
         updatedAt: date,
         deletedAt: date,
       };
-      const dto: CreateUserDto = {
+      const dto: CreateUserPayload = {
         username: 'username',
         password: 'password',
       };

@@ -1,12 +1,17 @@
 import { Role } from '../../authorization';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import {
-  CreateUserDto,
+  CreateUserPayload,
   EmailExistedException,
   InsertUserFailedException,
   NotFoundUserException,
-  TurnToMembersDto,
+  CreateUsersDto,
   User,
   UserManagementQuery,
   UserService,
@@ -23,6 +28,7 @@ import {
 } from '../../monthly-money';
 import uniqBy from 'lodash/uniqBy';
 import map from 'lodash/map';
+import { CreateUserType } from '../client/constants';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -62,8 +68,16 @@ export class UserServiceImpl implements UserService {
     });
   }
 
-  findByUsername(username: string): Promise<User>;
-  findByUsername(username: string, relations: string[]): Promise<User>;
+  count(query: UserManagementQuery): Promise<number> {
+    const offset = (query.page - 1) * query.size;
+
+    return this.userRepository.count({
+      skip: offset,
+      take: query.size,
+      withDeleted: true,
+    });
+  }
+
   findByUsername(username: string, relations?: string[]): Promise<User> {
     return this.userRepository.findOne({
       where: {
@@ -72,31 +86,6 @@ export class UserServiceImpl implements UserService {
       relations,
     });
   }
-
-  async create(dto: CreateUserDto | CreateUserDto[]): Promise<InsertResult> {
-    const uniqueDtos = Array.isArray(dto) ? uniqBy(dto, 'email') : [dto];
-    const emails = map(uniqueDtos, 'email');
-
-    await this.assertEmailsNotExist(emails);
-
-    const newUsers = uniqueDtos.map(this.toUser);
-
-    try {
-      return await this.userRepository.insert(newUsers);
-    } catch (error) {
-      Logger.error(error.message, error.stack, UserServiceImpl.name);
-      throw new InsertUserFailedException();
-    }
-  }
-
-  private toUser = (dto: CreateUserDto): User => {
-    return this.userRepository.create({
-      ...dto,
-      username: dto.email,
-      password: '',
-      birthday: dto.birthday ? new Date(dto.birthday) : null,
-    });
-  };
 
   async updateRolesForUser(user: User, roles: Role[]) {
     user.roles = roles;
@@ -143,22 +132,72 @@ export class UserServiceImpl implements UserService {
     return xor(uniqueEmails, existedEmails);
   }
 
-  async turnToMembers(turnToMembersDto: TurnToMembersDto): Promise<void> {
-    turnToMembersDto.memberEmails = uniq(turnToMembersDto.memberEmails);
+  async createUserUseCase(dto: CreateUsersDto): Promise<void> {
+    switch (dto.createUserType) {
+      case CreateUserType.NEWBIE:
+        await this.create(
+          dto.emails.map((email) => {
+            return {
+              email,
+            };
+          }),
+        );
+        break;
+      case CreateUserType.NEW_MEMBERS:
+        await this.turnToMembers(dto);
+        break;
+      default:
+        throw new InternalServerErrorException(
+          `Non support create user type: ${dto.createUserType}`,
+        );
+    }
+  }
+
+  async create(
+    payload: CreateUserPayload | CreateUserPayload[],
+  ): Promise<InsertResult> {
+    const uniqueDtos = Array.isArray(payload)
+      ? uniqBy(payload, 'email')
+      : [payload];
+    const emails = map(uniqueDtos, 'email');
+
+    await this.assertEmailsNotExist(emails);
+
+    const newUsers = uniqueDtos.map(this.toUser);
+
+    try {
+      return await this.userRepository.insert(newUsers);
+    } catch (error) {
+      Logger.error(error.message, error.stack, UserServiceImpl.name);
+      throw new InsertUserFailedException();
+    }
+  }
+
+  private toUser = (dto: CreateUserPayload): User => {
+    return this.userRepository.create({
+      ...dto,
+      username: dto.email,
+      password: '',
+      birthday: dto.birthday ? new Date(dto.birthday) : null,
+    });
+  };
+
+  async turnToMembers({
+    emails,
+    monthlyConfigId,
+  }: CreateUsersDto): Promise<void> {
+    const uniqueEmails = uniq(emails);
 
     const [monthlyConfig, users] = await Promise.all([
-      this.monthlyConfigService.findById(turnToMembersDto.monthlyConfigId),
+      this.monthlyConfigService.findById(monthlyConfigId),
       this.userRepository.find({
-        where: { email: In(turnToMembersDto.memberEmails) },
+        where: { email: In(uniqueEmails) },
       }),
     ]);
 
-    if (!users.length) {
+    if (!users.length || users.length !== uniqueEmails.length) {
       throw new NotFoundUserException(
-        xor(
-          turnToMembersDto.memberEmails,
-          users.map((user) => user.email),
-        ).toString(),
+        xor(uniqueEmails, map(users, 'email')).toString(),
       );
     }
 

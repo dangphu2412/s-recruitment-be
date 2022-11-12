@@ -2,15 +2,16 @@ import { User } from '../entities/user.entity';
 import { UserManagementQuery } from '../dtos/user-management-query.dto';
 import { Role } from '../../../authorization';
 import { MyProfile } from '../../../authentication';
-import { CreateUserDto } from '../dtos/create-user.dto';
 import { InsertResult } from 'typeorm';
 import { createInterfaceToken } from '../../../utils';
-import { TurnToMembersDto } from '../dtos/turn-to-members.dto';
+import { CreateUsersDto } from '../dtos/create-users.dto';
+import { CreateUserPayload } from '../types/user-service.types';
 
 export const UserServiceToken = createInterfaceToken('UserService');
 
 export interface UserService {
   find(query: UserManagementQuery): Promise<User[]>;
+  count(query: UserManagementQuery): Promise<number>;
 
   findById(id: string): Promise<User | null>;
   findById(id: string, relations: string[]): Promise<User | null>;
@@ -30,12 +31,13 @@ export interface UserService {
   /**
    * @throws {InsertUserFailedException}
    */
-  create(dto: CreateUserDto): Promise<InsertResult>;
-  create(dto: CreateUserDto[]): Promise<InsertResult>;
-  create(dto: CreateUserDto | CreateUserDto[]): Promise<InsertResult>;
+  create(dto: CreateUserPayload): Promise<InsertResult>;
+  create(dto: CreateUserPayload[]): Promise<InsertResult>;
 
   updateRolesForUser(user: User, roles: Role[]): Promise<void>;
   toggleUserIsActive(id: string): Promise<void>;
 
-  turnToMembers(turnToMembersDto: TurnToMembersDto): Promise<void>;
+  turnToMembers(turnToMembersDto: CreateUsersDto): Promise<void>;
+
+  createUserUseCase(dto: CreateUsersDto): Promise<void>;
 }
