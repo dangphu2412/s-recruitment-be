@@ -1,11 +1,8 @@
 import { User } from '../entities/user.entity';
 import { UserManagementQuery } from '../dtos/user-management-query.dto';
-import { Role } from '../../../authorization';
 import { MyProfile } from '../../../authentication';
-import { InsertResult } from 'typeorm';
 import { createInterfaceToken } from '../../../utils';
 import { CreateUsersDto } from '../dtos/create-users.dto';
-import { CreateUserPayload } from '../types/user-service.types';
 
 export const UserServiceToken = createInterfaceToken('UserService');
 
@@ -31,13 +28,9 @@ export interface UserService {
   /**
    * @throws {InsertUserFailedException}
    */
-  create(dto: CreateUserPayload): Promise<InsertResult>;
-  create(dto: CreateUserPayload[]): Promise<InsertResult>;
-
-  updateRolesForUser(user: User, roles: Role[]): Promise<void>;
-  toggleUserIsActive(id: string): Promise<void>;
-
-  turnToMembers(turnToMembersDto: CreateUsersDto): Promise<void>;
-
+  createNewbies(dto: CreateUsersDto): Promise<void>;
+  createMembers(dto: CreateUsersDto): Promise<void>;
   createUserUseCase(dto: CreateUsersDto): Promise<void>;
+
+  toggleUserIsActive(id: string): Promise<void>;
 }

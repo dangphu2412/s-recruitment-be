@@ -1,5 +1,6 @@
 import {
   ArrayNotEmpty,
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsString,
@@ -21,4 +22,7 @@ export class CreateUsersDto {
   @IsString()
   @IsNotEmpty()
   monthlyConfigId: string;
+
+  @IsBoolean()
+  isSilentCreate: boolean;
 }

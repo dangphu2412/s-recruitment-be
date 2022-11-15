@@ -1,7 +1,7 @@
 import { OptionalToDefault } from '../decorators/optional-to-default';
 import { ConfigKeys } from '../../config.registry';
 import { IsNumber } from 'class-validator';
-import { ToInt } from '../../../transformer/toInt.decorator';
+import { ToInt } from '../../../transformer';
 
 export class OffsetPagination {
   @ToInt()

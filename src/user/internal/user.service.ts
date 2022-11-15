@@ -1,4 +1,3 @@
-import { Role } from '../../authorization';
 import {
   Inject,
   Injectable,
@@ -8,16 +7,16 @@ import {
 import { UserRepository } from './user.repository';
 import {
   CreateUserPayload,
+  CreateUsersDto,
   EmailExistedException,
   InsertUserFailedException,
   NotFoundUserException,
-  CreateUsersDto,
   User,
   UserManagementQuery,
   UserService,
 } from '../client';
 import { MyProfile } from '../../authentication';
-import { In, InsertResult } from 'typeorm';
+import { In } from 'typeorm';
 import xor from 'lodash/xor';
 import uniq from 'lodash/uniq';
 import {
@@ -87,11 +86,6 @@ export class UserServiceImpl implements UserService {
     });
   }
 
-  async updateRolesForUser(user: User, roles: Role[]) {
-    user.roles = roles;
-    await this.userRepository.save(user, { reload: false });
-  }
-
   async toggleUserIsActive(id: string): Promise<void> {
     const user = await this.userRepository.findOne(id, {
       withDeleted: true,
@@ -109,8 +103,6 @@ export class UserServiceImpl implements UserService {
     await this.userRepository.restore(id);
   }
 
-  findById(id: string): Promise<User | null>;
-  findById(id: string, relations?: string[]): Promise<User | null>;
   findById(id: string, relations?: string[]): Promise<User | null> {
     return this.userRepository.findOne(id, {
       relations,
@@ -135,16 +127,10 @@ export class UserServiceImpl implements UserService {
   async createUserUseCase(dto: CreateUsersDto): Promise<void> {
     switch (dto.createUserType) {
       case CreateUserType.NEWBIE:
-        await this.create(
-          dto.emails.map((email) => {
-            return {
-              email,
-            };
-          }),
-        );
+        await this.createNewbies(dto);
         break;
       case CreateUserType.NEW_MEMBERS:
-        await this.turnToMembers(dto);
+        await this.createMembers(dto);
         break;
       default:
         throw new InternalServerErrorException(
@@ -153,12 +139,25 @@ export class UserServiceImpl implements UserService {
     }
   }
 
-  async create(
-    payload: CreateUserPayload | CreateUserPayload[],
-  ): Promise<InsertResult> {
-    const uniqueDtos = Array.isArray(payload)
-      ? uniqBy(payload, 'email')
-      : [payload];
+  async createNewbies({
+    emails,
+    isSilentCreate,
+  }: CreateUsersDto): Promise<void> {
+    const newEmails = isSilentCreate
+      ? await this.extractNewUserEmails(emails)
+      : emails;
+
+    await this.create(
+      newEmails.map((email) => {
+        return {
+          email,
+        };
+      }),
+    );
+  }
+
+  private async create(payload: CreateUserPayload[]): Promise<void> {
+    const uniqueDtos = uniqBy(payload, 'email');
     const emails = map(uniqueDtos, 'email');
 
     await this.assertEmailsNotExist(emails);
@@ -166,7 +165,7 @@ export class UserServiceImpl implements UserService {
     const newUsers = uniqueDtos.map(this.toUser);
 
     try {
-      return await this.userRepository.insert(newUsers);
+      await this.userRepository.insert(newUsers);
     } catch (error) {
       Logger.error(error.message, error.stack, UserServiceImpl.name);
       throw new InsertUserFailedException();
@@ -182,9 +181,10 @@ export class UserServiceImpl implements UserService {
     });
   };
 
-  async turnToMembers({
+  async createMembers({
     emails,
     monthlyConfigId,
+    isSilentCreate,
   }: CreateUsersDto): Promise<void> {
     const uniqueEmails = uniq(emails);
 
@@ -195,7 +195,11 @@ export class UserServiceImpl implements UserService {
       }),
     ]);
 
-    if (!users.length || users.length !== uniqueEmails.length) {
+    const toComparedEmails = isSilentCreate
+      ? map(users, 'email')
+      : uniqueEmails;
+
+    if (!users.length || users.length !== toComparedEmails.length) {
       throw new NotFoundUserException(
         xor(uniqueEmails, map(users, 'email')).toString(),
       );
