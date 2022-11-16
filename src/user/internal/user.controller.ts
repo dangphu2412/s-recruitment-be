@@ -15,16 +15,17 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser, Identified, JwtPayload } from '../../authentication';
-import { CanAccessBy, APP_RBAC } from '../../authorization';
+import { APP_RBAC, CanAccessBy } from '../../authorization';
 import {
-  ExtractNewUserQueryDto,
   CreateUsersDto,
+  ExtractNewUserQueryDto,
+  SearchUserService,
+  SearchUserServiceToken,
   UserManagementQuery,
   UserManagementView,
   UserService,
   UserServiceToken,
 } from '../client';
-import { createPage } from '../../shared/query-shape/pagination/factories/page.factory';
 
 @ApiTags('users')
 @Controller({
@@ -35,6 +36,8 @@ export class UserController {
   constructor(
     @Inject(UserServiceToken)
     private readonly userService: UserService,
+    @Inject(SearchUserServiceToken)
+    private readonly searchUserService: SearchUserService,
   ) {}
 
   @Identified
@@ -48,16 +51,7 @@ export class UserController {
   @Get('/')
   @ApiOkResponse()
   async find(@Query() query: UserManagementQuery): Promise<UserManagementView> {
-    const [users, totalRecords] = await Promise.all([
-      this.userService.find(query),
-      this.userService.count(query),
-    ]);
-
-    return createPage({
-      items: users,
-      totalRecords,
-      query,
-    });
+    return this.searchUserService.search(query);
   }
 
   @CanAccessBy(APP_RBAC.ADMIN)

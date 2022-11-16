@@ -4,5 +4,6 @@ export * from './dtos/create-users.dto';
 export * from './types/user-management-view.types';
 export * from './types/user-service.types';
 export * from './interfaces/user.service';
+export * from './interfaces/search-user.service';
 export * from './entities/user.entity';
 export * from './exceptions';

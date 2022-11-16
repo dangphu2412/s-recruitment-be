@@ -12,7 +12,6 @@ import {
   InsertUserFailedException,
   NotFoundUserException,
   User,
-  UserManagementQuery,
   UserService,
 } from '../client';
 import { MyProfile } from '../../authentication';
@@ -28,52 +27,24 @@ import {
 import uniqBy from 'lodash/uniqBy';
 import map from 'lodash/map';
 import { CreateUserType } from '../client/constants';
+import { BcryptService } from '../../shared/services/bcrypt.service';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
+  private cacheDefaultPassword: string | undefined;
+
   constructor(
     private readonly userRepository: UserRepository,
     @Inject(MonthlyMoneyConfigServiceToken)
     private readonly monthlyConfigService: MonthlyMoneyConfigService,
     @Inject(MonthlyMoneyOperationServiceToken)
     private readonly moneyOperationService: MonthlyMoneyOperationService,
+    private readonly bcryptService: BcryptService,
   ) {}
-
-  async assertEmailsNotExist(emails: string[]): Promise<void> {
-    const emailCount = await this.userRepository.count({
-      where: {
-        email: In(emails),
-      },
-    });
-
-    if (emailCount > 0) {
-      throw new EmailExistedException();
-    }
-  }
 
   async findMyProfile(id: string): Promise<MyProfile | null> {
     return this.userRepository.findOne(id, {
       select: ['id', 'username'],
-    });
-  }
-
-  find(query: UserManagementQuery): Promise<User[]> {
-    const offset = (query.page - 1) * query.size;
-
-    return this.userRepository.find({
-      skip: offset,
-      take: query.size,
-      withDeleted: true,
-    });
-  }
-
-  count(query: UserManagementQuery): Promise<number> {
-    const offset = (query.page - 1) * query.size;
-
-    return this.userRepository.count({
-      skip: offset,
-      take: query.size,
-      withDeleted: true,
     });
   }
 
@@ -119,7 +90,7 @@ export class UserServiceImpl implements UserService {
       select: ['id', 'email'],
     });
 
-    const existedEmails = users.map((user) => user.email);
+    const existedEmails = users.map(({ email }) => email);
 
     return xor(uniqueEmails, existedEmails);
   }
@@ -162,7 +133,16 @@ export class UserServiceImpl implements UserService {
 
     await this.assertEmailsNotExist(emails);
 
-    const newUsers = uniqueDtos.map(this.toUser);
+    const password = await this.getDefaultPassword();
+
+    const newUsers = uniqueDtos.map((dto: CreateUserPayload): User => {
+      return this.userRepository.create({
+        ...dto,
+        username: dto.email,
+        password,
+        birthday: dto.birthday ? new Date(dto.birthday) : null,
+      });
+    });
 
     try {
       await this.userRepository.insert(newUsers);
@@ -172,14 +152,25 @@ export class UserServiceImpl implements UserService {
     }
   }
 
-  private toUser = (dto: CreateUserPayload): User => {
-    return this.userRepository.create({
-      ...dto,
-      username: dto.email,
-      password: '',
-      birthday: dto.birthday ? new Date(dto.birthday) : null,
+  private async getDefaultPassword(): Promise<string> {
+    if (!this.cacheDefaultPassword) {
+      this.cacheDefaultPassword = await this.bcryptService.hash('Test12345@@');
+    }
+
+    return this.cacheDefaultPassword;
+  }
+
+  private async assertEmailsNotExist(emails: string[]): Promise<void> {
+    const emailCount = await this.userRepository.count({
+      where: {
+        email: In(emails),
+      },
     });
-  };
+
+    if (emailCount > 0) {
+      throw new EmailExistedException();
+    }
+  }
 
   async createMembers({
     emails,
