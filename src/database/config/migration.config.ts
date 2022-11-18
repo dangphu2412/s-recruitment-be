@@ -3,6 +3,6 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-op
 
 export default {
   ...connectionConfig,
-  migrations: ['src/database/migrations/*.ts'],
+  migrations: [`${process.cwd()}/**/database/migrations/*.js`],
   migrationsTableName: 'migrations',
 } as TypeOrmModuleOptions;

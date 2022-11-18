@@ -3,19 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModuleOptions } from '@nestjs/jwt';
 import { isBooleanString } from 'class-validator';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
-import { User } from '../../user';
-import { Role } from '../../authorization';
-import { Menu } from '../../menu';
-import { Province } from '../../location';
-import { MonthlyMoneyConfig, OperationFee } from '../../monthly-money';
+import migrationConfig from '../../database/config/migration.config';
 
 @Injectable()
 export class ModuleConfig {
   constructor(private readonly configService: ConfigService) {}
-
-  private isProduction(): boolean {
-    return this.get('NODE_ENV') === 'production';
-  }
 
   private getNumber(key: string): number {
     const value = Number(this.get(key));
@@ -67,10 +59,12 @@ export class ModuleConfig {
       password: this.getString('DB_PASSWORD'),
       port: this.getNumber('DB_PORT'),
       database: this.getString('DB_DATABASE'),
-      entities: [User, Role, Menu, Province, MonthlyMoneyConfig, OperationFee],
+      entities: migrationConfig.entities,
       synchronize: this.getBoolean('DB_SYNC'),
       logging: true,
-      migrationsRun: this.getBoolean('DB_MIGRATION_RUN'),
+      migrationsRun: true,
+      migrationsTableName: migrationConfig.migrationsTableName,
+      migrations: migrationConfig.migrations,
     };
   }
 
