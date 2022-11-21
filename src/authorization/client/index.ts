@@ -5,3 +5,4 @@ export * from './interfaces/role.service';
 export * from './types/role.types';
 export * from '../internal/constants/role-def.enum';
 export * from '../internal/decorators/can-access-by.decorator';
+export * from './exceptions';

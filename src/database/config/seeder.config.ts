@@ -5,4 +5,7 @@ export default {
   ...connectionConfig,
   migrations: [`${process.cwd()}/**/database/seeders/*.js`],
   migrationsTableName: 'seeder',
+  cli: {
+    migrationsDir: 'src/database/seeders',
+  },
 } as TypeOrmModuleOptions;

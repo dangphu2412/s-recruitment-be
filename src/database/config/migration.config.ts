@@ -5,4 +5,7 @@ export default {
   ...connectionConfig,
   migrations: [`${process.cwd()}/**/database/migrations/*.js`],
   migrationsTableName: 'migrations',
+  cli: {
+    migrationsDir: 'src/database/migrations',
+  },
 } as TypeOrmModuleOptions;

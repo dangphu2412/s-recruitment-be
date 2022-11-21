@@ -22,7 +22,4 @@ export const connectionConfig: TypeOrmModuleOptions = {
   migrationsRun: process.env.DB_MIGRATION_RUN
     ? process.env.DB_MIGRATION_RUN === 'true'
     : true,
-  cli: {
-    migrationsDir: 'src/database/migrations',
-  },
 };

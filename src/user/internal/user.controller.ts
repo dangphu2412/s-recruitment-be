@@ -26,6 +26,11 @@ import {
   UserService,
   UserServiceToken,
 } from '../client';
+import { UpdateMemberPaidDto } from '../client/dtos/update-member-paid.dto';
+import {
+  MonthlyMoneyOperationService,
+  MonthlyMoneyOperationServiceToken,
+} from '../../monthly-money';
 
 @ApiTags('users')
 @Controller({
@@ -38,6 +43,8 @@ export class UserController {
     private readonly userService: UserService,
     @Inject(SearchUserServiceToken)
     private readonly searchUserService: SearchUserService,
+    @Inject(MonthlyMoneyOperationServiceToken)
+    private readonly moneyOperationService: MonthlyMoneyOperationService,
   ) {}
 
   @Identified
@@ -75,5 +82,19 @@ export class UserController {
     @Query() extractNewUserQueryDto: ExtractNewUserQueryDto,
   ) {
     return this.userService.extractNewUserEmails(extractNewUserQueryDto.value);
+  }
+
+  @CanAccessBy(APP_RBAC.ADMIN)
+  @Patch('/:id/monthly-moneys')
+  @ApiNoContentResponse()
+  updateMemberPaid(
+    @Param('id') userId: string,
+    @Body() { newPaid, operationFeeId }: UpdateMemberPaidDto,
+  ) {
+    return this.moneyOperationService.updateNewPaid({
+      userId,
+      newPaid,
+      operationFeeId,
+    });
   }
 }
