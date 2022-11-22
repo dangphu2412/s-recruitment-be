@@ -3,8 +3,11 @@ import { createMonthlyMoneyClientCode } from './create-user-client.factory';
 
 export class ExceedLimitOperationUpdateException extends UnprocessableEntityException {
   constructor(message: string) {
-    super(createMonthlyMoneyClientCode('EXCEED_LIMIT'));
-
-    this.message = message;
+    super(
+      createMonthlyMoneyClientCode({
+        errorCode: 'EXCEED_LIMIT',
+        message: message,
+      }),
+    );
   }
 }

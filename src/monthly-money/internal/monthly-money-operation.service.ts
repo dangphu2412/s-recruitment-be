@@ -6,8 +6,8 @@ import {
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdatePaid } from '../client/types/update-paid.types';
-import { NotMemberForbiddenException } from '../../authorization';
-import { ExceedLimitOperationUpdateException } from '../client/exceptions/exceed-limit-operation-update.exception';
+import { NoOperationFeeFound } from '../../authorization';
+import { ExceedLimitOperationUpdateException } from '../client';
 
 export class MonthlyMoneyOperationServiceImpl
   implements MonthlyMoneyOperationService
@@ -29,10 +29,25 @@ export class MonthlyMoneyOperationServiceImpl
     await this.operationFeeRepository.insert(newOperationFees);
   }
 
-  async updateNewPaid({
+  async updateNewPaid(updatePaid: UpdatePaid): Promise<void> {
+    const { userId, newPaid } = updatePaid;
+
+    await this.validateUpdateUserOperationFee(updatePaid);
+
+    await this.operationFeeRepository.update(
+      {
+        userId,
+      },
+      {
+        paidMoney: newPaid,
+      },
+    );
+  }
+
+  private async validateUpdateUserOperationFee({
+    operationFeeId,
     userId,
     newPaid,
-    operationFeeId,
   }: UpdatePaid): Promise<void> {
     const operationFee = await this.operationFeeRepository.findOne({
       where: {
@@ -43,7 +58,7 @@ export class MonthlyMoneyOperationServiceImpl
     });
 
     if (!operationFee) {
-      throw new NotMemberForbiddenException();
+      throw new NoOperationFeeFound();
     }
 
     const maxPaidMoney =
@@ -60,14 +75,5 @@ export class MonthlyMoneyOperationServiceImpl
         'Exceed the min limit when update user monthly money',
       );
     }
-
-    await this.operationFeeRepository.update(
-      {
-        userId,
-      },
-      {
-        paidMoney: newPaid,
-      },
-    );
   }
 }

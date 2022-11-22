@@ -1,10 +1,10 @@
-import { IsNumber, IsString, Min } from 'class-validator';
+import { IsNumber, Min } from 'class-validator';
 
 export class UpdateMemberPaidDto {
   @IsNumber()
   @Min(0)
   newPaid: number;
 
-  @IsString()
+  @IsNumber()
   operationFeeId: string;
 }
