@@ -3,7 +3,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-op
 
 export default {
   ...connectionConfig,
-  migrations: [`${process.cwd()}/**/database/seeders/*.js`],
+  migrations: ['src/database/seeders/*.ts'],
   migrationsTableName: 'seeder',
   cli: {
     migrationsDir: 'src/database/seeders',

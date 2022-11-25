@@ -19,8 +19,6 @@ export interface UserService {
   /**
    * @throws {InsertUserFailedException}
    */
-  createNewbies(dto: CreateUsersDto): Promise<void>;
-  createMembers(dto: CreateUsersDto): Promise<void>;
   createUserUseCase(dto: CreateUsersDto): Promise<void>;
 
   toggleUserIsActive(id: string): Promise<void>;

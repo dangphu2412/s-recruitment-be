@@ -82,8 +82,8 @@ export class User {
       referencedColumnName: 'id',
     },
   })
-  roles: Role[];
+  roles?: Role[];
 
   @OneToOne(() => OperationFee, (operationFee) => operationFee.user)
-  operationFee: OperationFee;
+  operationFee?: OperationFee;
 }

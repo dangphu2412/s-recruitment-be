@@ -7,11 +7,11 @@ export type PaginationMetadata = {
 export type CreatePaginationMetadata = Omit<PaginationMetadata, 'totalPages'>;
 
 export type Page<T> = {
-  items: T;
+  items: T[];
   metadata: PaginationMetadata;
 };
 export type CreatePage<T, Q> = {
-  items: T;
+  items: T[];
   totalRecords: number;
   query: Q;
 };

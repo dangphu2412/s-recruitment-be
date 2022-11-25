@@ -31,6 +31,7 @@ import {
   MonthlyMoneyOperationService,
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
+import { Page } from '@shared/query-shape/pagination/types';
 
 @ApiTags('users')
 @Controller({
@@ -57,7 +58,9 @@ export class UserController {
   @CanAccessBy(APP_RBAC.ADMIN)
   @Get('/')
   @ApiOkResponse()
-  async find(@Query() query: UserManagementQuery): Promise<UserManagementView> {
+  async search(
+    @Query() query: UserManagementQuery,
+  ): Promise<Page<UserManagementView>> {
     return this.searchUserService.search(query);
   }
 

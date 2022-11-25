@@ -16,6 +16,9 @@ import {
 } from '../client';
 import { MyProfile } from '../../authentication';
 import { In } from 'typeorm';
+import { BcryptService } from '@shared/services';
+import uniqBy from 'lodash/uniqBy';
+import map from 'lodash/map';
 import xor from 'lodash/xor';
 import uniq from 'lodash/uniq';
 import {
@@ -24,10 +27,7 @@ import {
   MonthlyMoneyOperationService,
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
-import uniqBy from 'lodash/uniqBy';
-import map from 'lodash/map';
 import { CreateUserType } from '../client/constants';
-import { BcryptService } from '../../shared/services/bcrypt.service';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -110,7 +110,7 @@ export class UserServiceImpl implements UserService {
     }
   }
 
-  async createNewbies({
+  private async createNewbies({
     emails,
     isSilentCreate,
   }: CreateUsersDto): Promise<void> {
@@ -172,7 +172,7 @@ export class UserServiceImpl implements UserService {
     }
   }
 
-  async createMembers({
+  private async createMembers({
     emails,
     monthlyConfigId,
     isSilentCreate,
