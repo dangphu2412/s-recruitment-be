@@ -1,5 +1,8 @@
 import { User } from '../entities/user.entity';
+import { PaidStatus } from '../constants';
 
 export type UserManagementView = Omit<User, 'password' | 'roles'> & {
-  debtMonths: number;
+  paidMonths: number;
+  estimatedPaidMonths: number;
+  paidStatus: PaidStatus;
 };

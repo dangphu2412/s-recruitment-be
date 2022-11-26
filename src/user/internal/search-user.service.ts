@@ -1,22 +1,22 @@
 import {
-  UserManagementQuery,
-  UserManagementView,
   SearchUserService,
   User,
+  UserManagementQuery,
+  UserManagementView,
 } from '../client';
 import { UserRepository } from './user.repository';
 import { createPage } from '@shared/query-shape/pagination/factories';
 import { Injectable } from '@nestjs/common';
 import { differenceInMonths } from 'date-fns';
 import { Page } from '@shared/query-shape/pagination/types';
-import { alwaysTruePredicate } from '../../utils/predicate.utils';
+import { PaidStatus } from '../client/constants';
 
 @Injectable()
 export class SearchUserServiceImpl implements SearchUserService {
   constructor(private readonly userRepository: UserRepository) {}
 
   async search(query: UserManagementQuery): Promise<Page<UserManagementView>> {
-    const { page, size, search, isMemberIndebtedOnly, joinedIn } = query;
+    const { page, size, search, joinedIn } = query;
     const offset = (page - 1) * size;
 
     const searchQueryBuilder = this.userRepository
@@ -45,11 +45,7 @@ export class SearchUserServiceImpl implements SearchUserService {
 
     const [items, totalRecords] = await searchQueryBuilder.getManyAndCount();
 
-    const indebtedMemberPredicate = isMemberIndebtedOnly
-      ? this.filterIndebtedMonths
-      : alwaysTruePredicate;
-
-    const results = items.map(this.mapIndebted).filter(indebtedMemberPredicate);
+    const results = items.map(this.mapPayment);
 
     return createPage({
       query,
@@ -58,13 +54,15 @@ export class SearchUserServiceImpl implements SearchUserService {
     });
   }
 
-  private mapIndebted = (user: User): UserManagementView => {
+  private mapPayment = (user: User): UserManagementView => {
     const { operationFee } = user;
 
     if (!operationFee) {
       return {
         ...user,
-        debtMonths: null,
+        paidMonths: null,
+        paidStatus: null,
+        estimatedPaidMonths: null,
       };
     }
 
@@ -72,14 +70,13 @@ export class SearchUserServiceImpl implements SearchUserService {
       operationFee.paidMoney / operationFee.monthlyConfig.amount,
     );
     const estimatedMonths = differenceInMonths(new Date(), user.joinedAt);
+    const debtMonths = estimatedMonths - paidMonths;
 
     return {
       ...user,
-      debtMonths: estimatedMonths - paidMonths,
+      paidMonths,
+      paidStatus: debtMonths > 0 ? PaidStatus.LATE : PaidStatus.EARLY,
+      estimatedPaidMonths: estimatedMonths,
     };
-  };
-
-  private filterIndebtedMonths = ({ debtMonths }: UserManagementView) => {
-    return !!debtMonths;
   };
 }
