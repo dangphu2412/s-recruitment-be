@@ -23,8 +23,11 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "paths": {
-      "@shared/*": ["src/shared/*"]
-    },
-    "exclude": ["**/*.test.ts", "**/*.mock.ts", "**/*.json"]
-  }
+      "@shared/*": ["src/shared/*"],
+      "@modules/*": ["src/modules/*"],
+      "@authentication/*": ["src/authentication/*"],
+      "@authorization/*": ["src/authorization/*"]
+    }
+  },
+  "exclude": ["**/*.test.ts", "**/*.mock.ts", "**/*.json"]
 }
