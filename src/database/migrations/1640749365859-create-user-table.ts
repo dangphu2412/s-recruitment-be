@@ -37,11 +37,6 @@ export class CreateUserTable1640749365859 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'joined_at',
-            type: 'timestamp',
-            default: 'now()',
-          },
-          {
             name: 'birthday',
             type: 'timestamp',
             isNullable: true,

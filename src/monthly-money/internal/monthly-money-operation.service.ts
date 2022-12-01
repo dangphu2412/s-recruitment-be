@@ -1,20 +1,21 @@
 import {
   CreateMoneyFee,
+  DebtOperationFeeQuery,
+  ExceedLimitOperationUpdateException,
   MonthlyMoneyOperationService,
   OperationFee,
+  UpdatePaid,
 } from '../client';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UpdatePaid } from '../client/types/update-paid.types';
 import { NoOperationFeeFound } from '../../authorization';
-import { ExceedLimitOperationUpdateException } from '../client';
+import { MonthlyMoneyOperationRepository } from './monthly-money-operation.repository';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class MonthlyMoneyOperationServiceImpl
   implements MonthlyMoneyOperationService
 {
   constructor(
-    @InjectRepository(OperationFee)
-    private readonly operationFeeRepository: Repository<OperationFee>,
+    private readonly operationFeeRepository: MonthlyMoneyOperationRepository,
   ) {}
 
   async createOperationFee(createMoneyFee: CreateMoneyFee): Promise<void> {
@@ -75,5 +76,15 @@ export class MonthlyMoneyOperationServiceImpl
         'Exceed the min limit when update user monthly money',
       );
     }
+  }
+
+  async findDebtOperationFee({
+    offset,
+    size,
+  }: DebtOperationFeeQuery): Promise<OperationFee[]> {
+    return this.operationFeeRepository.findDebtOperationFee({
+      skip: offset,
+      take: size,
+    });
   }
 }

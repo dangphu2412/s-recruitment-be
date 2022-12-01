@@ -24,6 +24,12 @@ export class OperationFee {
   paidMoney: number;
 
   @Column({
+    name: 'joined_at',
+    default: 'now()',
+  })
+  joinedAt: Date;
+
+  @Column({
     name: 'user_id',
     nullable: false,
   })

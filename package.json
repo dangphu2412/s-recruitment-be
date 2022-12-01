@@ -41,7 +41,7 @@
     "@nestjs/passport": "^8.2.2",
     "@nestjs/platform-fastify": "8.2.0",
     "@nestjs/swagger": "^5.2.1",
-    "@nestjs/typeorm": "8.0.3",
+    "@nestjs/typeorm": "8.0.4",
     "bcryptjs": "^2.4.3",
     "cache-manager": "^4.1.0",
     "class-transformer": "^0.5.1",
@@ -61,7 +61,7 @@
     "reflect-metadata": "0.1.13",
     "rxjs": "7.2.0",
     "slugify": "^1.6.5",
-    "typeorm": "^0.2.41",
+    "typeorm": "^0.2.45",
     "typeorm-transactional-cls-hooked": "^0.1.21"
   },
   "devDependencies": {

@@ -1,22 +1,29 @@
+import map from 'lodash/map';
 import {
   SearchUserService,
-  User,
   UserManagementQuery,
   UserManagementView,
 } from '../client';
 import { UserRepository } from './user.repository';
 import { createPage } from '@shared/query-shape/pagination/factories';
-import { Injectable } from '@nestjs/common';
-import { differenceInMonths } from 'date-fns';
+import { Inject, Injectable } from '@nestjs/common';
 import { Page } from '@shared/query-shape/pagination/types';
-import { PaidStatus } from '../client/constants';
+import { MemberType } from '../client/constants';
+import {
+  MonthlyMoneyOperationService,
+  MonthlyMoneyOperationServiceToken,
+} from '../../monthly-money';
 
 @Injectable()
 export class SearchUserServiceImpl implements SearchUserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    @Inject(MonthlyMoneyOperationServiceToken)
+    private readonly operationFeeService: MonthlyMoneyOperationService,
+  ) {}
 
   async search(query: UserManagementQuery): Promise<Page<UserManagementView>> {
-    const { page, size, search, joinedIn } = query;
+    const { page, size, search, joinedIn, memberType } = query;
     const offset = (page - 1) * size;
 
     const searchQueryBuilder = this.userRepository
@@ -31,7 +38,7 @@ export class SearchUserServiceImpl implements SearchUserService {
       .andWhere('users_roles.id IS NULL');
 
     if (joinedIn) {
-      searchQueryBuilder.andWhere('users.joinedAt BETWEEN :from AND :to', {
+      searchQueryBuilder.andWhere('users.createdAt BETWEEN :from AND :to', {
         from: joinedIn.fromDate,
         to: joinedIn.toDate,
       });
@@ -43,40 +50,26 @@ export class SearchUserServiceImpl implements SearchUserService {
       });
     }
 
-    const [items, totalRecords] = await searchQueryBuilder.getManyAndCount();
+    if (memberType === MemberType.DEBTOR) {
+      const memberOperationFees =
+        await this.operationFeeService.findDebtOperationFee({
+          size,
+          offset,
+        });
 
-    const results = items.map(this.mapPayment);
+      const userIds = map(memberOperationFees, 'userId');
+
+      searchQueryBuilder.andWhere(`users.id IN (:...userIds)`, { userIds });
+      searchQueryBuilder.skip(undefined);
+      searchQueryBuilder.take(undefined);
+    }
+
+    const [items, totalRecords] = await searchQueryBuilder.getManyAndCount();
 
     return createPage({
       query,
       totalRecords,
-      items: results,
+      items,
     });
   }
-
-  private mapPayment = (user: User): UserManagementView => {
-    const { operationFee } = user;
-
-    if (!operationFee) {
-      return {
-        ...user,
-        paidMonths: null,
-        paidStatus: null,
-        estimatedPaidMonths: null,
-      };
-    }
-
-    const paidMonths = Math.ceil(
-      operationFee.paidMoney / operationFee.monthlyConfig.amount,
-    );
-    const estimatedMonths = differenceInMonths(new Date(), user.joinedAt);
-    const debtMonths = estimatedMonths - paidMonths;
-
-    return {
-      ...user,
-      paidMonths,
-      paidStatus: debtMonths > 0 ? PaidStatus.LATE : PaidStatus.EARLY,
-      estimatedPaidMonths: estimatedMonths,
-    };
-  };
 }

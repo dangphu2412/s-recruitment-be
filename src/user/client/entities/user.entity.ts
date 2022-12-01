@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Role } from '../../../authorization';
+import { Role } from '@authorization/client';
 import { Exclude } from 'class-transformer';
 import { OperationFee } from '../../../monthly-money';
 
@@ -42,12 +42,6 @@ export class User {
   })
   @Exclude({ toPlainOnly: true })
   password: string;
-
-  @Column({
-    name: 'joined_at',
-    default: 'now()',
-  })
-  joinedAt: Date;
 
   @Column({
     name: 'birthday',

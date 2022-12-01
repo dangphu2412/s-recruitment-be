@@ -26,6 +26,11 @@ export class CreateOperationFeeTable1667380184103
             isNullable: false,
           },
           {
+            name: 'joined_at',
+            type: 'timestamp',
+            default: 'now()',
+          },
+          {
             name: 'monthly_config_id',
             type: 'int',
             isNullable: false,
