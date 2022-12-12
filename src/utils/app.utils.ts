@@ -21,7 +21,6 @@ export async function logAppScaffold(app: INestApplication) {
   logger.log(
     `Application is allowing origins: ${origins === '*' ? 'ALL' : origins}`,
   );
-  logger.log(`Application is running on: ${await app.getUrl()}`);
   logger.log(`Application is running in ${env} mode`);
   logger.log(
     `Memory usage: ${memUsage} MB -` +
