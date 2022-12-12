@@ -16,7 +16,7 @@ import {
 import { fastifyHelmet } from '@fastify/helmet';
 import compression from 'fastify-compress';
 import { logAppScaffold } from './utils';
-import { registerPaginationConfig } from './shared/query-shape/pagination/config/register-pagination.config';
+import { registerPaginationConfig } from '@shared/query-shape/pagination/config/register-pagination.config';
 
 async function bootstrap() {
   initializeTransactionalContext();

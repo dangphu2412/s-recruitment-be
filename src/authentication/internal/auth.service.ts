@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { BcryptService } from '../../shared/services/bcrypt.service';
+import { BcryptService } from '@shared/services';
 import { extractJwtPayload } from './utils/jwt.utils';
 import {
   AuthService,
@@ -10,12 +10,7 @@ import {
   TokenGenerator,
   TokenGeneratorToken,
 } from '../client';
-import {
-  RoleService,
-  RoleServiceToken,
-  RoleStorage,
-  RoleStorageToken,
-} from '../../authorization';
+import { RoleStorage, RoleStorageToken } from '../../authorization';
 import { UserService, UserServiceToken } from '../../user';
 import { IncorrectUsernamePasswordException } from '../client/exceptions';
 import { InvalidTokenFormatException } from '../client/exceptions/invalid-token-format.exception';
@@ -26,8 +21,6 @@ export class AuthServiceImpl implements AuthService {
   constructor(
     @Inject(UserServiceToken)
     private readonly userService: UserService,
-    @Inject(RoleServiceToken)
-    private readonly roleService: RoleService,
     @Inject(RoleStorageToken)
     private readonly roleStorage: RoleStorage,
     @Inject(TokenGeneratorToken)

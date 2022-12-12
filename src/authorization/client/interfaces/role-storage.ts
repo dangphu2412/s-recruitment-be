@@ -1,4 +1,4 @@
-import { Role } from '../entities/role.entity';
+import { Role } from '@authorization/client';
 import { RoleMapByActiveState } from '../types/role.types';
 import { createInterfaceToken } from '../../../utils';
 

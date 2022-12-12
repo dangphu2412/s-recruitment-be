@@ -11,10 +11,9 @@ export function extractOrigins(rawConfigString: string | undefined) {
   return EnvLoaderUtils.loadMany(rawConfigString);
 }
 
-export function logAppScaffold(app: INestApplication) {
+export async function logAppScaffold(app: INestApplication) {
   const logger: Logger = new Logger('AppBootstrap');
   const configService: ConfigService = app.get(ConfigService);
-  const port = configService.get('PORT', 3000);
   const origins = extractOrigins(configService.get('CORS_ORIGINS'));
   const env = configService.get('NODE_ENV');
   const memUsage = Math.floor(process.memoryUsage().heapUsed / 1024 / 1024);
@@ -22,7 +21,7 @@ export function logAppScaffold(app: INestApplication) {
   logger.log(
     `Application is allowing origins: ${origins === '*' ? 'ALL' : origins}`,
   );
-  logger.log(`Application is running on port ${port}`);
+  logger.log(`Application is running on: ${await app.getUrl()}`);
   logger.log(`Application is running in ${env} mode`);
   logger.log(
     `Memory usage: ${memUsage} MB -` +

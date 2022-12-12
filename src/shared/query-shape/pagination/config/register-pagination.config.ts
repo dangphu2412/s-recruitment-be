@@ -14,23 +14,24 @@ export function registerPaginationConfig(
 export function registerPaginationConfig(
   config?: RegisterPaginationConfig,
 ): void {
-  const logger = new Logger(registerPaginationConfig.name);
-
   ConfigRegistry.set(ConfigKeys.MAX_SIZE, config?.maxSize ?? 50);
   ConfigRegistry.set(ConfigKeys.DEFAULT_SIZE, config?.defaultSize ?? 10);
   ConfigRegistry.set(ConfigKeys.DEFAULT_PAGE, config?.defaultPage ?? 1);
 
-  logger.log(
+  Logger.log(
     `Max size for pagination will be: ${ConfigRegistry.get(
       ConfigKeys.MAX_SIZE,
     )}`,
+    registerPaginationConfig.name,
   );
-  logger.log(
+  Logger.log(
     `Default pagination size will be: ${ConfigRegistry.get(
       ConfigKeys.DEFAULT_SIZE,
     )}`,
+    registerPaginationConfig.name,
   );
-  logger.log(
+  Logger.log(
     `Default page will be: ${ConfigRegistry.get(ConfigKeys.DEFAULT_PAGE)}`,
+    registerPaginationConfig.name,
   );
 }

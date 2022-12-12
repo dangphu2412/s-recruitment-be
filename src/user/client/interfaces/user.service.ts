@@ -1,5 +1,5 @@
+import { MyProfile } from '@authentication/client';
 import { User } from '../entities/user.entity';
-import { MyProfile } from '../../../authentication';
 import { createInterfaceToken } from '../../../utils';
 import { CreateUsersDto } from '../dtos/create-users.dto';
 

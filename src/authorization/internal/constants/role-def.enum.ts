@@ -1,4 +1,5 @@
 export enum APP_RBAC {
   ADMIN = 'ADMIN',
-  VISITOR = 'VISITOR',
+  MEMBER = 'MEMBER',
+  NEWBIE = 'NEWBIE',
 }

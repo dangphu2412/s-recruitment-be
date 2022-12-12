@@ -59,6 +59,14 @@ export class SearchUserServiceImpl implements SearchUserService {
 
       const userIds = map(memberOperationFees, 'userId');
 
+      if (!userIds.length) {
+        return createPage({
+          query,
+          totalRecords: 0,
+          items: [],
+        });
+      }
+
       searchQueryBuilder.andWhere(`users.id IN (:...userIds)`, { userIds });
       searchQueryBuilder.skip(undefined);
       searchQueryBuilder.take(undefined);

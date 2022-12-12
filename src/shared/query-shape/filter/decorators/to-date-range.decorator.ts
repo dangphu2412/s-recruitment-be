@@ -1,6 +1,5 @@
 import { Transform, TransformFnParams } from 'class-transformer';
 import { isString } from 'class-validator';
-import { parse } from 'qs';
 import isNil from 'lodash.isempty';
 import { DateRange } from '../entities/date-range.query';
 
@@ -10,7 +9,7 @@ export function ToDateRange() {
       return undefined;
     }
 
-    const { fromDate, toDate } = parse(params.value);
+    const { fromDate, toDate } = JSON.parse(params.value);
 
     const dateRange = new DateRange();
 

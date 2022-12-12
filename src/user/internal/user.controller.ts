@@ -55,7 +55,7 @@ export class UserController {
     return this.userService.findMyProfile(user.sub);
   }
 
-  // @CanAccessBy(APP_RBAC.ADMIN)
+  @CanAccessBy(APP_RBAC.ADMIN)
   @Get('/')
   @ApiOkResponse()
   async search(
