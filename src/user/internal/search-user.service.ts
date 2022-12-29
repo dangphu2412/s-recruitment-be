@@ -2,17 +2,18 @@ import map from 'lodash/map';
 import {
   SearchUserService,
   UserManagementQuery,
+  UserManagementQueryDto,
   UserManagementView,
 } from '../client';
 import { UserRepository } from './user.repository';
-import { createPage } from '@shared/query-shape/pagination/factories';
 import { Inject, Injectable } from '@nestjs/common';
-import { Page } from '@shared/query-shape/pagination/types';
+import { Page } from '@shared/query-shape/pagination/entities';
 import { MemberType } from '../client/constants';
 import {
   MonthlyMoneyOperationService,
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
+import { PageRequest } from '@shared/query-shape/pagination/entities/page-request';
 
 @Injectable()
 export class SearchUserServiceImpl implements SearchUserService {
@@ -22,33 +23,11 @@ export class SearchUserServiceImpl implements SearchUserService {
     private readonly operationFeeService: MonthlyMoneyOperationService,
   ) {}
 
-  async search(query: UserManagementQuery): Promise<Page<UserManagementView>> {
-    const { page, size, search, joinedIn, memberType } = query;
-    const offset = (page - 1) * size;
-
-    const searchQueryBuilder = this.userRepository
-      .createQueryBuilder('users')
-      .select()
-      .skip(offset)
-      .take(size)
-      .withDeleted()
-      .leftJoinAndSelect('users.roles', 'roles')
-      .leftJoinAndSelect('users.operationFee', 'operationFee')
-      .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig')
-      .andWhere('users_roles.id IS NULL');
-
-    if (joinedIn) {
-      searchQueryBuilder.andWhere('users.createdAt BETWEEN :from AND :to', {
-        from: joinedIn.fromDate,
-        to: joinedIn.toDate,
-      });
-    }
-
-    if (search) {
-      searchQueryBuilder.andWhere('users.email LIKE :email', {
-        email: `%${search}%`,
-      });
-    }
+  async search(
+    query: UserManagementQueryDto,
+  ): Promise<Page<UserManagementView>> {
+    const { search, joinedIn, memberType } = query;
+    const { offset, size } = PageRequest.of(query);
 
     if (memberType === MemberType.DEBTOR) {
       const memberOperationFees =
@@ -60,21 +39,36 @@ export class SearchUserServiceImpl implements SearchUserService {
       const userIds = map(memberOperationFees, 'userId');
 
       if (!userIds.length) {
-        return createPage({
+        return Page.of({
           query,
           totalRecords: 0,
           items: [],
         });
       }
 
-      searchQueryBuilder.andWhere(`users.id IN (:...userIds)`, { userIds });
-      searchQueryBuilder.skip(undefined);
-      searchQueryBuilder.take(undefined);
+      const [items, totalRecords] =
+        await this.userRepository.findDebtorForManagement({
+          joinedIn,
+          userIds,
+          search,
+          memberType,
+        });
+
+      return Page.of({
+        query,
+        totalRecords,
+        items,
+      });
     }
 
-    const [items, totalRecords] = await searchQueryBuilder.getManyAndCount();
+    const [items, totalRecords] =
+      await this.userRepository.findUsersForManagement({
+        ...query,
+        offset,
+        size,
+      } as UserManagementQuery);
 
-    return createPage({
+    return Page.of({
       query,
       totalRecords,
       items,

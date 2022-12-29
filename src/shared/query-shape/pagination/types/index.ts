@@ -15,3 +15,9 @@ export type CreatePage<T, Q> = {
   totalRecords: number;
   query: Q;
 };
+
+export type PageRequest = {
+  page: number;
+  size: number;
+  offset: number;
+};

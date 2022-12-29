@@ -6,7 +6,7 @@ import { UserServiceImpl } from '../internal/user.service';
 import { UserController } from '../internal/user.controller';
 import {
   User,
-  UserManagementQuery,
+  UserManagementQueryDto,
   UserManagementView,
   UserService,
   UserServiceToken,
@@ -77,7 +77,7 @@ describe('UserService', () => {
           deletedAt: date,
         },
       ];
-      const query: UserManagementQuery = {
+      const query: UserManagementQueryDto = {
         size: 10,
         page: 1,
         activeDateRange: {
@@ -95,7 +95,7 @@ describe('UserService', () => {
     });
 
     it('should return empty data when no records found', async () => {
-      const query: UserManagementQuery = {
+      const query: UserManagementQueryDto = {
         size: 10,
         page: 1,
         activeDateRange: {

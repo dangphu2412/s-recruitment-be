@@ -1,16 +1,22 @@
-import { CreatePage, Page } from '../types';
-import { createPaginationMetadata } from './pagination-metadata.factory';
+import { CreatePage, Page, PaginationMetadata } from '../types';
 import { OffsetPagination } from '../entities/offset-pagination.request';
 
-export function createPage<T, Q extends OffsetPagination>(
-  createPageReq: CreatePage<T, Q>,
-): Page<T> {
+export function createPage<T, Q extends OffsetPagination>({
+  query,
+  items,
+  totalRecords,
+}: CreatePage<T, Q>): Page<T> {
+  const totalPages = Math.ceil(totalRecords / query.size);
+
+  const metadata: PaginationMetadata = {
+    size: query.size,
+    page: query.page,
+    totalRecords,
+    totalPages,
+  };
+
   return {
-    items: createPageReq.items,
-    metadata: createPaginationMetadata({
-      size: createPageReq.query.size,
-      page: createPageReq.query.page,
-      totalRecords: createPageReq.totalRecords,
-    }),
+    items,
+    metadata,
   };
 }

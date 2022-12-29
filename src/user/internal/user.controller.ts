@@ -21,7 +21,7 @@ import {
   ExtractNewUserQueryDto,
   SearchUserService,
   SearchUserServiceToken,
-  UserManagementQuery,
+  UserManagementQueryDto,
   UserManagementView,
   UserService,
   UserServiceToken,
@@ -59,7 +59,7 @@ export class UserController {
   @Get('/')
   @ApiOkResponse()
   async search(
-    @Query() query: UserManagementQuery,
+    @Query() query: UserManagementQueryDto,
   ): Promise<Page<UserManagementView>> {
     return this.searchUserService.search(query);
   }
