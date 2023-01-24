@@ -20,6 +20,7 @@ export class SeedUsers1657339686264 implements MigrationInterface {
     );
     const password = await bcryptService.hash('test123');
     const user = new User();
+    user.fullName = 'Phu Dep Trai';
     user.email = 'test@gmail.com';
     user.username = 'test';
     user.password = password;

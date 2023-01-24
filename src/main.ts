@@ -17,6 +17,7 @@ import { fastifyHelmet } from '@fastify/helmet';
 import compression from 'fastify-compress';
 import { logAppScaffold } from './utils';
 import { registerPaginationConfig } from '@shared/query-shape/pagination/config/register-pagination.config';
+import { contentParser } from 'fastify-multer';
 
 async function bootstrap() {
   initializeTransactionalContext();
@@ -48,6 +49,7 @@ async function bootstrap() {
     },
   });
   await app.register(compression, { encodings: ['gzip', 'deflate'] });
+  await app.register(contentParser);
 
   app.enableCors();
   app.useGlobalPipes(

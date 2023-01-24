@@ -7,7 +7,7 @@ export class UserRepository extends Repository<User> {
     offset,
     size,
     joinedIn,
-    search,
+    search = '',
   }: UserManagementQuery) {
     return this.createQueryBuilder('users')
       .select()
@@ -30,7 +30,7 @@ export class UserRepository extends Repository<User> {
 
   findDebtorForManagement({
     joinedIn,
-    search,
+    search = '',
     userIds,
   }: DebtorManagementQuery) {
     return this.createQueryBuilder('users')
@@ -49,5 +49,13 @@ export class UserRepository extends Repository<User> {
       })
       .andWhere(`users.id IN (:...userIds)`, { userIds })
       .getManyAndCount();
+  }
+
+  insertIgnoreDuplicated(users: User[]) {
+    return this.createQueryBuilder()
+      .insert()
+      .values(users)
+      .orIgnore()
+      .execute();
   }
 }

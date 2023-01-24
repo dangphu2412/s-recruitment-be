@@ -2,6 +2,7 @@ import { MyProfile } from '@authentication/client';
 import { User } from '../entities/user.entity';
 import { createInterfaceToken } from '../../../utils';
 import { CreateUsersDto } from '../dtos/create-users.dto';
+import { FileCreateUsersDto } from '../dtos/file-create-users.dto';
 
 export const UserServiceToken = createInterfaceToken('UserService');
 
@@ -20,6 +21,7 @@ export interface UserService {
    * @throws {InsertUserFailedException}
    */
   createUserUseCase(dto: CreateUsersDto): Promise<void>;
+  createUserUseCase(dto: FileCreateUsersDto): Promise<void>;
 
   toggleUserIsActive(id: string): Promise<void>;
 }

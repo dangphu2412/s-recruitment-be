@@ -9,7 +9,9 @@ import {
   CreateUserPayload,
   CreateUsersDto,
   EmailExistedException,
+  ExcelUserCreationPayload,
   InsertUserFailedException,
+  NotFoundSheetNameException,
   NotFoundUserException,
   User,
   UserService,
@@ -17,8 +19,7 @@ import {
 import { MyProfile } from '../../authentication';
 import { In } from 'typeorm';
 import { BcryptService } from '@shared/services';
-import uniqBy from 'lodash/uniqBy';
-import map from 'lodash/map';
+import { read, utils } from 'xlsx';
 import xor from 'lodash/xor';
 import uniq from 'lodash/uniq';
 import {
@@ -28,6 +29,7 @@ import {
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
 import { CreateUserType } from '../client/constants';
+import { FileCreateUsersDto } from '../client/dtos/file-create-users.dto';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -95,13 +97,20 @@ export class UserServiceImpl implements UserService {
     return xor(uniqueEmails, existedEmails);
   }
 
-  async createUserUseCase(dto: CreateUsersDto): Promise<void> {
+  createUserUseCase(dto: FileCreateUsersDto): Promise<void>;
+  createUserUseCase(dto: CreateUsersDto): Promise<void>;
+  async createUserUseCase(
+    dto: CreateUsersDto | FileCreateUsersDto,
+  ): Promise<void> {
     switch (dto.createUserType) {
       case CreateUserType.NEWBIE:
-        await this.createNewbies(dto);
+        await this.create(dto as CreateUsersDto);
         break;
       case CreateUserType.NEW_MEMBERS:
-        await this.createMembers(dto);
+        await this.createMember(dto as CreateUsersDto);
+        break;
+      case CreateUserType.EXCEL:
+        await this.createUsersByFile(dto as FileCreateUsersDto);
         break;
       default:
         throw new InternalServerErrorException(
@@ -110,42 +119,29 @@ export class UserServiceImpl implements UserService {
     }
   }
 
-  private async createNewbies({
-    emails,
-    isSilentCreate,
-  }: CreateUsersDto): Promise<void> {
-    const newEmails = isSilentCreate
-      ? await this.extractNewUserEmails(emails)
-      : emails;
+  private async create(payload: CreateUserPayload): Promise<void> {
+    const isEmailDuplicated =
+      (await this.userRepository.count({
+        where: {
+          email: payload.email,
+        },
+      })) > 0;
 
-    await this.create(
-      newEmails.map((email) => {
-        return {
-          email,
-        };
-      }),
-    );
-  }
-
-  private async create(payload: CreateUserPayload[]): Promise<void> {
-    const uniqueDtos = uniqBy(payload, 'email');
-    const emails = map(uniqueDtos, 'email');
-
-    await this.assertEmailsNotExist(emails);
+    if (isEmailDuplicated) {
+      throw new EmailExistedException();
+    }
 
     const password = await this.getDefaultPassword();
 
-    const newUsers = uniqueDtos.map((dto: CreateUserPayload): User => {
-      return this.userRepository.create({
-        ...dto,
-        username: dto.email,
-        password,
-        birthday: dto.birthday ? new Date(dto.birthday) : null,
-      });
+    const newUser = this.userRepository.create({
+      ...payload,
+      username: payload.email,
+      password,
+      birthday: payload.birthday ? new Date(payload.birthday) : null,
     });
 
     try {
-      await this.userRepository.insert(newUsers);
+      await this.userRepository.insert(newUser);
     } catch (error) {
       Logger.error(error.message, error.stack, UserServiceImpl.name);
       throw new InsertUserFailedException();
@@ -160,45 +156,66 @@ export class UserServiceImpl implements UserService {
     return this.cacheDefaultPassword;
   }
 
-  private async assertEmailsNotExist(emails: string[]): Promise<void> {
-    const emailCount = await this.userRepository.count({
-      where: {
-        email: In(emails),
-      },
-    });
-
-    if (emailCount > 0) {
-      throw new EmailExistedException();
-    }
-  }
-
-  private async createMembers({
-    emails,
+  private async createMember({
+    email,
     monthlyConfigId,
-    isSilentCreate,
   }: CreateUsersDto): Promise<void> {
-    const uniqueEmails = uniq(emails);
-
-    const [monthlyConfig, users] = await Promise.all([
+    const [monthlyConfig, user] = await Promise.all([
       this.monthlyConfigService.findById(monthlyConfigId),
-      this.userRepository.find({
-        where: { email: In(uniqueEmails) },
+      this.userRepository.findOne({
+        where: { email },
       }),
     ]);
 
-    const toComparedEmails = isSilentCreate
-      ? map(users, 'email')
-      : uniqueEmails;
-
-    if (!users.length || users.length !== toComparedEmails.length) {
-      throw new NotFoundUserException(
-        xor(uniqueEmails, map(users, 'email')).toString(),
-      );
+    if (user) {
+      throw new NotFoundUserException(email);
     }
 
     await this.moneyOperationService.createOperationFee({
       monthlyConfigId: monthlyConfig.id,
-      userIds: map(users, 'id'),
+      userIds: [user.id],
     });
   }
+
+  private async createUsersByFile(dto: FileCreateUsersDto) {
+    const workbook = read(dto.file.buffer, { type: 'buffer' });
+
+    const sheetName = workbook.SheetNames.find(
+      (sheetName) => sheetName === dto.processSheetName,
+    );
+
+    if (!sheetName) {
+      throw new NotFoundSheetNameException();
+    }
+
+    const sheet = workbook.Sheets[sheetName];
+
+    const fileCreateUserPayloads =
+      utils.sheet_to_json<ExcelUserCreationPayload>(sheet);
+    const isUpgradingToMember = dto.monthlyConfigId;
+
+    if (isUpgradingToMember) {
+      // Do stuff
+      return;
+    }
+    const password = await this.getDefaultPassword();
+    const users = fileCreateUserPayloads.map(this.mapExcelFileToUser(password));
+
+    await this.userRepository.insertIgnoreDuplicated(users);
+  }
+
+  private mapExcelFileToUser =
+    (password: string) =>
+    (payload: ExcelUserCreationPayload): User => {
+      const user = this.userRepository.create();
+
+      user.username = payload.Email;
+      user.email = payload.Email;
+      user.fullName = payload['Họ và Tên:'];
+      user.birthday = new Date(payload['Ngày sinh']); // There are more complex case
+      user.phoneNumber = `${payload['SĐT']}`;
+      user.password = password;
+
+      return user;
+    };
 }

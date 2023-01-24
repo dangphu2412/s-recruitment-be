@@ -36,6 +36,12 @@ export class User {
   email: string;
 
   @Column({
+    name: 'full_name',
+    nullable: true,
+  })
+  fullName: string;
+
+  @Column({
     name: 'password',
     type: 'varchar',
     nullable: true,
@@ -48,6 +54,12 @@ export class User {
     nullable: true,
   })
   birthday?: Date;
+
+  @Column({
+    name: 'phone_number',
+    nullable: true,
+  })
+  phoneNumber: string;
 
   @CreateDateColumn({
     name: 'created_at',

@@ -48,12 +48,14 @@
     "class-validator": "^0.13.2",
     "date-fns": "^2.29.3",
     "fastify-compress": "^4.1.0",
+    "fastify-multer": "^2.0.3",
     "fastify-swagger": "^5.2.0",
     "lodash.isempty": "^4.4.0",
     "lodash.map": "^4.6.0",
     "lodash.uniq": "^4.5.0",
     "lodash.uniqby": "^4.7.0",
     "lodash.xor": "^4.5.0",
+    "multer": "^1.4.5-lts.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "pg": "8.7.1",
@@ -62,7 +64,8 @@
     "rxjs": "7.2.0",
     "slugify": "^1.6.5",
     "typeorm": "^0.2.45",
-    "typeorm-transactional-cls-hooked": "^0.1.21"
+    "typeorm-transactional-cls-hooked": "^0.1.21",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@commitlint/cli": "16.2.3",
@@ -77,6 +80,7 @@
     "@types/jest": "27.4.1",
     "@types/lodash.isempty": "^4.4.7",
     "@types/ms": "^0.7.31",
+    "@types/multer": "^1.4.7",
     "@types/node": "^16.0.0",
     "@types/passport-jwt": "^3.0.6",
     "@types/supertest": "^2.0.11",

@@ -4,7 +4,6 @@ import { JwtModuleOptions } from '@nestjs/jwt';
 import { isBooleanString } from 'class-validator';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
 import migrationConfig from '../../database/config/migration.config';
-import seederConfig from '../../database/config/seeder.config';
 
 @Injectable()
 export class ModuleConfig {
@@ -66,23 +65,6 @@ export class ModuleConfig {
       migrationsRun: true,
       migrationsTableName: migrationConfig.migrationsTableName,
       migrations: migrationConfig.migrations,
-    };
-  }
-
-  getSeederConfig(): TypeOrmModuleOptions {
-    return {
-      type: 'postgres',
-      host: this.getString('DB_HOST'),
-      username: this.getString('DB_USERNAME'),
-      password: this.getString('DB_PASSWORD'),
-      port: this.getNumber('DB_PORT'),
-      database: this.getString('DB_DATABASE'),
-      entities: migrationConfig.entities,
-      synchronize: this.getBoolean('DB_SYNC'),
-      logging: true,
-      migrationsRun: true,
-      migrationsTableName: seederConfig.migrationsTableName,
-      migrations: seederConfig.migrations,
     };
   }
 

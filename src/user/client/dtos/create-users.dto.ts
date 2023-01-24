@@ -1,8 +1,8 @@
 import {
-  ArrayNotEmpty,
-  IsBoolean,
+  IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   ValidateIf,
 } from 'class-validator';
@@ -12,17 +12,19 @@ export class CreateUsersDto {
   @IsEnum(CreateUserType)
   createUserType: CreateUserType;
 
-  @IsString({
-    each: true,
-  })
-  @ArrayNotEmpty()
-  emails: string[];
+  @IsString()
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  fullName: string;
+
+  @IsOptional()
+  @IsString()
+  birthday: string;
 
   @ValidateIf((dto) => dto.createUserType === CreateUserType.NEW_MEMBERS)
   @IsString()
   @IsNotEmpty()
   monthlyConfigId: string;
-
-  @IsBoolean()
-  isSilentCreate: boolean;
 }

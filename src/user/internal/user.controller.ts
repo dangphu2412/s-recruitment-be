@@ -7,8 +7,11 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
+  ApiConsumes,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
@@ -32,6 +35,8 @@ import {
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
 import { Page } from '@shared/query-shape/pagination/types';
+import { FileInterceptor } from '../../core/internal';
+import { FileCreateUsersDto } from '../client/dtos/file-create-users.dto';
 
 @ApiTags('users')
 @Controller({
@@ -99,5 +104,18 @@ export class UserController {
       newPaid,
       operationFeeId,
     });
+  }
+
+  @CanAccessBy(APP_RBAC.ADMIN)
+  @Post('/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiNoContentResponse()
+  createUsersByFile(
+    @Body() dto: FileCreateUsersDto,
+    @UploadedFile()
+    file: Express.Multer.File,
+  ) {
+    return this.userService.createUserUseCase({ ...dto, file });
   }
 }
