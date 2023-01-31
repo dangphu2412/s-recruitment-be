@@ -24,5 +24,5 @@ export class Permission {
   description: string;
 
   @ManyToMany(() => Role, (role) => role.permissions)
-  roles: Role[];
+  roles?: Role[];
 }
