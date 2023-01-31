@@ -7,7 +7,7 @@ import { ModuleConfig } from '@shared/services/module-config';
     TypeOrmModule.forRootAsync({
       inject: [ModuleConfig],
       useFactory: (moduleConfigService: ModuleConfig) =>
-        moduleConfigService.getTypeormConfig(),
+        moduleConfigService.getPostgresConfig(),
     }),
   ],
 })

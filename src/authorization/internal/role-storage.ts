@@ -15,7 +15,7 @@ export class RoleStorageImpl implements RoleStorage {
 
   private static toRoleKeys(roles: Role[]): RoleMapByActiveState {
     return roles.reduce((roles: Record<string, boolean>, currentRole) => {
-      roles[currentRole.key] = true;
+      roles[currentRole.name] = true;
       return roles;
     }, {});
   }

@@ -1,14 +1,12 @@
 import { MigrationInterface, QueryRunner, Table, TableUnique } from 'typeorm';
 
-export class CreateRoleAndPermission1650749408883
-  implements MigrationInterface
-{
-  private UNIQUE_NAME_KEY = 'UQ_roles_name_key';
+export class CreatePermissionTable1675180023605 implements MigrationInterface {
+  private UNIQUE_NAME_KEY = 'UQ_permissions_name_key';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'roles',
+        name: 'permissions',
         columns: [
           {
             name: 'id',
@@ -27,20 +25,11 @@ export class CreateRoleAndPermission1650749408883
             type: 'varchar',
             isNullable: true,
           },
-          {
-            name: 'updated_at',
-            type: 'timestamp',
-            default: 'now()',
-          },
-          {
-            name: 'update_by_user_id',
-            type: 'uuid',
-          },
         ],
       }),
     );
 
-    await queryRunner.createUniqueConstraints('roles', [
+    await queryRunner.createUniqueConstraints('permissions', [
       new TableUnique({
         name: this.UNIQUE_NAME_KEY,
         columnNames: ['name'],
@@ -49,13 +38,13 @@ export class CreateRoleAndPermission1650749408883
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropUniqueConstraints('roles', [
+    await queryRunner.dropUniqueConstraints('permissions', [
       new TableUnique({
         name: this.UNIQUE_NAME_KEY,
         columnNames: ['name'],
       }),
     ]);
 
-    await queryRunner.dropTable('roles');
+    await queryRunner.dropTable('permissions');
   }
 }

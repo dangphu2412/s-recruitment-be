@@ -51,7 +51,7 @@ export class ModuleConfig {
     };
   }
 
-  getTypeormConfig(): TypeOrmModuleOptions {
+  getPostgresConfig(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
       host: this.getString('DB_HOST'),
