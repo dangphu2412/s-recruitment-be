@@ -8,7 +8,7 @@ export const StrategiesKeyById: Record<string, AuthorizationStrategy> = {};
  * @param strategy the authorization strategy use to authorize
  * and can interact with nestjs module out of the box
  */
-export function useAuthorizationStrategy(
+export function registerStrategy(
   identify: string,
   strategy: AuthorizationStrategy,
 ) {

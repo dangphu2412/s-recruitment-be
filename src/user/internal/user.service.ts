@@ -17,11 +17,8 @@ import {
   UserService,
 } from '../client';
 import { MyProfile } from '../../authentication';
-import { In } from 'typeorm';
 import { BcryptService } from '@shared/services';
 import { read, utils } from 'xlsx';
-import xor from 'lodash/xor';
-import uniq from 'lodash/uniq';
 import {
   MonthlyMoneyConfigService,
   MonthlyMoneyConfigServiceToken,
@@ -80,21 +77,6 @@ export class UserServiceImpl implements UserService {
     return this.userRepository.findOne(id, {
       relations,
     });
-  }
-
-  async extractNewUserEmails(emails: string[]): Promise<string[]> {
-    const uniqueEmails = uniq(emails);
-
-    const users = await this.userRepository.find({
-      where: {
-        email: In(uniqueEmails),
-      },
-      select: ['id', 'email'],
-    });
-
-    const existedEmails = users.map(({ email }) => email);
-
-    return xor(uniqueEmails, existedEmails);
   }
 
   createUserUseCase(dto: FileCreateUsersDto): Promise<void>;

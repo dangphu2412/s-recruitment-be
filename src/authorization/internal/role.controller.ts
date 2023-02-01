@@ -1,10 +1,10 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
+  AccessRights,
   CanAccessBy,
   RoleService,
   RoleServiceToken,
-  SystemRoles,
 } from '@authorization/client';
 
 @ApiTags('roles')
@@ -18,7 +18,7 @@ export class RoleController {
     private readonly roleService: RoleService,
   ) {}
 
-  @CanAccessBy(SystemRoles.CHAIRMAN)
+  @CanAccessBy(AccessRights.VIEW_ACCESS_RIGHTS)
   @Get()
   getRoles() {
     return this.roleService.findAccessControlList();

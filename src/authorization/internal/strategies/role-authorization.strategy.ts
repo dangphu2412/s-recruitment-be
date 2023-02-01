@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  RoleStorage,
+  AccessRightStorage,
   RoleStorageToken,
   AuthorizationStrategy,
 } from '../../client';
-import { JwtPayload } from '../../../authentication';
-import { useAuthorizationStrategy } from './authorization-strategy.register';
-import { LogoutRequiredException } from '../../../authentication/client/exceptions/logout-required.exception';
+import { JwtPayload } from '@authentication/client';
+import { LogoutRequiredException } from '@authentication/client/exceptions/logout-required.exception';
+import { registerStrategy } from './authorization-strategy.register';
 
 @Injectable()
 export class RoleAuthorizationStrategy
@@ -14,21 +14,21 @@ export class RoleAuthorizationStrategy
 {
   constructor(
     @Inject(RoleStorageToken)
-    private readonly roleStorage: RoleStorage,
+    private readonly roleStorage: AccessRightStorage,
   ) {
-    useAuthorizationStrategy(RoleAuthorizationStrategy.name, this);
+    registerStrategy(RoleAuthorizationStrategy.name, this);
   }
 
   async canAccess(
     { sub }: JwtPayload,
-    requiredRoles: string[],
+    requiredRights: string[],
   ): Promise<boolean> {
-    const userRoles = await this.roleStorage.get(sub);
+    const accessRights = await this.roleStorage.get(sub);
 
-    if (!userRoles) {
+    if (!accessRights) {
       throw new LogoutRequiredException();
     }
 
-    return requiredRoles.some((role) => userRoles[role]);
+    return requiredRights.some((role) => accessRights[role]);
   }
 }

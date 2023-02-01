@@ -1,23 +1,16 @@
-import { Role, RoleMapByActiveState, RoleStorage } from '../client';
+import { AccessRightStorage } from '../client';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import type { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
 import ms from 'ms';
 
 @Injectable()
-export class RoleStorageImpl implements RoleStorage {
-  private static readonly ROLE_CACHE_KEY = 'RK';
+export class AccessRightStorageImpl implements AccessRightStorage {
+  private static readonly CACHE_KEY = 'RK';
   private readonly ttl: number;
 
   private static generateCacheKey(userId: string): string {
-    return `${RoleStorageImpl.ROLE_CACHE_KEY}-${userId}`;
-  }
-
-  private static toRoleKeys(roles: Role[]): RoleMapByActiveState {
-    return roles.reduce((roles: Record<string, boolean>, currentRole) => {
-      roles[currentRole.name] = true;
-      return roles;
-    }, {});
+    return `${AccessRightStorageImpl.CACHE_KEY}-${userId}`;
   }
 
   constructor(
@@ -34,19 +27,21 @@ export class RoleStorageImpl implements RoleStorage {
 
   get(userId: string): Promise<Record<string, boolean> | undefined> {
     return this.cacheManager.get<Record<string, boolean>>(
-      RoleStorageImpl.generateCacheKey(userId),
+      AccessRightStorageImpl.generateCacheKey(userId),
     );
   }
 
-  async set(userId: string, roles: Role[]): Promise<void> {
+  async set(userId: string, accessRights: string[]): Promise<void> {
     await this.cacheManager.set(
-      RoleStorageImpl.generateCacheKey(userId),
-      RoleStorageImpl.toRoleKeys(roles),
+      AccessRightStorageImpl.generateCacheKey(userId),
+      accessRights,
       this.ttl,
     );
   }
 
   async clean(userId: string): Promise<void> {
-    await this.cacheManager.del(RoleStorageImpl.generateCacheKey(userId));
+    await this.cacheManager.del(
+      AccessRightStorageImpl.generateCacheKey(userId),
+    );
   }
 }

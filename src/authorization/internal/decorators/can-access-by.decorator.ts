@@ -1,13 +1,13 @@
 import { applyDecorators, SetMetadata, UseGuards } from '@nestjs/common';
-import { RoleAuthorizationGuard } from '../guards/role-authorization.guard';
+import { AccessRightGuard } from '../guards/access-right.guard';
 import { Identified } from '../../../authentication';
 
-export const ROLE_META_DATA_KEY = 'roles';
+export const ACCESS_RIGHT_META_DATA_KEY = 'roles';
 
-export function CanAccessBy(...roles: string[]) {
+export function CanAccessBy(...rights: string[]) {
   return applyDecorators(
-    SetMetadata(ROLE_META_DATA_KEY, roles),
+    SetMetadata(ACCESS_RIGHT_META_DATA_KEY, rights),
     Identified,
-    UseGuards(RoleAuthorizationGuard),
+    UseGuards(AccessRightGuard),
   );
 }

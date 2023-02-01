@@ -15,8 +15,6 @@ export interface UserService {
 
   findMyProfile(id: string): Promise<MyProfile>;
 
-  extractNewUserEmails(emails: string[]): Promise<string[]>;
-
   /**
    * @throws {InsertUserFailedException}
    */

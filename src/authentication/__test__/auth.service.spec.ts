@@ -11,7 +11,7 @@ import {
 import {
   RoleService,
   RoleServiceToken,
-  RoleStorage,
+  AccessRightStorage,
   RoleStorageToken,
 } from '../../authorization';
 import { UserService, UserServiceToken } from '../../user';
@@ -30,7 +30,7 @@ describe('AuthService', () => {
   let authService: AuthService;
   let userService: UserService;
   let roleService: RoleService;
-  let roleStorage: RoleStorage;
+  let roleStorage: AccessRightStorage;
   let tokenGenerator: TokenGenerator;
   let bcryptService: BcryptService;
   const date = new Date();

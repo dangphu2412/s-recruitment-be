@@ -18,10 +18,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser, Identified, JwtPayload } from '../../authentication';
-import { CanAccessBy, SystemRoles } from '../../authorization';
+import { AccessRights, CanAccessBy } from '../../authorization';
 import {
   CreateUsersDto,
-  ExtractNewUserQueryDto,
   SearchUserService,
   SearchUserServiceToken,
   UserManagementQueryDto,
@@ -60,7 +59,7 @@ export class UserController {
     return this.userService.findMyProfile(user.sub);
   }
 
-  @CanAccessBy(SystemRoles.CHAIRMAN)
+  @CanAccessBy(AccessRights.VIEW_USERS, AccessRights.EDIT_MEMBER_USER)
   @Get('/')
   @ApiOkResponse()
   async search(
@@ -69,30 +68,21 @@ export class UserController {
     return this.searchUserService.search(query);
   }
 
-  @CanAccessBy(SystemRoles.CHAIRMAN)
+  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
   @Patch('/:id/active')
   @ApiNoContentResponse()
   async toggleIsActive(@Param('id') id: string) {
     await this.userService.toggleUserIsActive(id);
   }
 
-  @CanAccessBy(SystemRoles.CHAIRMAN)
+  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
   @Post('/')
   @ApiCreatedResponse()
   async createUsers(@Body() createUsersDto: CreateUsersDto) {
     await this.userService.createUserUseCase(createUsersDto);
   }
 
-  @CanAccessBy(SystemRoles.CHAIRMAN)
-  @Get('/extract-new-values')
-  @ApiCreatedResponse()
-  extractNewUserEmails(
-    @Query() extractNewUserQueryDto: ExtractNewUserQueryDto,
-  ) {
-    return this.userService.extractNewUserEmails(extractNewUserQueryDto.value);
-  }
-
-  @CanAccessBy(SystemRoles.CHAIRMAN)
+  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
   @Patch('/:id/monthly-moneys')
   @ApiNoContentResponse()
   updateMemberPaid(
@@ -106,7 +96,7 @@ export class UserController {
     });
   }
 
-  @CanAccessBy(SystemRoles.CHAIRMAN)
+  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')

@@ -5,7 +5,7 @@ import {
   BasicLoginDto,
   RenewTokensDto,
 } from '../client';
-import { RoleStorage, RoleStorageToken } from '../../authorization';
+import { AccessRightStorage, RoleStorageToken } from '../../authorization';
 import { extractJwtPayload } from './utils/jwt.utils';
 import { ApiNoContentResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -19,7 +19,7 @@ export class AuthController {
     @Inject(AuthServiceToken)
     private readonly authService: AuthService,
     @Inject(RoleStorageToken)
-    private readonly roleStorage: RoleStorage,
+    private readonly roleStorage: AccessRightStorage,
   ) {}
 
   @Post('login')

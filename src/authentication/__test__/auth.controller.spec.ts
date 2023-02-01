@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { AuthController } from '../internal/auth.controller';
-import { RoleStorage, RoleStorageToken } from '../../authorization';
+import { AccessRightStorage, RoleStorageToken } from '../../authorization';
 import { extractJwtPayload } from '../internal/utils/jwt.utils';
 import { AuthService, AuthServiceToken, LoginCredentials } from '../client';
 
@@ -11,7 +11,7 @@ jest.mock('../utils/jwt.utils', () => ({
 describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
-  let roleStorage: RoleStorage;
+  let roleStorage: AccessRightStorage;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -36,7 +36,7 @@ describe('AuthController', () => {
 
     authController = moduleRef.get<AuthController>(AuthController);
     authService = moduleRef.get<AuthService>(AuthServiceToken);
-    roleStorage = moduleRef.get<RoleStorage>(RoleStorageToken);
+    roleStorage = moduleRef.get<AccessRightStorage>(RoleStorageToken);
   });
 
   describe('login', () => {
