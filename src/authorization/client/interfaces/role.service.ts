@@ -1,9 +1,8 @@
-import { AccessControlList, RoleOverview } from '@authorization/client';
+import { AccessControlList } from '@authorization/client';
 import { createInterfaceToken } from '../../../utils';
 
 export const RoleServiceToken = createInterfaceToken('RoleService');
 
 export interface RoleService {
-  findRoles(): Promise<RoleOverview>;
-  findAccessControlListById(id: string): Promise<AccessControlList>;
+  findAccessControlList(): Promise<AccessControlList>;
 }

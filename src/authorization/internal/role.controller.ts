@@ -1,6 +1,11 @@
-import { Controller, Get, Inject, Param } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { RoleService, RoleServiceToken } from '@authorization/client';
+import {
+  CanAccessBy,
+  RoleService,
+  RoleServiceToken,
+  SystemRoles,
+} from '@authorization/client';
 
 @ApiTags('roles')
 @Controller({
@@ -13,13 +18,9 @@ export class RoleController {
     private readonly roleService: RoleService,
   ) {}
 
+  @CanAccessBy(SystemRoles.CHAIRMAN)
   @Get()
   getRoles() {
-    return this.roleService.findRoles();
-  }
-
-  @Get('/:id')
-  getAccessControlList(@Param() id: string) {
-    return this.roleService.findAccessControlListById(id);
+    return this.roleService.findAccessControlList();
   }
 }

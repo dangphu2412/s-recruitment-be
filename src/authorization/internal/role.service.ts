@@ -1,7 +1,8 @@
 import { RoleRepository } from './repositories/role.repository';
 import { Injectable } from '@nestjs/common';
-import { AccessControlList, RoleOverview, RoleService } from '../client';
+import { AccessControlList, Right, Role, RoleService } from '../client';
 import { PermissionRepository } from '@authorization/internal/repositories/permission.repository';
+import { Permission } from '@authorization/client/entities/permission.entity';
 
 @Injectable()
 export class RoleServiceImpl implements RoleService {
@@ -10,31 +11,32 @@ export class RoleServiceImpl implements RoleService {
     private readonly permissionRepository: PermissionRepository,
   ) {}
 
-  findRoles(): Promise<RoleOverview> {
-    return this.roleRepository.find() as Promise<RoleOverview>;
-  }
-
-  async findAccessControlListById(id: string): Promise<AccessControlList> {
-    const [role, allPermissions] = await Promise.all([
-      this.roleRepository.findOne(id, {
+  async findAccessControlList(): Promise<AccessControlList> {
+    const [roles, allPermissions] = await Promise.all([
+      this.roleRepository.find({
         relations: ['permissions'],
       }),
       this.permissionRepository.find(),
     ]);
 
-    const grantedPermissionIdDict = role.permissions.reduce<
-      Record<string, boolean>
-    >((grantedPermissionIdDictResult, currentPermission) => {
-      grantedPermissionIdDictResult[currentPermission.id] = true;
-
-      return grantedPermissionIdDictResult;
-    }, {});
-
     return {
-      rights: allPermissions.map((rootPermission) => {
+      access: roles.map((role: Role) => {
+        const grantedPermissionIdDict = role.permissions.reduce<
+          Record<string, boolean>
+        >((grantedPermissionIdDictResult, currentPermission) => {
+          grantedPermissionIdDictResult[currentPermission.id] = true;
+
+          return grantedPermissionIdDictResult;
+        }, {});
+
         return {
-          ...rootPermission,
-          canAccess: !!grantedPermissionIdDict[rootPermission.id],
+          name: role.name,
+          rights: allPermissions.map<Right>((permission: Permission) => {
+            return {
+              ...permission,
+              canAccess: !!grantedPermissionIdDict[permission.id],
+            };
+          }),
         };
       }),
     };
