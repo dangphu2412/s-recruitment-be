@@ -9,7 +9,7 @@ export class Permission {
   id: string;
 
   @Column({
-    name: 'subject',
+    name: 'name',
     type: 'varchar',
     nullable: false,
     unique: true,

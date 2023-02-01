@@ -1,4 +1,4 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { RoleService, RoleServiceToken } from '@authorization/client';
 
@@ -14,7 +14,12 @@ export class RoleController {
   ) {}
 
   @Get()
-  getAccessControlList() {
-    return this.roleService.getAccessControlList();
+  getRoles() {
+    return this.roleService.findRoles();
+  }
+
+  @Get('/:id')
+  getAccessControlList(@Param() id: string) {
+    return this.roleService.findAccessControlListById(id);
   }
 }

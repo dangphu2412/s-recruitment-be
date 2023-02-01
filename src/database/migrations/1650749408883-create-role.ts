@@ -35,6 +35,7 @@ export class CreateRoleAndPermission1650749408883
           {
             name: 'update_by_user_id',
             type: 'uuid',
+            isNullable: true,
           },
         ],
       }),

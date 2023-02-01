@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { BcryptService } from '../../shared/services/bcrypt.service';
 import { ConfigService } from '@nestjs/config';
-import { Role } from '../../authorization';
+import { BcryptService } from '../../shared/services/bcrypt.service';
+import { SystemRoles, Role } from '../../authorization';
 import { ModuleConfig } from '../../shared/services/module-config';
 import { User } from '../../user';
 
@@ -12,7 +12,7 @@ export class SeedUsers1657339686264 implements MigrationInterface {
 
     const adminRole = await roleRepository.findOne({
       where: {
-        key: 'ADMIN',
+        name: SystemRoles.CHAIRMAN,
       },
     });
     const bcryptService = new BcryptService(

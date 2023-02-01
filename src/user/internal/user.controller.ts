@@ -18,7 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser, Identified, JwtPayload } from '../../authentication';
-import { APP_RBAC, CanAccessBy } from '../../authorization';
+import { CanAccessBy, SystemRoles } from '../../authorization';
 import {
   CreateUsersDto,
   ExtractNewUserQueryDto,
@@ -60,7 +60,7 @@ export class UserController {
     return this.userService.findMyProfile(user.sub);
   }
 
-  @CanAccessBy(APP_RBAC.ADMIN)
+  @CanAccessBy(SystemRoles.CHAIRMAN)
   @Get('/')
   @ApiOkResponse()
   async search(
@@ -69,21 +69,21 @@ export class UserController {
     return this.searchUserService.search(query);
   }
 
-  @CanAccessBy(APP_RBAC.ADMIN)
+  @CanAccessBy(SystemRoles.CHAIRMAN)
   @Patch('/:id/active')
   @ApiNoContentResponse()
   async toggleIsActive(@Param('id') id: string) {
     await this.userService.toggleUserIsActive(id);
   }
 
-  @CanAccessBy(APP_RBAC.ADMIN)
+  @CanAccessBy(SystemRoles.CHAIRMAN)
   @Post('/')
   @ApiCreatedResponse()
   async createUsers(@Body() createUsersDto: CreateUsersDto) {
     await this.userService.createUserUseCase(createUsersDto);
   }
 
-  @CanAccessBy(APP_RBAC.ADMIN)
+  @CanAccessBy(SystemRoles.CHAIRMAN)
   @Get('/extract-new-values')
   @ApiCreatedResponse()
   extractNewUserEmails(
@@ -92,7 +92,7 @@ export class UserController {
     return this.userService.extractNewUserEmails(extractNewUserQueryDto.value);
   }
 
-  @CanAccessBy(APP_RBAC.ADMIN)
+  @CanAccessBy(SystemRoles.CHAIRMAN)
   @Patch('/:id/monthly-moneys')
   @ApiNoContentResponse()
   updateMemberPaid(
@@ -106,7 +106,7 @@ export class UserController {
     });
   }
 
-  @CanAccessBy(APP_RBAC.ADMIN)
+  @CanAccessBy(SystemRoles.CHAIRMAN)
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')

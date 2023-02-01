@@ -1,5 +1,12 @@
-export enum APP_RBAC {
-  ADMIN = 'Admin',
+export enum SystemRoles {
+  CHAIRMAN = 'Chairman',
+  DOMAIN_CHIEF = 'Domain Chief',
+  DOMAIN_LEADER = 'Domain Leader',
   MEMBER = 'Member',
-  NEWBIE = 'Newbie',
+}
+
+export enum AccessRights {
+  VIEW_USERS = 'View users',
+  EDIT_MEMBER_USER = 'Edit member user',
+  VIEW_ACCESS_RIGHTS = 'View access rights',
 }
