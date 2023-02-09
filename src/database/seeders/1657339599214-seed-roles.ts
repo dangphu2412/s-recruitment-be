@@ -12,6 +12,7 @@ export class SeedRoles1657339599214 implements MigrationInterface {
       {
         name: SystemRoles.CHAIRMAN,
         description: 'Chairman of group',
+        isEditable: false,
       },
       {
         name: SystemRoles.DOMAIN_CHIEF,

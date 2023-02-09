@@ -46,6 +46,7 @@ export class RoleServiceImpl implements RoleService {
           id: role.id,
           name: role.name,
           description: role.description,
+          isEditable: role.isEditable,
           rights: allPermissions.map<Right>((permission: Permission) => {
             return {
               ...permission,
@@ -74,7 +75,7 @@ export class RoleServiceImpl implements RoleService {
       }),
     ]);
 
-    if (!role || permissions.length !== uniqueIds.length) {
+    if (!role || !role?.isEditable || permissions.length !== uniqueIds.length) {
       throw new InvalidRoleUpdateException();
     }
 

@@ -6,6 +6,7 @@ export type AccessControlList = {
     id: string;
     name: string;
     description: string;
+    isEditable: boolean;
     rights: Right[];
   }[];
 };

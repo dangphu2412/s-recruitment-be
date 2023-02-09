@@ -37,6 +37,11 @@ export class CreateRoleAndPermission1650749408883
             type: 'uuid',
             isNullable: true,
           },
+          {
+            name: 'is_editable',
+            type: 'boolean',
+            default: true,
+          },
         ],
       }),
     );

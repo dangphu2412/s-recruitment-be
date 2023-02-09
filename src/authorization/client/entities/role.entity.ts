@@ -38,6 +38,13 @@ export class Role {
   })
   updatedAt: Date;
 
+  @Column({
+    name: 'is_editable',
+    type: 'boolean',
+    default: true,
+  })
+  isEditable: boolean;
+
   @ManyToOne(() => User)
   @JoinColumn({
     name: 'update_by_user_id',

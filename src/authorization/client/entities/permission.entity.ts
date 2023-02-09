@@ -23,6 +23,13 @@ export class Permission {
   })
   description: string;
 
+  @Column({
+    name: 'can_assignable',
+    type: 'boolean',
+    default: true,
+  })
+  canAssignable: boolean;
+
   @ManyToMany(() => Role, (role) => role.permissions)
   roles?: Role[];
 }
