@@ -1,6 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { AuthController } from '../internal/auth.controller';
-import { AccessRightStorage, RoleStorageToken } from '../../authorization';
+import {
+  AccessRightStorage,
+  AccessRightStorageToken,
+} from '../../authorization';
 import { extractJwtPayload } from '../internal/utils/jwt.utils';
 import { AuthService, AuthServiceToken, LoginCredentials } from '../client';
 
@@ -26,7 +29,7 @@ describe('AuthController', () => {
           },
         },
         {
-          provide: RoleStorageToken,
+          provide: AccessRightStorageToken,
           useValue: {
             clean: jest.fn(),
           },
@@ -36,7 +39,7 @@ describe('AuthController', () => {
 
     authController = moduleRef.get<AuthController>(AuthController);
     authService = moduleRef.get<AuthService>(AuthServiceToken);
-    roleStorage = moduleRef.get<AccessRightStorage>(RoleStorageToken);
+    roleStorage = moduleRef.get<AccessRightStorage>(AccessRightStorageToken);
   });
 
   describe('login', () => {

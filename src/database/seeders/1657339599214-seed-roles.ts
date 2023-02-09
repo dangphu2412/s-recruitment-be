@@ -40,6 +40,10 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         name: AccessRights.VIEW_USERS,
         description: 'View users of system',
       },
+      {
+        name: AccessRights.EDIT_ACCESS_RIGHTS,
+        description: 'Edit roles of system',
+      },
     ]);
     const nameMapToRoles = keyBy(savedRoles, 'name');
     const nameMapToPermissions = keyBy(savedPermissions, 'name');

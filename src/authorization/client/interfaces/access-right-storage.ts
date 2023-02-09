@@ -1,10 +1,13 @@
-import { AccessRightMap } from '../types/role.types';
 import { createInterfaceToken } from '../../../utils';
+import { Role } from '@authorization/client';
 
-export const RoleStorageToken = createInterfaceToken('RoleStorage');
+export const AccessRightStorageToken =
+  createInterfaceToken('AccessRightStorage');
 
 export interface AccessRightStorage {
-  set(userId: string, rights: string[]): Promise<void>;
-  get(userId: string): Promise<AccessRightMap>;
+  save(userId: string, roles: Role[]): Promise<void>;
+  get(userId: string): Promise<string[]>;
+
   clean(userId: string): Promise<void>;
+  clean(userIds: string[]): Promise<void>;
 }

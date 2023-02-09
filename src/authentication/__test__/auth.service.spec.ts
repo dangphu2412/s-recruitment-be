@@ -12,7 +12,7 @@ import {
   RoleService,
   RoleServiceToken,
   AccessRightStorage,
-  RoleStorageToken,
+  AccessRightStorageToken,
 } from '../../authorization';
 import { UserService, UserServiceToken } from '../../user';
 
@@ -57,7 +57,7 @@ describe('AuthService', () => {
           },
         },
         {
-          provide: RoleStorageToken,
+          provide: AccessRightStorageToken,
           useValue: {
             set: jest.fn(),
           },
@@ -86,7 +86,7 @@ describe('AuthService', () => {
     authService = moduleRef.get(AuthServiceToken);
     userService = moduleRef.get(UserServiceToken);
     roleService = moduleRef.get(RoleServiceToken);
-    roleStorage = moduleRef.get(RoleStorageToken);
+    roleStorage = moduleRef.get(AccessRightStorageToken);
     tokenGenerator = moduleRef.get(TokenGeneratorToken);
     bcryptService = moduleRef.get(BcryptService);
   });

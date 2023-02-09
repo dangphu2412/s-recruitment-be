@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
   AccessRightStorage,
-  RoleStorageToken,
+  AccessRightStorageToken,
   AuthorizationStrategy,
 } from '../../client';
 import { JwtPayload } from '@authentication/client';
@@ -13,7 +13,7 @@ export class RoleAuthorizationStrategy
   implements AuthorizationStrategy<JwtPayload, string[]>
 {
   constructor(
-    @Inject(RoleStorageToken)
+    @Inject(AccessRightStorageToken)
     private readonly roleStorage: AccessRightStorage,
   ) {
     registerStrategy(RoleAuthorizationStrategy.name, this);
@@ -29,6 +29,8 @@ export class RoleAuthorizationStrategy
       throw new LogoutRequiredException();
     }
 
-    return requiredRights.some((role) => accessRights[role]);
+    return requiredRights.some((role) =>
+      accessRights.some((right) => right === role),
+    );
   }
 }

@@ -1,47 +1,54 @@
-import { AccessRightStorage } from '../client';
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import type { Cache } from 'cache-manager';
-import { ConfigService } from '@nestjs/config';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
+import { ModuleConfig } from '@shared/services';
+import { AccessRightStorage, Role } from '../client';
 
 @Injectable()
 export class AccessRightStorageImpl implements AccessRightStorage {
   private static readonly CACHE_KEY = 'RK';
   private readonly ttl: number;
 
-  private static generateCacheKey(userId: string): string {
+  private static genKey = (userId: string): string => {
     return `${AccessRightStorageImpl.CACHE_KEY}-${userId}`;
+  };
+
+  private static toRights(roles: Role[]): string[] {
+    return roles
+      .map((role) => role.permissions.map((permission) => permission.name))
+      .flat();
   }
 
   constructor(
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    configService: ConfigService,
+    moduleConfig: ModuleConfig,
   ) {
-    const refreshTokenExpiration = configService.get<string>(
-      'REFRESH_TOKEN_EXPIRATION',
-      '1h',
-    );
+    const refreshTokenExpiration = moduleConfig.getRefreshTokenExpiration();
     this.ttl = ms(refreshTokenExpiration);
   }
 
-  get(userId: string): Promise<Record<string, boolean> | undefined> {
-    return this.cacheManager.get<Record<string, boolean>>(
-      AccessRightStorageImpl.generateCacheKey(userId),
+  get(userId: string): Promise<string[]> {
+    return this.cacheManager.get<string[]>(
+      AccessRightStorageImpl.genKey(userId),
     );
   }
 
-  async set(userId: string, accessRights: string[]): Promise<void> {
+  async save(userId: string, roles: Role[]): Promise<void> {
     await this.cacheManager.set(
-      AccessRightStorageImpl.generateCacheKey(userId),
-      accessRights,
+      AccessRightStorageImpl.genKey(userId),
+      AccessRightStorageImpl.toRights(roles),
       this.ttl,
     );
   }
 
-  async clean(userId: string): Promise<void> {
-    await this.cacheManager.del(
-      AccessRightStorageImpl.generateCacheKey(userId),
-    );
+  async clean(userId: string): Promise<void>;
+  async clean(userIds: string[]): Promise<void>;
+  async clean(idOrIds: string | string[]): Promise<void> {
+    const ids = Array.isArray(idOrIds)
+      ? idOrIds.map(AccessRightStorageImpl.genKey)
+      : [AccessRightStorageImpl.genKey(idOrIds)];
+
+    await this.cacheManager.store.del<string>(ids);
   }
 }

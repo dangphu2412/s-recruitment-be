@@ -1,11 +1,12 @@
-import { Controller, Get, Inject } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Inject, Param, Put } from '@nestjs/common';
+import { ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
 import {
   AccessRights,
   CanAccessBy,
   RoleService,
   RoleServiceToken,
 } from '@authorization/client';
+import { UpdateRoleDto } from '@authorization/client/dto';
 
 @ApiTags('roles')
 @Controller({
@@ -22,5 +23,15 @@ export class RoleController {
   @Get()
   getRoles() {
     return this.roleService.findAccessControlList();
+  }
+
+  @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
+  @Put('/:id')
+  @ApiNoContentResponse()
+  async updateRole(
+    @Param('id') roleId: string,
+    @Body() updateRoleDto: UpdateRoleDto,
+  ) {
+    await this.roleService.updateRole(roleId, updateRoleDto);
   }
 }

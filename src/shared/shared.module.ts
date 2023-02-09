@@ -1,12 +1,14 @@
-import { Global, Module } from '@nestjs/common';
+import { CacheModule, Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { BcryptService } from './services/bcrypt.service';
-import { ModuleConfig } from './services/module-config';
+import { ModuleConfig, BcryptService } from './services';
 
 @Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    CacheModule.register({
       isGlobal: true,
     }),
   ],

@@ -71,4 +71,12 @@ export class ModuleConfig {
   getSaltRounds(): number {
     return this.getNumber('SALT_ROUNDS');
   }
+
+  getAccessTokenExpiration(): string {
+    return this.getString('ACCESS_TOKEN_EXPIRATION');
+  }
+
+  getRefreshTokenExpiration(): string {
+    return this.getString('REFRESH_TOKEN_EXPIRATION');
+  }
 }

@@ -10,7 +10,10 @@ import {
   TokenGenerator,
   TokenGeneratorToken,
 } from '../client';
-import { AccessRightStorage, RoleStorageToken } from '../../authorization';
+import {
+  AccessRightStorage,
+  AccessRightStorageToken,
+} from '../../authorization';
 import { UserService, UserServiceToken } from '../../user';
 import { IncorrectUsernamePasswordException } from '../client/exceptions';
 import { InvalidTokenFormatException } from '../client/exceptions/invalid-token-format.exception';
@@ -21,8 +24,8 @@ export class AuthServiceImpl implements AuthService {
   constructor(
     @Inject(UserServiceToken)
     private readonly userService: UserService,
-    @Inject(RoleStorageToken)
-    private readonly roleStorage: AccessRightStorage,
+    @Inject(AccessRightStorageToken)
+    private readonly accessRightStorage: AccessRightStorage,
     @Inject(TokenGeneratorToken)
     private readonly tokenGenerator: TokenGenerator,
     private readonly jwtService: JwtService,
@@ -44,12 +47,7 @@ export class AuthServiceImpl implements AuthService {
 
     const [tokens] = await Promise.all([
       this.tokenGenerator.generate(user.id),
-      this.roleStorage.set(
-        user.id,
-        user.roles
-          .map((role) => role.permissions.map((permission) => permission.name))
-          .flat(),
-      ),
+      this.accessRightStorage.save(user.id, user.roles),
     ]);
 
     return {
@@ -63,6 +61,7 @@ export class AuthServiceImpl implements AuthService {
         refreshToken,
       );
 
+      // TODO: Missing access token in cache when server restart
       return {
         tokens: await this.tokenGenerator.generate(sub, refreshToken),
       };
@@ -73,7 +72,7 @@ export class AuthServiceImpl implements AuthService {
         throw new InvalidTokenFormatException();
       }
 
-      await this.roleStorage.clean(jwtPayload.sub);
+      await this.accessRightStorage.clean(jwtPayload.sub);
 
       throw new LogoutRequiredException();
     }
