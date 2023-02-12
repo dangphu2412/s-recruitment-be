@@ -6,7 +6,7 @@ type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
   subMenus?: InsertMenu[];
 };
 
-export class InitMenus1659108460003 implements MigrationInterface {
+export class SeedingMenus1659108460003 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const menuRepository = queryRunner.manager.getTreeRepository(Menu);
     const menus: InsertMenu[] = [
@@ -36,7 +36,7 @@ export class InitMenus1659108460003 implements MigrationInterface {
 
     const createdParent = await menuRepository.save(
       menus
-        .map(InitMenus1659108460003.excludeSubMenus)
+        .map(SeedingMenus1659108460003.excludeSubMenus)
         .map((menu) => menuRepository.create(menu)),
     );
 

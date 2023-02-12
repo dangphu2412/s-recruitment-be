@@ -6,16 +6,14 @@ import {
   TableIndex,
 } from 'typeorm';
 
-export class CreateReferenceUserRole1650749459918
-  implements MigrationInterface
-{
-  private INDEX_USER_KEY = 'IDX_FK_users_roles_users_key';
-  private INDEX_ROLE_KEY = 'IDX_FK_users_roles_roles_key';
+export class CreateMenuSettings1676171301978 implements MigrationInterface {
+  private INDEX_MENU_KEY = 'IDX_FK_menus_settings_menus_key';
+  private INDEX_PERMISSION_KEY = 'IDX_FK_menus_settings_permissions_key';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'users_roles',
+        name: 'menu_settings',
         columns: [
           {
             name: 'id',
@@ -24,73 +22,73 @@ export class CreateReferenceUserRole1650749459918
             isGenerated: true,
           },
           {
-            name: 'user_id',
-            type: 'uuid',
+            name: 'permission_id',
+            type: 'int',
           },
           {
-            name: 'role_id',
+            name: 'menu_id',
             type: 'int',
           },
         ],
       }),
     );
 
-    await queryRunner.createForeignKeys('users_roles', [
+    await queryRunner.createForeignKeys('menu_settings', [
       new TableForeignKey({
-        columnNames: ['user_id'],
+        columnNames: ['menu_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'users',
+        referencedTableName: 'menus',
         onUpdate: 'CASCADE',
       }),
       new TableForeignKey({
-        columnNames: ['role_id'],
+        columnNames: ['permission_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'roles',
+        referencedTableName: 'permissions',
         onUpdate: 'CASCADE',
       }),
     ]);
 
-    await queryRunner.createIndices('users_roles', [
+    await queryRunner.createIndices('menu_settings', [
       new TableIndex({
-        name: this.INDEX_USER_KEY,
-        columnNames: ['user_id'],
+        name: this.INDEX_PERMISSION_KEY,
+        columnNames: ['permission_id'],
       }),
       new TableIndex({
-        name: this.INDEX_ROLE_KEY,
-        columnNames: ['role_id'],
+        name: this.INDEX_MENU_KEY,
+        columnNames: ['menu_id'],
       }),
     ]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKeys('users_roles', [
+    await queryRunner.dropForeignKeys('menu_settings', [
       new TableForeignKey({
-        columnNames: ['user_id'],
+        columnNames: ['permission_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       }),
       new TableForeignKey({
-        columnNames: ['role_id'],
+        columnNames: ['menu_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'roles',
+        referencedTableName: 'menus',
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       }),
     ]);
 
-    await queryRunner.dropIndices('users_roles', [
+    await queryRunner.dropIndices('menu_settings', [
       new TableIndex({
-        name: this.INDEX_USER_KEY,
-        columnNames: ['user_id'],
+        name: this.INDEX_PERMISSION_KEY,
+        columnNames: ['permission_id'],
       }),
       new TableIndex({
-        name: this.INDEX_ROLE_KEY,
-        columnNames: ['role_id'],
+        name: this.INDEX_MENU_KEY,
+        columnNames: ['menu_id'],
       }),
     ]);
 
-    await queryRunner.dropTable('users_roles');
+    await queryRunner.dropTable('menu_settings');
   }
 }

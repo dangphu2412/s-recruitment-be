@@ -28,8 +28,8 @@ export class AccessRightStorageImpl implements AccessRightStorage {
     this.ttl = ms(refreshTokenExpiration);
   }
 
-  get(userId: string): Promise<string[]> {
-    return this.cacheManager.get<string[]>(
+  get(userId: string): Promise<string[] | undefined> {
+    return this.cacheManager.get<string[] | undefined>(
       AccessRightStorageImpl.genKey(userId),
     );
   }

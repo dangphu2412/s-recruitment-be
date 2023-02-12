@@ -30,7 +30,8 @@
     "seeder:latest": "npm run seeder migration:run",
     "seeder:rollback": "npm run seeder migration:revert",
     "schema:drop": "npm run migration schema:drop",
-    "schema:sync": "npm run migration schema:sync"
+    "schema:sync": "npm run migration schema:sync",
+    "db:reload": "npm run migration schema:drop && npm run seeder schema:drop && npm run migrate:latest && npm run seeder:latest"
   },
   "dependencies": {
     "@fastify/helmet": "8.0.0",

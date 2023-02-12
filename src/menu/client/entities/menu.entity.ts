@@ -2,11 +2,13 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   PrimaryGeneratedColumn,
   Tree,
   TreeChildren,
   TreeParent,
 } from 'typeorm';
+import { MenuSetting } from './menu-settings.entity';
 
 @Entity({
   name: 'menus',
@@ -53,4 +55,7 @@ export class Menu {
     name: 'parent_id',
   })
   parent: Menu;
+
+  @OneToMany(() => MenuSetting, (settings) => settings.menu)
+  settings?: MenuSetting;
 }

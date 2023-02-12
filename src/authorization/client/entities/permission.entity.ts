@@ -1,5 +1,12 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Role } from './role.entity';
+import { MenuSetting } from '../../../menu/client/entities/menu-settings.entity';
 
 @Entity({
   name: 'permissions',
@@ -23,13 +30,9 @@ export class Permission {
   })
   description: string;
 
-  @Column({
-    name: 'can_assignable',
-    type: 'boolean',
-    default: true,
-  })
-  canAssignable: boolean;
-
   @ManyToMany(() => Role, (role) => role.permissions)
   roles?: Role[];
+
+  @OneToMany(() => MenuSetting, (settings) => settings.permission)
+  menuSettings: MenuSetting[];
 }

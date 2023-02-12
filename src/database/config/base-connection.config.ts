@@ -4,9 +4,9 @@ import { User } from '../../user';
 import { Role } from '../../authorization';
 import { Menu } from '../../menu';
 import { Province } from '../../location';
-import { MonthlyMoneyConfig } from '../../monthly-money';
-import { OperationFee } from '../../monthly-money';
+import { MonthlyMoneyConfig, OperationFee } from '../../monthly-money';
 import { Permission } from '@authorization/client/entities/permission.entity';
+import { MenuSetting } from '../../menu/client/entities/menu-settings.entity';
 
 dotenv.config();
 
@@ -21,6 +21,7 @@ export const connectionConfig: TypeOrmModuleOptions = {
     User,
     Role,
     Menu,
+    MenuSetting,
     Province,
     MonthlyMoneyConfig,
     OperationFee,
