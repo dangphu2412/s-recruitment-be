@@ -4,6 +4,8 @@ import { Menu, MenuService } from '../client';
 import {
   AccessRightStorage,
   AccessRightStorageToken,
+  RoleService,
+  RoleServiceToken,
 } from '@authorization/client';
 import keyBy from 'lodash/keyBy';
 
@@ -13,12 +15,14 @@ export class MenuServiceImpl implements MenuService {
     private readonly menuRepository: MenuRepository,
     @Inject(AccessRightStorageToken)
     private readonly accessRightStorage: AccessRightStorage,
+    @Inject(RoleServiceToken)
+    private readonly roleService: RoleService,
   ) {}
 
   async findMenusByUserId(userId: string): Promise<Menu[]> {
     const rights = await this.accessRightStorage.get(userId);
 
-    if (!rights) {
+    if (!rights?.length) {
       return [];
     }
 

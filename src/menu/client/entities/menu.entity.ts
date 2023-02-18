@@ -57,5 +57,5 @@ export class Menu {
   parent: Menu;
 
   @OneToMany(() => MenuSetting, (settings) => settings.menu)
-  settings?: MenuSetting;
+  settings?: MenuSetting[];
 }

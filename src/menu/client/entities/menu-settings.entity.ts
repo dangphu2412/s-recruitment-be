@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Menu } from './menu.entity';
 import { Permission } from '@authorization/client/entities/permission.entity';
 
@@ -9,14 +9,14 @@ export class MenuSetting {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @ManyToOne(() => Menu)
+  @OneToOne(() => Menu)
   @JoinColumn({
     name: 'menu_id',
     referencedColumnName: 'id',
   })
   menu: Menu;
 
-  @ManyToOne(() => Permission)
+  @OneToOne(() => Permission)
   @JoinColumn({
     name: 'permission_id',
     referencedColumnName: 'id',

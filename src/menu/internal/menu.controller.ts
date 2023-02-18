@@ -16,7 +16,7 @@ export class MenuController {
 
   @Identified
   @Get()
-  find(@CurrentUser() { sub: userId }: JwtPayload) {
+  findMenusByUserId(@CurrentUser() { sub: userId }: JwtPayload) {
     return this.menuService.findMenusByUserId(userId);
   }
 }

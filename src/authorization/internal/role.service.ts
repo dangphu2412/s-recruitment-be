@@ -2,11 +2,11 @@ import { RoleRepository } from './repositories/role.repository';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   AccessControlList,
+  AccessControlView,
   AccessRightStorage,
-  Right,
-  Role,
-  RoleService,
   AccessRightStorageToken,
+  Right,
+  RoleService,
 } from '../client';
 import { PermissionRepository } from '@authorization/internal/repositories/permission.repository';
 import { Permission } from '@authorization/client/entities/permission.entity';
@@ -24,16 +24,20 @@ export class RoleServiceImpl implements RoleService {
     private readonly accessRightStorage: AccessRightStorage,
   ) {}
 
-  async findAccessControlList(): Promise<AccessControlList> {
+  findAccessControlList(): Promise<AccessControlList> {
+    return this.roleRepository.find({
+      relations: ['permissions'],
+    }) as Promise<AccessControlList>;
+  }
+
+  async findAccessControlView(): Promise<AccessControlView> {
     const [roles, allPermissions] = await Promise.all([
-      this.roleRepository.find({
-        relations: ['permissions'],
-      }),
+      this.findAccessControlList(),
       this.permissionRepository.find(),
     ]);
 
     return {
-      access: roles.map((role: Role) => {
+      access: roles.map((role) => {
         const grantedPermissionIdDict = role.permissions.reduce<
           Record<string, boolean>
         >((grantedPermissionIdDictResult, currentPermission) => {

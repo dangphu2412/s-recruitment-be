@@ -22,7 +22,7 @@ export class RoleController {
   @CanAccessBy(AccessRights.VIEW_ACCESS_RIGHTS)
   @Get()
   getRoles() {
-    return this.roleService.findAccessControlList();
+    return this.roleService.findAccessControlView();
   }
 
   // @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
