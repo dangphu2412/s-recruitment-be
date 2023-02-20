@@ -1,11 +1,10 @@
 import { createInterfaceToken } from '../../../utils';
-import { Role } from '@authorization/client';
 
 export const AccessRightStorageToken =
   createInterfaceToken('AccessRightStorage');
 
 export interface AccessRightStorage {
-  save(userId: string, roles: Role[]): Promise<void>;
+  renew(userId: string): Promise<string[]>;
   get(userId: string): Promise<string[] | undefined>;
 
   clean(userId: string): Promise<void>;

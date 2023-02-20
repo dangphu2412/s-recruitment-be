@@ -33,10 +33,7 @@ export class AuthServiceImpl implements AuthService {
   ) {}
 
   async login(basicLoginDto: BasicLoginDto): Promise<LoginCredentials> {
-    const user = await this.userService.findByUsername(basicLoginDto.username, [
-      'roles',
-      'roles.permissions',
-    ]);
+    const user = await this.userService.findByUsername(basicLoginDto.username);
     const cannotLogin =
       !user ||
       (await this.bcryptService.compare(basicLoginDto.password, user.password));
@@ -47,7 +44,7 @@ export class AuthServiceImpl implements AuthService {
 
     const [tokens] = await Promise.all([
       this.tokenGenerator.generate(user.id),
-      this.accessRightStorage.save(user.id, user.roles),
+      this.accessRightStorage.renew(user.id),
     ]);
 
     return {

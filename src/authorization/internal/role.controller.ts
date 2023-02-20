@@ -25,7 +25,7 @@ export class RoleController {
     return this.roleService.findAccessControlView();
   }
 
-  // @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
+  @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
   @Put('/:id')
   @ApiNoContentResponse()
   async updateRole(

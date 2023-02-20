@@ -3,6 +3,7 @@ import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 import { ModuleConfig } from '@shared/services';
 import { AccessRightStorage, Role } from '../client';
+import { UserService, UserServiceToken } from '../../user';
 
 @Injectable()
 export class AccessRightStorageImpl implements AccessRightStorage {
@@ -22,20 +23,33 @@ export class AccessRightStorageImpl implements AccessRightStorage {
   constructor(
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    @Inject(UserServiceToken)
+    private readonly userService: UserService,
     moduleConfig: ModuleConfig,
   ) {
     const refreshTokenExpiration = moduleConfig.getRefreshTokenExpiration();
     this.ttl = ms(refreshTokenExpiration);
   }
 
-  get(userId: string): Promise<string[] | undefined> {
-    return this.cacheManager.get<string[] | undefined>(
+  async get(userId: string): Promise<string[] | undefined> {
+    const rights = await this.cacheManager.get<string[] | undefined>(
       AccessRightStorageImpl.genKey(userId),
     );
+
+    if (!rights) {
+      return await this.renew(userId);
+    }
+
+    return rights;
   }
 
-  async save(userId: string, roles: Role[]): Promise<void> {
-    await this.cacheManager.set(
+  async renew(userId: string): Promise<string[]> {
+    const { roles } = await this.userService.findById(userId, [
+      'roles',
+      'roles.permissions',
+    ]);
+
+    return await this.cacheManager.set(
       AccessRightStorageImpl.genKey(userId),
       AccessRightStorageImpl.toRights(roles),
       this.ttl,

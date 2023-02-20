@@ -1,7 +1,6 @@
 import { RoleRepository } from './repositories/role.repository';
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  AccessControlList,
   AccessControlView,
   AccessRightStorage,
   AccessRightStorageToken,
@@ -24,15 +23,9 @@ export class RoleServiceImpl implements RoleService {
     private readonly accessRightStorage: AccessRightStorage,
   ) {}
 
-  findAccessControlList(): Promise<AccessControlList> {
-    return this.roleRepository.find({
-      relations: ['permissions'],
-    }) as Promise<AccessControlList>;
-  }
-
   async findAccessControlView(): Promise<AccessControlView> {
     const [roles, allPermissions] = await Promise.all([
-      this.findAccessControlList(),
+      this.roleRepository.findAccessControlList(),
       this.permissionRepository.find(),
     ]);
 
