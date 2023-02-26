@@ -2,19 +2,19 @@ import { Test } from '@nestjs/testing';
 import { Role } from '../../authorization';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { UserRepository } from '../internal/user.repository';
-import { UserServiceImpl } from '../internal/user.service';
+import { DomainUserImpl } from '../internal/domain.user';
 import { UserController } from '../internal/user.controller';
 import {
   User,
   UserManagementQueryDto,
   UserManagementView,
-  UserService,
-  UserServiceToken,
+  DomainUser,
+  DomainUserToken,
   CreateUserPayload,
 } from '../client';
 
 describe('UserService', () => {
-  let userService: UserService;
+  let userService: DomainUser;
   let userRepository: UserRepository;
   const date = new Date();
 
@@ -23,8 +23,8 @@ describe('UserService', () => {
       controllers: [UserController],
       providers: [
         {
-          provide: UserServiceToken,
-          useClass: UserServiceImpl,
+          provide: DomainUserToken,
+          useClass: DomainUserImpl,
         },
         {
           provide: UserRepository,
@@ -40,7 +40,7 @@ describe('UserService', () => {
       ],
     }).compile();
 
-    userService = moduleRef.get<UserService>(UserServiceToken);
+    userService = moduleRef.get<DomainUser>(DomainUserToken);
     userRepository = moduleRef.get<UserRepository>(UserRepository);
   });
 

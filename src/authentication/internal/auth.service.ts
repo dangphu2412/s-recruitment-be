@@ -32,14 +32,17 @@ export class AuthServiceImpl implements AuthService {
     private readonly bcryptService: BcryptService,
   ) {}
 
-  async login(basicLoginDto: BasicLoginDto): Promise<LoginCredentials> {
-    const user = await this.userService.findByUsername(basicLoginDto.username, [
-      'roles',
-      'roles.permissions',
-    ]);
+  async login({
+    username,
+    password,
+  }: BasicLoginDto): Promise<LoginCredentials> {
+    const user = await this.userService.findOne({
+      username,
+      withRights: true,
+    });
+
     const cannotLogin =
-      !user ||
-      (await this.bcryptService.compare(basicLoginDto.password, user.password));
+      !user || (await this.bcryptService.compare(password, user.password));
 
     if (cannotLogin) {
       throw new IncorrectUsernamePasswordException();
@@ -60,10 +63,10 @@ export class AuthServiceImpl implements AuthService {
       const { sub } = await this.jwtService.verifyAsync<JwtPayload>(
         refreshToken,
       );
-      const user = await this.userService.findById(sub, [
-        'roles',
-        'roles.permissions',
-      ]);
+      const user = await this.userService.findOne({
+        id: sub,
+        withRights: true,
+      });
 
       const [tokens] = await Promise.all([
         this.tokenGenerator.generate(sub, refreshToken),

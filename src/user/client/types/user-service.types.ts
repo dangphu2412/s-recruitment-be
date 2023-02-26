@@ -1,3 +1,5 @@
+import { User } from '../entities/user.entity';
+
 export type CreateUserPayload = {
   email: string;
   fullName: string;
@@ -16,4 +18,10 @@ export type ExcelUserCreationPayload = {
   'Ngày sinh': number;
   Tháng: number;
   SĐT: number;
+};
+
+export type UserQuery = Partial<User> & {
+  withRights?: boolean;
+  withRoles?: boolean;
+  withDeleted?: boolean;
 };

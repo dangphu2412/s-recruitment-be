@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { AuthServiceImpl } from '../internal/auth.service';
 import { JwtService } from '@nestjs/jwt';
-import { BcryptService } from '../../shared/services/bcrypt.service';
+import { BcryptService } from '@shared/services';
 import {
   AuthService,
   AuthServiceToken,
@@ -14,7 +14,7 @@ import {
   AccessRightStorage,
   AccessRightStorageToken,
 } from '../../authorization';
-import { UserService, UserServiceToken } from '../../user';
+import { DomainUser, DomainUserToken } from '../../user';
 
 jest.mock('typeorm-transactional-cls-hooked', () => ({
   Transactional: () => () => ({}),
@@ -28,7 +28,7 @@ jest.mock('typeorm-transactional-cls-hooked', () => ({
 }));
 describe('AuthService', () => {
   let authService: AuthService;
-  let userService: UserService;
+  let userService: DomainUser;
   let roleService: RoleService;
   let roleStorage: AccessRightStorage;
   let tokenGenerator: TokenGenerator;
@@ -43,7 +43,7 @@ describe('AuthService', () => {
           useClass: AuthServiceImpl,
         },
         {
-          provide: UserServiceToken,
+          provide: DomainUserToken,
           useValue: {
             updateRolesForUser: jest.fn(),
             create: jest.fn(),
@@ -84,7 +84,7 @@ describe('AuthService', () => {
     }).compile();
 
     authService = moduleRef.get(AuthServiceToken);
-    userService = moduleRef.get(UserServiceToken);
+    userService = moduleRef.get(DomainUserToken);
     roleService = moduleRef.get(RoleServiceToken);
     roleStorage = moduleRef.get(AccessRightStorageToken);
     tokenGenerator = moduleRef.get(TokenGeneratorToken);

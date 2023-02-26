@@ -26,12 +26,12 @@ import {
 } from '../../authorization';
 import {
   CreateUsersDto,
-  SearchUserService,
-  SearchUserServiceToken,
-  UserManagementQueryDto,
-  UserManagementView,
   UserService,
   UserServiceToken,
+  UserManagementQueryDto,
+  UserManagementView,
+  DomainUser,
+  DomainUserToken,
 } from '../client';
 import { UpdateMemberPaidDto } from '../client/dtos/update-member-paid.dto';
 import {
@@ -50,10 +50,10 @@ import { UpdatableUserDto } from '../client/dtos/updatable-user.dto';
 })
 export class UserController {
   constructor(
+    @Inject(DomainUserToken)
+    private readonly domainUser: DomainUser,
     @Inject(UserServiceToken)
     private readonly userService: UserService,
-    @Inject(SearchUserServiceToken)
-    private readonly searchUserService: SearchUserService,
     @Inject(MonthlyMoneyOperationServiceToken)
     private readonly moneyOperationService: MonthlyMoneyOperationService,
     @Inject(RoleServiceToken)
@@ -64,7 +64,7 @@ export class UserController {
   @Get('/me')
   @ApiOkResponse()
   findMyProfile(@CurrentUser() user: JwtPayload) {
-    return this.userService.findMyProfile(user.sub);
+    return this.domainUser.findMyProfile(user.sub);
   }
 
   @CanAccessBy(AccessRights.VIEW_USERS, AccessRights.EDIT_MEMBER_USER)
@@ -73,28 +73,24 @@ export class UserController {
   async search(
     @Query() query: UserManagementQueryDto,
   ): Promise<Page<UserManagementView>> {
-    return this.userService.search(query);
+    return this.domainUser.search(query);
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
   @Patch('/:id/active')
   @ApiNoContentResponse()
   async toggleIsActive(@Param('id') id: string) {
-    await this.userService.toggleUserIsActive(id);
+    await this.domainUser.toggleUserIsActive(id);
   }
 
   @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
   @Get('/:id/roles')
   @ApiOkResponse()
-  async findUserRoles(@Param('id') userId: string) {
-    // Provide search with deleted
-    const user = await this.userService.findById(userId, ['roles']);
-
-    if (!user) {
-      return {};
-    }
-
-    return user;
+  findUserWithRoles(@Param('id') userId: string) {
+    return this.userService.findOne({
+      id: userId,
+      withRoles: true,
+    });
   }
 
   @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
@@ -104,14 +100,14 @@ export class UserController {
     @Param('id') userId: string,
     @Body() dto: UpdatableUserDto,
   ) {
-    await this.userService.update(userId, dto);
+    await this.domainUser.update(userId, dto);
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
   @Post('/')
   @ApiCreatedResponse()
   async createUsers(@Body() createUsersDto: CreateUsersDto) {
-    await this.userService.createUserUseCase(createUsersDto);
+    await this.domainUser.createUserUseCase(createUsersDto);
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
@@ -138,6 +134,6 @@ export class UserController {
     @UploadedFile()
     file: Express.Multer.File,
   ) {
-    return this.userService.createUserUseCase({ ...dto, file });
+    return this.domainUser.createUserUseCase({ ...dto, file });
   }
 }

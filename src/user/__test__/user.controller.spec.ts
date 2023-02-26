@@ -1,18 +1,18 @@
 import { Test } from '@nestjs/testing';
 import { UserController } from '../internal/user.controller';
 import { MyProfile } from '../../authentication';
-import { UserManagementView, UserService, UserServiceToken } from '../client';
+import { UserManagementView, DomainUser, DomainUserToken } from '../client';
 
 describe('AuthController', () => {
   let userController: UserController;
-  let userService: UserService;
+  let userService: DomainUser;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
         {
-          provide: UserServiceToken,
+          provide: DomainUserToken,
           useValue: {
             find: jest.fn(),
             getMyProfile: jest.fn(),
@@ -23,7 +23,7 @@ describe('AuthController', () => {
     }).compile();
 
     userController = moduleRef.get<UserController>(UserController);
-    userService = moduleRef.get<UserService>(UserServiceToken);
+    userService = moduleRef.get<DomainUser>(DomainUserToken);
   });
 
   describe('getMyProfile', () => {
