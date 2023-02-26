@@ -17,7 +17,6 @@ export class UserRepository extends Repository<User> {
       .leftJoinAndSelect('users.roles', 'roles')
       .leftJoinAndSelect('users.operationFee', 'operationFee')
       .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig')
-      .andWhere('users_roles.id IS NULL')
       .andWhere('users.createdAt BETWEEN :from AND :to', {
         from: joinedIn.fromDate,
         to: joinedIn.toDate,
@@ -39,7 +38,6 @@ export class UserRepository extends Repository<User> {
       .leftJoinAndSelect('users.roles', 'roles')
       .leftJoinAndSelect('users.operationFee', 'operationFee')
       .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig')
-      .andWhere('users_roles.id IS NULL')
       .andWhere('users.createdAt BETWEEN :from AND :to', {
         from: joinedIn.fromDate,
         to: joinedIn.toDate,

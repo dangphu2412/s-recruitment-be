@@ -13,7 +13,11 @@ import {
   InsertUserFailedException,
   NotFoundSheetNameException,
   NotFoundUserException,
+  UpdatableUserPayload,
   User,
+  UserManagementQuery,
+  UserManagementQueryDto,
+  UserManagementView,
   UserService,
 } from '../client';
 import { MyProfile } from '../../authentication';
@@ -25,8 +29,11 @@ import {
   MonthlyMoneyOperationService,
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
-import { CreateUserType } from '../client/constants';
+import { CreateUserType, MemberType } from '../client/constants';
 import { FileCreateUsersDto } from '../client/dtos/file-create-users.dto';
+import { RoleService, RoleServiceToken } from '@authorization/client';
+import { Page, PageRequest } from '@shared/query-shape/pagination/entities';
+import map from 'lodash/map';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -39,6 +46,8 @@ export class UserServiceImpl implements UserService {
     @Inject(MonthlyMoneyOperationServiceToken)
     private readonly moneyOperationService: MonthlyMoneyOperationService,
     private readonly bcryptService: BcryptService,
+    @Inject(RoleServiceToken)
+    private readonly roleService: RoleService,
   ) {}
 
   async findMyProfile(id: string): Promise<MyProfile | null> {
@@ -200,4 +209,70 @@ export class UserServiceImpl implements UserService {
 
       return user;
     };
+
+  async update(id: string, payload: UpdatableUserPayload): Promise<void> {
+    const user = await this.userRepository.findOne(id, { withDeleted: true });
+
+    if (!user) {
+      throw new NotFoundUserException();
+    }
+
+    if (payload.roleIds) {
+      await this.roleService.updateUserRoles(user, payload.roleIds);
+    }
+
+    await this.userRepository.save(user);
+  }
+
+  async search(
+    query: UserManagementQueryDto,
+  ): Promise<Page<UserManagementView>> {
+    const { search, joinedIn, memberType } = query;
+    const { offset, size } = PageRequest.of(query);
+
+    if (memberType === MemberType.DEBTOR) {
+      const memberOperationFees =
+        await this.moneyOperationService.findDebtOperationFee({
+          size,
+          offset,
+        });
+
+      const userIds = map(memberOperationFees, 'userId');
+
+      if (!userIds.length) {
+        return Page.of({
+          query,
+          totalRecords: 0,
+          items: [],
+        });
+      }
+
+      const [items, totalRecords] =
+        await this.userRepository.findDebtorForManagement({
+          joinedIn,
+          userIds,
+          search,
+          memberType,
+        });
+
+      return Page.of({
+        query,
+        totalRecords,
+        items,
+      });
+    }
+
+    const [items, totalRecords] =
+      await this.userRepository.findUsersForManagement({
+        ...query,
+        offset,
+        size,
+      } as UserManagementQuery);
+
+    return Page.of({
+      query,
+      totalRecords,
+      items,
+    });
+  }
 }

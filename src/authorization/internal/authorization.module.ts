@@ -7,13 +7,9 @@ import { RoleAuthorizationStrategy } from './strategies/role-authorization.strat
 import { AccessRightStorageToken, RoleServiceToken } from '../client';
 import { RoleController } from '@authorization/internal/role.controller';
 import { PermissionRepository } from '@authorization/internal/repositories/permission.repository';
-import { UserModule } from '../../user/internal/user.module';
 
 @Module({
-  imports: [
-    UserModule,
-    TypeOrmModule.forFeature([RoleRepository, PermissionRepository]),
-  ],
+  imports: [TypeOrmModule.forFeature([RoleRepository, PermissionRepository])],
   controllers: [RoleController],
   providers: [
     RoleAuthorizationStrategy,

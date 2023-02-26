@@ -33,7 +33,10 @@ export class AuthServiceImpl implements AuthService {
   ) {}
 
   async login(basicLoginDto: BasicLoginDto): Promise<LoginCredentials> {
-    const user = await this.userService.findByUsername(basicLoginDto.username);
+    const user = await this.userService.findByUsername(basicLoginDto.username, [
+      'roles',
+      'roles.permissions',
+    ]);
     const cannotLogin =
       !user ||
       (await this.bcryptService.compare(basicLoginDto.password, user.password));
@@ -44,7 +47,7 @@ export class AuthServiceImpl implements AuthService {
 
     const [tokens] = await Promise.all([
       this.tokenGenerator.generate(user.id),
-      this.accessRightStorage.renew(user.id),
+      this.accessRightStorage.save(user.id, user.roles),
     ]);
 
     return {
@@ -57,10 +60,19 @@ export class AuthServiceImpl implements AuthService {
       const { sub } = await this.jwtService.verifyAsync<JwtPayload>(
         refreshToken,
       );
+      const user = await this.userService.findById(sub, [
+        'roles',
+        'roles.permissions',
+      ]);
+
+      const [tokens] = await Promise.all([
+        this.tokenGenerator.generate(sub, refreshToken),
+        this.accessRightStorage.save(user.id, user.roles),
+      ]);
 
       // TODO: Missing access token in cache when server restart
       return {
-        tokens: await this.tokenGenerator.generate(sub, refreshToken),
+        tokens,
       };
     } catch {
       const jwtPayload = extractJwtPayload(refreshToken);

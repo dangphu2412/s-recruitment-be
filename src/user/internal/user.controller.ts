@@ -18,7 +18,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser, Identified, JwtPayload } from '../../authentication';
-import { AccessRights, CanAccessBy } from '../../authorization';
+import {
+  AccessRights,
+  CanAccessBy,
+  RoleService,
+  RoleServiceToken,
+} from '../../authorization';
 import {
   CreateUsersDto,
   SearchUserService,
@@ -36,6 +41,7 @@ import {
 import { Page } from '@shared/query-shape/pagination/types';
 import { FileInterceptor } from '../../core/internal';
 import { FileCreateUsersDto } from '../client/dtos/file-create-users.dto';
+import { UpdatableUserDto } from '../client/dtos/updatable-user.dto';
 
 @ApiTags('users')
 @Controller({
@@ -50,6 +56,8 @@ export class UserController {
     private readonly searchUserService: SearchUserService,
     @Inject(MonthlyMoneyOperationServiceToken)
     private readonly moneyOperationService: MonthlyMoneyOperationService,
+    @Inject(RoleServiceToken)
+    private readonly roleService: RoleService,
   ) {}
 
   @Identified
@@ -65,7 +73,7 @@ export class UserController {
   async search(
     @Query() query: UserManagementQueryDto,
   ): Promise<Page<UserManagementView>> {
-    return this.searchUserService.search(query);
+    return this.userService.search(query);
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
@@ -73,6 +81,30 @@ export class UserController {
   @ApiNoContentResponse()
   async toggleIsActive(@Param('id') id: string) {
     await this.userService.toggleUserIsActive(id);
+  }
+
+  @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
+  @Get('/:id/roles')
+  @ApiOkResponse()
+  async findUserRoles(@Param('id') userId: string) {
+    // Provide search with deleted
+    const user = await this.userService.findById(userId, ['roles']);
+
+    if (!user) {
+      return {};
+    }
+
+    return user;
+  }
+
+  @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
+  @Patch('/:id/roles')
+  @ApiNoContentResponse()
+  async updateUserRoles(
+    @Param('id') userId: string,
+    @Body() dto: UpdatableUserDto,
+  ) {
+    await this.userService.update(userId, dto);
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)

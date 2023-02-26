@@ -25,6 +25,7 @@ export class RoleAuthorizationStrategy
   ): Promise<boolean> {
     const accessRights = await this.roleStorage.get(sub);
 
+    // TODO: renew instead of kick out
     if (!accessRights) {
       throw new LogoutRequiredException();
     }

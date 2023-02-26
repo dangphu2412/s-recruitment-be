@@ -5,6 +5,7 @@ import {
   AccessRightStorage,
   AccessRightStorageToken,
   Right,
+  Role,
   RoleService,
 } from '../client';
 import { PermissionRepository } from '@authorization/internal/repositories/permission.repository';
@@ -13,6 +14,7 @@ import { UpdateRoleDto } from '@authorization/client/dto';
 import { In } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { InvalidRoleUpdateException } from '@authorization/client/exceptions/invalid-role-update.exception';
+import { User } from '../../user';
 
 @Injectable()
 export class RoleServiceImpl implements RoleService {
@@ -81,5 +83,13 @@ export class RoleServiceImpl implements RoleService {
 
     await this.roleRepository.save(role);
     await this.accessRightStorage.clean(removalIds);
+  }
+
+  findByIds(ids: number[]): Promise<Role[]> {
+    return this.roleRepository.findByIds(ids);
+  }
+
+  async updateUserRoles(user: User, roleIds: number[]): Promise<void> {
+    user.roles = await this.roleRepository.findByIds(roleIds);
   }
 }

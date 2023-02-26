@@ -4,6 +4,10 @@ export type CreateUserPayload = {
   birthday?: string;
 };
 
+export type UpdatableUserPayload = {
+  roleIds?: number[];
+};
+
 export type ExcelUserCreationPayload = {
   STT: string;
   'Họ và Tên:': string;

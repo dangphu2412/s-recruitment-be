@@ -1,7 +1,7 @@
 import { AuthorizationStrategy } from '../../client';
 import { Logger } from '@nestjs/common';
 
-export const StrategiesKeyById: Record<string, AuthorizationStrategy> = {};
+export const StrategiesStorage = new Map<string, AuthorizationStrategy>();
 
 /**
  * @param identify the key which help authorization module identify strategy out of the box
@@ -13,5 +13,5 @@ export function registerStrategy(
   strategy: AuthorizationStrategy,
 ) {
   Logger.log(`Initializing strategy ${identify}`, 'AuthorizationStrategy');
-  StrategiesKeyById[identify] = strategy;
+  StrategiesStorage.set(identify, strategy);
 }
