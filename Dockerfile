@@ -19,7 +19,6 @@ FROM node:16-alpine AS runner
 
 WORKDIR /usr/backend
 
-COPY .env ./.env
 COPY --from=builder /usr/backend/prod/node_modules  ./node_modules
 COPY --from=builder /usr/backend/dist ./dist
 
