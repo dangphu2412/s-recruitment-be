@@ -1,10 +1,8 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   JoinTable,
   ManyToMany,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -44,13 +42,6 @@ export class Role {
     default: true,
   })
   isEditable: boolean;
-
-  @ManyToOne(() => User)
-  @JoinColumn({
-    name: 'update_by_user_id',
-    referencedColumnName: 'id',
-  })
-  updatedBy: User;
 
   @ManyToMany(() => User)
   @JoinTable({

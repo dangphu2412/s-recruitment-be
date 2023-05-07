@@ -31,14 +31,6 @@ export class UpdateRelationsRolesPermissionsAndUsers1675180178689
       }),
     );
 
-    await queryRunner.createForeignKeys('roles', [
-      new TableForeignKey({
-        columnNames: ['update_by_user_id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'users',
-      }),
-    ]);
-
     await queryRunner.createForeignKeys('roles_permissions', [
       new TableForeignKey({
         columnNames: ['role_id'],
