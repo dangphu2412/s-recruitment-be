@@ -28,9 +28,16 @@ export class SeedingMenus1659108460003 implements MigrationInterface {
         ],
       },
       {
-        name: 'Category',
-        iconCode: 'CATEGORY_ICON',
-        code: 'CATEGORY',
+        name: 'Recruitment',
+        iconCode: 'RECRUITMENT_ICON',
+        code: 'RECRUITMENT',
+        subMenus: [
+          {
+            name: 'Recruitment management',
+            accessLink: '/recruitments/overview',
+            code: 'RECRUITMENT_OVERVIEW',
+          },
+        ],
       },
     ];
 
@@ -69,7 +76,13 @@ export class SeedingMenus1659108460003 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     const menuRepository = queryRunner.manager.getTreeRepository(Menu);
     await menuRepository.delete({
-      code: In(['USER_MANAGEMENT', 'ADMIN', 'ACCESS_CONTROL', 'CATEGORY']),
+      code: In([
+        'USER_MANAGEMENT',
+        'ADMIN',
+        'ACCESS_CONTROL',
+        'RECRUITMENT',
+        'RECRUITMENT_OVERVIEW',
+      ]),
     });
   }
 

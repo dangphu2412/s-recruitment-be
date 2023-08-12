@@ -22,10 +22,14 @@ export class SeedMenuSettings1676171233978 implements MigrationInterface {
     const menuCodeMapToMenu = this.keyMenusByCode(menus);
 
     const permissionDefineMenus: Record<string, Array<string>> = {
-      [AccessRights.VIEW_USERS]: ['USER_MANAGEMENT', 'ADMIN', 'CATEGORY'],
+      [AccessRights.VIEW_USERS]: ['USER_MANAGEMENT', 'ADMIN'],
       [AccessRights.EDIT_MEMBER_USER]: ['ADMIN'],
       [AccessRights.VIEW_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
       [AccessRights.EDIT_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
+      [AccessRights.MANAGE_RECRUITMENT]: [
+        'RECRUITMENT',
+        'RECRUITMENT_OVERVIEW',
+      ],
     };
     const settings = Object.keys(permissionDefineMenus)
       .map((permissionName) => {

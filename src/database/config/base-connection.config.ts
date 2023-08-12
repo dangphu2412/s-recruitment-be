@@ -3,7 +3,6 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-op
 import { User } from '../../user';
 import { Role } from '../../authorization';
 import { Menu } from '../../menu';
-import { Province } from '../../location';
 import { MonthlyMoneyConfig, OperationFee } from '../../monthly-money';
 import { Permission } from '@authorization/client/entities/permission.entity';
 import { MenuSetting } from '../../menu/client/entities/menu-settings.entity';
@@ -22,7 +21,6 @@ export const connectionConfig: TypeOrmModuleOptions = {
     Role,
     Menu,
     MenuSetting,
-    Province,
     MonthlyMoneyConfig,
     OperationFee,
     Permission,

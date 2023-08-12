@@ -1,5 +1,4 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -8,16 +7,17 @@ import {
   patchTypeORMRepositoryWithBaseRepository,
   patchTypeORMTreeRepositoryWithBaseTreeRepository,
 } from 'typeorm-transactional-cls-hooked';
-import { ClientExceptionFilter } from './exception/exception.filter';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { fastifyHelmet } from '@fastify/helmet';
 import compression from 'fastify-compress';
-import { logAppScaffold } from './utils';
 import { registerPaginationConfig } from '@shared/query-shape/pagination/config/register-pagination.config';
 import { contentParser } from 'fastify-multer';
+import { AppModule } from './app.module';
+import { ClientExceptionFilter } from './exception/exception.filter';
+import { logAppScaffold } from './utils';
 
 async function bootstrap() {
   initializeTransactionalContext();
@@ -62,10 +62,10 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   const configService = app.get(ConfigService);
-  const port = configService.get<string>('PORT');
-  const host = configService.get<string>('HOST');
+  const port = configService.get<string>('PORT') ?? 3000;
+  const host = configService.get<string>('HOST') ?? '0.0.0.0';
 
-  await app.listen(port ?? 3000, host ?? '0.0.0.0', (err, address) => {
+  await app.listen(port, host, (err, address) => {
     if (err) {
       Logger.log(err);
     }

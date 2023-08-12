@@ -45,6 +45,10 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         name: AccessRights.EDIT_ACCESS_RIGHTS,
         description: 'Edit roles of system',
       },
+      {
+        name: AccessRights.MANAGE_RECRUITMENT,
+        description: 'Manage recruitment',
+      },
     ]);
     const nameMapToRoles = keyBy(savedRoles, 'name');
     const nameMapToPermissions = keyBy(savedPermissions, 'name');
