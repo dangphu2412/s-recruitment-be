@@ -4,7 +4,7 @@ import { User } from '../../user';
 import { Role } from '../../authorization';
 import { Menu } from '../../menu';
 import { MonthlyMoneyConfig, OperationFee } from '../../monthly-money';
-import { Permission } from '@authorization/client/entities/permission.entity';
+import { Permission } from 'src/authorization/client/entities/permission.entity';
 import { MenuSetting } from '../../menu/client/entities/menu-settings.entity';
 import { RecruitmentEvent } from '../../recruitment/client/entities/recruitment-event.entity';
 

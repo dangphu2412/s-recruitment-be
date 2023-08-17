@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload, TokenDto, TokenGenerator } from '../client';
-import { ModuleConfig } from '@shared/services';
+import { ModuleConfig } from 'src/system/services';
 
 @Injectable()
 export class TokenGeneratorImpl implements TokenGenerator {

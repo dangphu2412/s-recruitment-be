@@ -21,13 +21,7 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "paths": {
-      "@shared/*": ["src/shared/*"],
-      "@modules/*": ["src/modules/*"],
-      "@authentication/*": ["src/authentication/*"],
-      "@authorization/*": ["src/authorization/*"]
-    }
+    "resolveJsonModule": true
   },
   "exclude": ["**/*.test.ts", "**/*.mock.ts", "**/*.json"]
 }

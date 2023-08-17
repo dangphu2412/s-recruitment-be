@@ -13,7 +13,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { fastifyHelmet } from '@fastify/helmet';
 import compression from 'fastify-compress';
-import { registerPaginationConfig } from '@shared/query-shape/pagination/config/register-pagination.config';
+import { registerPaginationConfig } from 'src/system/query-shape/pagination/config/register-pagination.config';
 import { contentParser } from 'fastify-multer';
 import { AppModule } from './app.module';
 import { ClientExceptionFilter } from './exception/exception.filter';

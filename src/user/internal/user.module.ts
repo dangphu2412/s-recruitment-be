@@ -5,7 +5,7 @@ import { DomainUserImpl } from './domain.user';
 import { UserRepository } from './user.repository';
 import { MonthlyMoneyModule } from '../../monthly-money/internal/monthly-money.module';
 import { UserServiceImpl } from './user.service';
-import { AuthorizationModule } from '@authorization/internal/authorization.module';
+import { AuthorizationModule } from 'src/authorization/internal/authorization.module';
 import { UserController } from './user.controller';
 
 @Module({

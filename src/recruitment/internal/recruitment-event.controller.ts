@@ -10,10 +10,10 @@ import {
 import { RecruitmentEventService } from './recruitment-event.service';
 import { CreateRecruitmentEventDto } from '../client/dto/create-recruitment-event.dto';
 import { UpdateRecruitmentDto } from '../client/dto/update-recruitment.dto';
-import { CanAccessBy } from '@authorization/internal/decorators/can-access-by.decorator';
-import { AccessRights } from '@authorization/internal/constants/role-def.enum';
-import { CurrentUser } from '@authentication/internal/decorators';
-import { JwtPayload } from '@authentication/client';
+import { CanAccessBy } from 'src/authorization/internal/decorators/can-access-by.decorator';
+import { AccessRights } from 'src/authorization/internal/constants/role-def.enum';
+import { CurrentUser } from 'src/authentication/internal/decorators';
+import { JwtPayload } from 'src/authentication/client';
 
 @Controller('recruitments/events')
 export class RecruitmentEventController {

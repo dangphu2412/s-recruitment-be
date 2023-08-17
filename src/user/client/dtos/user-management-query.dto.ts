@@ -1,7 +1,7 @@
 import { IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { OffsetPagination } from '@shared/query-shape/pagination/entities/offset-pagination.request';
-import { DateRange } from '@shared/query-shape/filter/entities/date-range.query';
-import { ToDateRange } from '@shared/query-shape/filter/decorators/to-date-range.decorator';
+import { OffsetPagination } from 'src/system/query-shape/pagination/entities/offset-pagination.request';
+import { DateRange } from 'src/system/query-shape/filter/entities/date-range.query';
+import { ToDateRange } from 'src/system/query-shape/filter/decorators/to-date-range.decorator';
 import { MemberType } from '../constants';
 
 export class UserManagementQueryDto extends OffsetPagination {

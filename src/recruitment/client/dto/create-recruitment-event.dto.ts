@@ -4,7 +4,7 @@ import {
   IsUUID,
   ValidateNested,
 } from 'class-validator';
-import { DateRange } from '@shared/query-shape/filter/entities/date-range.query';
+import { DateRange } from 'src/system/query-shape/filter/entities/date-range.query';
 import { Type } from 'class-transformer';
 
 export class CreateRecruitmentEventDto {

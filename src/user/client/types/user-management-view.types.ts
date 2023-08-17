@@ -1,6 +1,6 @@
 import { User } from '../entities/user.entity';
 import { UserManagementQueryDto } from '../dtos/user-management-query.dto';
-import { PageRequest } from '@shared/query-shape/pagination/types';
+import { PageRequest } from 'src/system/query-shape/pagination/types';
 
 export type UserManagementView = Omit<User, 'password' | 'roles'>;
 

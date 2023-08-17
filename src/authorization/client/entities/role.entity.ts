@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../../user';
-import { Permission } from '@authorization/client/entities/permission.entity';
+import { Permission } from 'src/authorization/client/entities/permission.entity';
 
 @Entity({
   name: 'roles',
