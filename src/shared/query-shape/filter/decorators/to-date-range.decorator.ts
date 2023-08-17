@@ -9,13 +9,17 @@ export function ToDateRange() {
       return undefined;
     }
 
-    const { fromDate, toDate } = JSON.parse(params.value);
+    try {
+      const { fromDate, toDate } = JSON.parse(params.value);
 
-    const dateRange = new DateRange();
+      const dateRange = new DateRange();
 
-    dateRange.fromDate = isString(fromDate) ? new Date(fromDate) : undefined;
-    dateRange.toDate = isString(toDate) ? new Date(toDate) : undefined;
+      dateRange.fromDate = fromDate;
+      dateRange.toDate = toDate;
 
-    return dateRange;
+      return dateRange;
+    } catch {
+      return undefined;
+    }
   });
 }

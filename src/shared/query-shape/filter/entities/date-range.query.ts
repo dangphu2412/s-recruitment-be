@@ -1,11 +1,9 @@
-import { IsDate, IsOptional } from 'class-validator';
+import { IsISO8601 } from 'class-validator';
 
 export class DateRange {
-  @IsOptional()
-  @IsDate()
-  fromDate: Date;
+  @IsISO8601()
+  fromDate: string;
 
-  @IsOptional()
-  @IsDate()
-  toDate: Date;
+  @IsISO8601()
+  toDate: string;
 }

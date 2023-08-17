@@ -6,5 +6,6 @@ export const UserServiceToken = createInterfaceToken('UserService');
 
 export interface UserService {
   find(query: UserQuery): Promise<User[]>;
+  find(ids: string[]): Promise<User[]>;
   findOne(query: UserQuery): Promise<User>;
 }

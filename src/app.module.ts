@@ -6,6 +6,7 @@ import { AuthorizationModule } from './authorization/internal/authorization.modu
 import { SharedModule } from './shared/shared.module';
 import { MenuModule } from './menu/internal/menu.module';
 import { MonthlyMoneyModule } from './monthly-money/internal/monthly-money.module';
+import { RecruitmentEventModule } from './recruitment/internal/recruitment-event.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MonthlyMoneyModule } from './monthly-money/internal/monthly-money.modul
     SharedModule,
     MenuModule,
     MonthlyMoneyModule,
+    RecruitmentEventModule,
   ],
 })
 export class AppModule {}

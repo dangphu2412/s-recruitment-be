@@ -6,6 +6,7 @@ import { Menu } from '../../menu';
 import { MonthlyMoneyConfig, OperationFee } from '../../monthly-money';
 import { Permission } from '@authorization/client/entities/permission.entity';
 import { MenuSetting } from '../../menu/client/entities/menu-settings.entity';
+import { RecruitmentEvent } from '../../recruitment/client/entities/recruitment-event.entity';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ export const connectionConfig: TypeOrmModuleOptions = {
     MonthlyMoneyConfig,
     OperationFee,
     Permission,
+    RecruitmentEvent,
   ],
   synchronize: process.env.DB_SYNC ? process.env.DB_SYNC === 'true' : false,
   logging: true,

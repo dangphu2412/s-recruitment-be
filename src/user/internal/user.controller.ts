@@ -18,20 +18,15 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser, Identified, JwtPayload } from '../../authentication';
-import {
-  AccessRights,
-  CanAccessBy,
-  RoleService,
-  RoleServiceToken,
-} from '../../authorization';
+import { AccessRights, CanAccessBy } from '../../authorization';
 import {
   CreateUsersDto,
-  UserService,
-  UserServiceToken,
-  UserManagementQueryDto,
-  UserManagementView,
   DomainUser,
   DomainUserToken,
+  UserManagementQueryDto,
+  UserManagementView,
+  UserService,
+  UserServiceToken,
 } from '../client';
 import { UpdateMemberPaidDto } from '../client/dtos/update-member-paid.dto';
 import {
@@ -56,8 +51,6 @@ export class UserController {
     private readonly userService: UserService,
     @Inject(MonthlyMoneyOperationServiceToken)
     private readonly moneyOperationService: MonthlyMoneyOperationService,
-    @Inject(RoleServiceToken)
-    private readonly roleService: RoleService,
   ) {}
 
   @Identified

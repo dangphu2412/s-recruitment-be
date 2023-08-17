@@ -7,14 +7,19 @@ import { UserRepository } from './user.repository';
 export class UserServiceImpl implements UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  find({
-    withDeleted,
-    withRoles = false,
-    withRights = false,
-    ...userFields
-  }: UserQuery): Promise<User[]> {
+  find(query: UserQuery | string[]): Promise<User[]> {
+    if (Array.isArray(query)) {
+      return this.userRepository.findByIds(query);
+    }
+
     const relations = [];
 
+    const {
+      withDeleted,
+      withRoles = false,
+      withRights = false,
+      ...userFields
+    } = query;
     withRoles && relations.push('roles');
     withRights && relations.push('roles', 'roles.permissions');
 

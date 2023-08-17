@@ -9,22 +9,27 @@ export class UserRepository extends Repository<User> {
     joinedIn,
     search = '',
   }: UserManagementQuery) {
-    return this.createQueryBuilder('users')
+    const qb = this.createQueryBuilder('users')
       .select()
       .skip(offset)
       .take(size)
       .withDeleted()
       .leftJoinAndSelect('users.roles', 'roles')
       .leftJoinAndSelect('users.operationFee', 'operationFee')
-      .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig')
-      .andWhere('users.createdAt BETWEEN :from AND :to', {
+      .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig');
+
+    if (joinedIn) {
+      qb.andWhere('users.createdAt BETWEEN :from AND :to', {
         from: joinedIn.fromDate,
         to: joinedIn.toDate,
-      })
-      .andWhere('users.email LIKE :email', {
-        email: `%${search}%`,
-      })
-      .getManyAndCount();
+      });
+    }
+
+    qb.andWhere('users.email LIKE :email', {
+      email: `%${search}%`,
+    });
+
+    return qb.getManyAndCount();
   }
 
   findDebtorForManagement({
@@ -32,21 +37,25 @@ export class UserRepository extends Repository<User> {
     search = '',
     userIds,
   }: DebtorManagementQuery) {
-    return this.createQueryBuilder('users')
+    const qb = this.createQueryBuilder('users')
       .select()
       .withDeleted()
       .leftJoinAndSelect('users.roles', 'roles')
       .leftJoinAndSelect('users.operationFee', 'operationFee')
-      .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig')
-      .andWhere('users.createdAt BETWEEN :from AND :to', {
+      .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig');
+
+    if (joinedIn) {
+      qb.andWhere('users.createdAt BETWEEN :from AND :to', {
         from: joinedIn.fromDate,
         to: joinedIn.toDate,
-      })
-      .andWhere('users.email LIKE :email', {
-        email: `%${search}%`,
-      })
-      .andWhere(`users.id IN (:...userIds)`, { userIds })
-      .getManyAndCount();
+      });
+    }
+
+    qb.andWhere('users.email LIKE :email', {
+      email: `%${search}%`,
+    }).andWhere(`users.id IN (:...userIds)`, { userIds });
+
+    return qb.getManyAndCount();
   }
 
   insertIgnoreDuplicated(users: User[]) {

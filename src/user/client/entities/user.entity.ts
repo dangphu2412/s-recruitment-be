@@ -12,6 +12,7 @@ import {
 import { Role } from '@authorization/client';
 import { Exclude } from 'class-transformer';
 import { OperationFee } from '../../../monthly-money';
+import { RecruitmentEvent } from '../../../recruitment/client/entities/recruitment-event.entity';
 
 @Entity({
   name: 'users',
@@ -89,6 +90,20 @@ export class User {
     },
   })
   roles?: Role[];
+
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable({
+    name: 'recruitment_events_examiners',
+    joinColumn: {
+      name: 'examiner_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'recruitment_event_id',
+      referencedColumnName: 'id',
+    },
+  })
+  joinedRecruitEvents?: RecruitmentEvent[];
 
   @OneToOne(() => OperationFee, (operationFee) => operationFee.user)
   operationFee?: OperationFee;
