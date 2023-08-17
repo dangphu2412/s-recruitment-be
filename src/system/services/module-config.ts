@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModuleOptions } from '@nestjs/jwt';
 import { isBooleanString } from 'class-validator';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
-import migrationConfig from '../../database/config/migration.config';
+import migrationConfig from '../database/config/migration.config';
 
 @Injectable()
 export class ModuleConfig {

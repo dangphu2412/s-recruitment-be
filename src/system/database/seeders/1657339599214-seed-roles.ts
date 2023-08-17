@@ -1,5 +1,5 @@
 import { In, MigrationInterface, QueryRunner } from 'typeorm';
-import { SystemRoles, Role, AccessRights } from '../../authorization';
+import { SystemRoles, Role, AccessRights } from '../../../authorization';
 import { Permission } from 'src/authorization/client/entities/permission.entity';
 import keyBy from 'lodash/keyBy';
 

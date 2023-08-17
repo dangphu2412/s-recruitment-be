@@ -16,7 +16,7 @@ import compression from 'fastify-compress';
 import { registerPaginationConfig } from 'src/system/query-shape/pagination/config/register-pagination.config';
 import { contentParser } from 'fastify-multer';
 import { AppModule } from './app.module';
-import { ClientExceptionFilter } from './exception/exception.filter';
+import { ClientExceptionFilter } from './system/exception/exception.filter';
 import { logAppScaffold } from './utils';
 
 async function bootstrap() {

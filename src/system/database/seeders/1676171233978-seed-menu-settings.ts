@@ -1,8 +1,8 @@
 import { In, MigrationInterface, QueryRunner } from 'typeorm';
-import { MenuSetting } from '../../menu/client/entities/menu-settings.entity';
+import { MenuSetting } from '../../../menu/client/entities/menu-settings.entity';
 import { Permission } from 'src/authorization/client/entities/permission.entity';
 import { AccessRights } from 'src/authorization/internal/constants/role-def.enum';
-import { Menu } from '../../menu';
+import { Menu } from '../../../menu';
 import keyBy from 'lodash/keyBy';
 
 export class SeedMenuSettings1676171233978 implements MigrationInterface {

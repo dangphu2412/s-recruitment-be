@@ -34,7 +34,7 @@ import {
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
 import { Page } from 'src/system/query-shape/pagination/types';
-import { FileInterceptor } from '../../core/internal';
+import { FileInterceptor } from '../../system/internal';
 import { FileCreateUsersDto } from '../client/dtos/file-create-users.dto';
 import { UpdatableUserDto } from '../client/dtos/updatable-user.dto';
 

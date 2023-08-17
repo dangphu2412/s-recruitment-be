@@ -10,7 +10,7 @@ import { FastifyReply } from 'fastify';
 import { isClientException } from './exception-generator';
 import { SystemExceptionClientCode } from './exception-client-code.constant';
 import { HttpToClientCodeMapper } from './mapper/http-to-client-code.mapper';
-import { Mapper } from '../core/client/mapper.interface';
+import { Mapper } from '../client/mapper.interface';
 
 @Catch()
 export class ClientExceptionFilter implements ExceptionFilter {
