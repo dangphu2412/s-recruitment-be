@@ -1,4 +1,4 @@
-import { createInterfaceToken } from '../../../utils';
+import { createInterfaceToken } from '../../../system/utils';
 import { UserQuery } from '../types/user-service.types';
 import { User } from '../entities/user.entity';
 

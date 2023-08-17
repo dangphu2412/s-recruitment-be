@@ -1,4 +1,4 @@
-import { createInterfaceToken } from '../../../utils';
+import { createInterfaceToken } from '../../../system/utils';
 import { CreateMoneyFee } from '../types/create-money-fee.types';
 import { UpdatePaid } from '../types/update-paid.types';
 import { OperationFee } from '../entities/operation-fee.entity';

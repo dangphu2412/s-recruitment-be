@@ -1,4 +1,4 @@
-import { createInterfaceToken } from '../../../utils';
+import { createInterfaceToken } from '../../../system/utils';
 import { Role } from 'src/authorization/client';
 
 export const AccessRightStorageToken =

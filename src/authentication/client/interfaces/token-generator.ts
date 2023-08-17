@@ -1,5 +1,5 @@
 import { TokenDto } from '../types';
-import { createInterfaceToken } from '../../../utils';
+import { createInterfaceToken } from '../../../system/utils';
 
 export const TokenGeneratorToken = createInterfaceToken('TokenGenerator');
 

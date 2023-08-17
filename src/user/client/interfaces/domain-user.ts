@@ -1,5 +1,5 @@
 import { MyProfile } from 'src/authentication/client';
-import { createInterfaceToken } from '../../../utils';
+import { createInterfaceToken } from '../../../system/utils';
 import { CreateUsersDto } from '../dtos/create-users.dto';
 import { FileCreateUsersDto } from '../dtos/file-create-users.dto';
 import { UpdatableUserPayload } from '../types/user-service.types';

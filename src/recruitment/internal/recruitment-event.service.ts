@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CreateRecruitmentEventDto } from '../client/dto/create-recruitment-event.dto';
 import { UpdateRecruitmentDto } from '../client/dto/update-recruitment.dto';
 import { RecruitmentEventRepository } from './recruitment-event.repository';
 import { UserService, UserServiceToken } from '../../user';
@@ -24,24 +23,22 @@ export class RecruitmentEventService {
       throw new NotFoundExaminersException();
     }
 
-    const user = await this.userService.findOne({
-      id: createRecruitmentDto.userId,
-    });
-
     const newRecruitmentEvent = this.recruitmentEventRepository.create({
       name: createRecruitmentDto.name,
       location: createRecruitmentDto.location,
       startDate: createRecruitmentDto.recruitmentRange.fromDate,
       endDate: createRecruitmentDto.recruitmentRange.toDate,
       examiners,
-      createdBy: user,
+      authorId: createRecruitmentDto.authorId,
     });
 
     await this.recruitmentEventRepository.save(newRecruitmentEvent);
   }
 
   async findAll() {
-    const items = await this.recruitmentEventRepository.find();
+    const items = await this.recruitmentEventRepository.find({
+      relations: ['createdBy', 'examiners'],
+    });
 
     return Page.of({
       items,

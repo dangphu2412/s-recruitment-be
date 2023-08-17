@@ -17,7 +17,7 @@ import { registerPaginationConfig } from 'src/system/query-shape/pagination/conf
 import { contentParser } from 'fastify-multer';
 import { AppModule } from './app.module';
 import { ClientExceptionFilter } from './system/exception/exception.filter';
-import { logAppScaffold } from './utils';
+import { logAppScaffold } from './system/utils';
 
 async function bootstrap() {
   initializeTransactionalContext();

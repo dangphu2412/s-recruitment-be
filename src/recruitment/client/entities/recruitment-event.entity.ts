@@ -59,6 +59,11 @@ export class RecruitmentEvent {
   })
   examiners?: User[];
 
+  @Column({
+    name: 'author_id',
+  })
+  authorId: string;
+
   @ManyToOne(() => User)
   @JoinColumn({
     name: 'author_id',

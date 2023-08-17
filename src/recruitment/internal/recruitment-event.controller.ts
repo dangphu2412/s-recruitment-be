@@ -29,7 +29,7 @@ export class RecruitmentEventController {
   ) {
     return this.recruitmentEventService.create({
       ...createRecruitmentDto,
-      userId: user.sub,
+      authorId: user.sub,
     });
   }
 

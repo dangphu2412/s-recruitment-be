@@ -1,5 +1,5 @@
 import { AccessControlView, Role } from 'src/authorization/client';
-import { createInterfaceToken } from '../../../utils';
+import { createInterfaceToken } from '../../../system/utils';
 import { UpdateRoleDto } from 'src/authorization/client/dto';
 import { User } from '../../../user';
 
