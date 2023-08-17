@@ -1,6 +1,6 @@
 import { In, MigrationInterface, QueryRunner } from 'typeorm';
 import { SystemRoles, Role, AccessRights } from '../../authorization';
-import { Permission } from '@authorization/client/entities/permission.entity';
+import { Permission } from 'src/authorization/client/entities/permission.entity';
 import keyBy from 'lodash/keyBy';
 
 export class SeedRoles1657339599214 implements MigrationInterface {

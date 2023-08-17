@@ -1,5 +1,5 @@
 import { UnprocessableEntityException } from '@nestjs/common';
-import { createAuthorizationClientCode } from '@authorization/client/exceptions/create-authorization-client.factory';
+import { createAuthorizationClientCode } from 'src/authorization/client/exceptions/create-authorization-client.factory';
 
 export class InvalidRoleUpdateException extends UnprocessableEntityException {
   constructor() {

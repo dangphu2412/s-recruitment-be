@@ -21,7 +21,7 @@ import {
   UserManagementView,
 } from '../client';
 import { MyProfile } from '../../authentication';
-import { BcryptService } from '@shared/services';
+import { BcryptService } from 'src/system/services';
 import { read, utils } from 'xlsx';
 import {
   MonthlyMoneyConfigService,
@@ -31,8 +31,8 @@ import {
 } from '../../monthly-money';
 import { CreateUserType, MemberType } from '../client/constants';
 import { FileCreateUsersDto } from '../client/dtos/file-create-users.dto';
-import { RoleService, RoleServiceToken } from '@authorization/client';
-import { Page, PageRequest } from '@shared/query-shape/pagination/entities';
+import { RoleService, RoleServiceToken } from 'src/authorization/client';
+import { Page, PageRequest } from 'src/system/query-shape/pagination/entities';
 import map from 'lodash/map';
 
 @Injectable()

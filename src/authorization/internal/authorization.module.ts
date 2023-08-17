@@ -5,8 +5,8 @@ import { RoleRepository } from './repositories/role.repository';
 import { AccessRightStorageImpl } from './role-storage';
 import { RoleAuthorizationStrategy } from './strategies/role-authorization.strategy';
 import { AccessRightStorageToken, RoleServiceToken } from '../client';
-import { RoleController } from '@authorization/internal/role.controller';
-import { PermissionRepository } from '@authorization/internal/repositories/permission.repository';
+import { RoleController } from 'src/authorization/internal/role.controller';
+import { PermissionRepository } from 'src/authorization/internal/repositories/permission.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([RoleRepository, PermissionRepository])],

@@ -1,8 +1,8 @@
-import { OffsetPagination } from '@shared/query-shape/pagination/entities/offset-pagination.request';
+import { OffsetPagination } from 'src/system/query-shape/pagination/entities/offset-pagination.request';
 import {
   CreatePage,
   PaginationMetadata,
-} from '@shared/query-shape/pagination/types';
+} from 'src/system/query-shape/pagination/types';
 
 export class Page<T> {
   items: T[];

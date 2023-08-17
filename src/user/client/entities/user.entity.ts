@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Role } from '@authorization/client';
+import { Role } from 'src/authorization/client';
 import { Exclude } from 'class-transformer';
 import { OperationFee } from '../../../monthly-money';
 import { RecruitmentEvent } from '../../../recruitment/client/entities/recruitment-event.entity';

@@ -1,5 +1,5 @@
 import { IsNumber } from 'class-validator';
-import { ToInt } from '@shared/transformer';
+import { ToInt } from 'src/system/transformer';
 import { OptionalToDefault } from '../decorators/optional-to-default';
 import { ConfigKeys } from '../../config.registry';
 

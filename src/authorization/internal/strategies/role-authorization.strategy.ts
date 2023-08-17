@@ -4,8 +4,8 @@ import {
   AccessRightStorageToken,
   AuthorizationStrategy,
 } from '../../client';
-import { JwtPayload } from '@authentication/client';
-import { LogoutRequiredException } from '@authentication/client/exceptions/logout-required.exception';
+import { JwtPayload } from 'src/authentication/client';
+import { LogoutRequiredException } from 'src/authentication/client/exceptions/logout-required.exception';
 import { registerStrategy } from './authorization-strategy.register';
 
 @Injectable()

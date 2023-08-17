@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { BcryptService } from '@shared/services';
+import { BcryptService } from 'src/system/services';
 import { extractJwtPayload } from './utils/jwt.utils';
 import {
   AuthService,

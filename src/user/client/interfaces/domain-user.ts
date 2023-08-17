@@ -1,10 +1,10 @@
-import { MyProfile } from '@authentication/client';
+import { MyProfile } from 'src/authentication/client';
 import { createInterfaceToken } from '../../../utils';
 import { CreateUsersDto } from '../dtos/create-users.dto';
 import { FileCreateUsersDto } from '../dtos/file-create-users.dto';
 import { UpdatableUserPayload } from '../types/user-service.types';
 import { UserManagementQueryDto } from '../dtos/user-management-query.dto';
-import { Page } from '@shared/query-shape/pagination/types';
+import { Page } from 'src/system/query-shape/pagination/types';
 import { UserManagementView } from '../types/user-management-view.types';
 
 export const DomainUserToken = createInterfaceToken('DomainUser');

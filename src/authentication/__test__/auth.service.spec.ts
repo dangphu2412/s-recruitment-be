@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { AuthServiceImpl } from '../internal/auth.service';
 import { JwtService } from '@nestjs/jwt';
-import { BcryptService } from '@shared/services';
+import { BcryptService } from 'src/system/services';
 import {
   AuthService,
   AuthServiceToken,

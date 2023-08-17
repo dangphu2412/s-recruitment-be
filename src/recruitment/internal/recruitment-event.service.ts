@@ -4,7 +4,7 @@ import { UpdateRecruitmentDto } from '../client/dto/update-recruitment.dto';
 import { RecruitmentEventRepository } from './recruitment-event.repository';
 import { UserService, UserServiceToken } from '../../user';
 import { NotFoundExaminersException } from '../client/exceptions/not-found-examiners.exception';
-import { Page } from '@shared/query-shape/pagination/entities';
+import { Page } from 'src/system/query-shape/pagination/entities';
 import { CreateRecruitmentPayload } from '../client/types/create-recruitment-payload';
 
 @Injectable()

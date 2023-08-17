@@ -1,5 +1,5 @@
-import { Permission } from '@authorization/client/entities/permission.entity';
-import { Role } from '@authorization/client';
+import { Permission } from 'src/authorization/client/entities/permission.entity';
+import { Role } from 'src/authorization/client';
 
 export type Right = Permission & { canAccess: boolean };
 export type AccessControlView = {

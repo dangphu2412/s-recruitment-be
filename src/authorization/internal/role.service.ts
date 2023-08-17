@@ -8,12 +8,12 @@ import {
   Role,
   RoleService,
 } from '../client';
-import { PermissionRepository } from '@authorization/internal/repositories/permission.repository';
-import { Permission } from '@authorization/client/entities/permission.entity';
-import { UpdateRoleDto } from '@authorization/client/dto';
+import { PermissionRepository } from 'src/authorization/internal/repositories/permission.repository';
+import { Permission } from 'src/authorization/client/entities/permission.entity';
+import { UpdateRoleDto } from 'src/authorization/client/dto';
 import { In } from 'typeorm';
 import uniq from 'lodash/uniq';
-import { InvalidRoleUpdateException } from '@authorization/client/exceptions/invalid-role-update.exception';
+import { InvalidRoleUpdateException } from 'src/authorization/client/exceptions/invalid-role-update.exception';
 import { User } from '../../user';
 
 @Injectable()

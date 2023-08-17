@@ -5,8 +5,8 @@ import {
   CanAccessBy,
   RoleService,
   RoleServiceToken,
-} from '@authorization/client';
-import { UpdateRoleDto } from '@authorization/client/dto';
+} from 'src/authorization/client';
+import { UpdateRoleDto } from 'src/authorization/client/dto';
 
 @ApiTags('roles')
 @Controller({

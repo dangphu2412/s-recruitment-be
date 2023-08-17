@@ -1,9 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { BcryptService } from '../../shared/services/bcrypt.service';
 import { SystemRoles, Role } from '../../authorization';
-import { ModuleConfig } from '../../shared/services/module-config';
 import { User } from '../../user';
+import { BcryptService, ModuleConfig } from '../../system/services';
 
 export class SeedUsers1657339686264 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

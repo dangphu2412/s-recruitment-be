@@ -1,6 +1,6 @@
-import { AccessControlView, Role } from '@authorization/client';
+import { AccessControlView, Role } from 'src/authorization/client';
 import { createInterfaceToken } from '../../../utils';
-import { UpdateRoleDto } from '@authorization/client/dto';
+import { UpdateRoleDto } from 'src/authorization/client/dto';
 import { User } from '../../../user';
 
 export const RoleServiceToken = createInterfaceToken('RoleService');

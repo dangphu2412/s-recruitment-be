@@ -5,7 +5,7 @@ import { MenuRepository } from './menu.repositoryt';
 import { MenuServiceImpl } from './menu.service';
 import { MenuServiceToken } from '../client';
 import { UserModule } from '../../user/internal/user.module';
-import { AuthorizationModule } from '@authorization/internal/authorization.module';
+import { AuthorizationModule } from 'src/authorization/internal/authorization.module';
 
 @Module({
   imports: [

@@ -6,8 +6,8 @@ import { AuthorizationModule } from '../../authorization/internal/authorization.
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { TokenGeneratorImpl } from './token-generator';
-import { ModuleConfig } from '../../shared/services/module-config';
 import { AuthServiceToken, TokenGeneratorToken } from '../client';
+import { ModuleConfig } from '../../system/services';
 
 @Module({
   imports: [
