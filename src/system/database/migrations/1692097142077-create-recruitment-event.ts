@@ -44,6 +44,10 @@ export class CreateRecruitmentEvent1692097142077 implements MigrationInterface {
             name: 'author_id',
             type: 'uuid',
           },
+          {
+            name: 'scoring_standard',
+            type: 'json',
+          },
         ],
       }),
     );
@@ -95,6 +99,37 @@ export class CreateRecruitmentEvent1692097142077 implements MigrationInterface {
       new TableUnique({
         name: this.UNIQUE_NAME_KEY,
         columnNames: ['name'],
+      }),
+    ]);
+
+    await queryRunner.createTable(
+      new Table({
+        name: 'recruitment_employees',
+        columns: [
+          {
+            name: 'id',
+            type: 'int',
+            generationStrategy: 'increment',
+            isGenerated: true,
+            isPrimary: true,
+          },
+          {
+            name: 'data',
+            type: 'json',
+          },
+          {
+            name: 'event_id',
+            type: 'int',
+          },
+        ],
+      }),
+    );
+
+    await queryRunner.createForeignKeys('recruitment_employees', [
+      new TableForeignKey({
+        columnNames: ['event_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'recruitment_events',
       }),
     ]);
   }

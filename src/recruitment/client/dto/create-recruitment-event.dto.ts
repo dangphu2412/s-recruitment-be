@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsNotEmpty,
@@ -5,7 +6,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { DateRange } from 'src/system/query-shape/filter/entities/date-range.query';
-import { Type } from 'class-transformer';
+import { ScoringStandardDto } from './scoring-standard.dto';
 
 export class CreateRecruitmentEventDto {
   @IsNotEmpty()
@@ -24,4 +25,9 @@ export class CreateRecruitmentEventDto {
   })
   @ArrayNotEmpty()
   examinerIds: string[];
+
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => ScoringStandardDto)
+  scoringStandards: ScoringStandardDto[];
 }

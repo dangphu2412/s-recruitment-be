@@ -29,8 +29,6 @@ export class RoleAuthorizationStrategy
     if (!accessRights) {
       throw new LogoutRequiredException();
     }
-    console.log(requiredRights);
-    console.log(accessRights);
 
     return requiredRights.some((role) =>
       accessRights.some((right) => right === role),

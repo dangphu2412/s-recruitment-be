@@ -1,19 +1,21 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
+  Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { RecruitmentEventService } from './recruitment-event.service';
-import { CreateRecruitmentEventDto } from '../client/dto/create-recruitment-event.dto';
-import { UpdateRecruitmentDto } from '../client/dto/update-recruitment.dto';
-import { CanAccessBy } from 'src/authorization/internal/decorators/can-access-by.decorator';
-import { AccessRights } from 'src/authorization/internal/constants/role-def.enum';
-import { CurrentUser } from 'src/authentication/internal/decorators';
+import { ApiConsumes, ApiNoContentResponse } from '@nestjs/swagger';
 import { JwtPayload } from 'src/authentication/client';
+import { CurrentUser } from 'src/authentication/internal/decorators';
+import { AccessRights } from 'src/authorization/internal/constants/role-def.enum';
+import { CanAccessBy } from 'src/authorization/internal/decorators/can-access-by.decorator';
+import { FileInterceptor } from '../../system/internal';
+import { CreateRecruitmentEventDto } from '../client/dto/create-recruitment-event.dto';
+import { ImportEmployeesDto } from '../client/dto/import-employees.dto';
+import { RecruitmentEventService } from './recruitment-event.service';
 
 @Controller('recruitments/events')
 export class RecruitmentEventController {
@@ -33,6 +35,21 @@ export class RecruitmentEventController {
     });
   }
 
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiNoContentResponse()
+  @Post('employees')
+  importRecruitmentEventEmployees(
+    importEmployeesDto: ImportEmployeesDto,
+    @UploadedFile()
+    file: Express.Multer.File,
+  ) {
+    return this.recruitmentEventService.importEmployees({
+      ...importEmployeesDto,
+      file,
+    });
+  }
+
   @Get()
   findAll() {
     return this.recruitmentEventService.findAll();
@@ -40,19 +57,6 @@ export class RecruitmentEventController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.recruitmentEventService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateRecruitmentDto: UpdateRecruitmentDto,
-  ) {
-    return this.recruitmentEventService.update(+id, updateRecruitmentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recruitmentEventService.remove(+id);
+    return this.recruitmentEventService.findOne(id);
   }
 }

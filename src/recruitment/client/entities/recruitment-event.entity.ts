@@ -5,9 +5,11 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../../user';
+import { RecruitmentEmployee } from './recruitment-employee.entity';
 
 @Entity({
   name: 'recruitment_events',
@@ -70,4 +72,16 @@ export class RecruitmentEvent {
     referencedColumnName: 'id',
   })
   createdBy: User;
+
+  @OneToMany(
+    () => RecruitmentEmployee,
+    (recruitmentEmployee) => recruitmentEmployee.organizedBy,
+  )
+  employees: RecruitmentEmployee[];
+
+  @Column({
+    name: 'scoring_standard',
+    type: 'json',
+  })
+  scoringStandards: any[];
 }

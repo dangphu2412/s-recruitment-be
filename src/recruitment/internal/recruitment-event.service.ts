@@ -1,15 +1,26 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UpdateRecruitmentDto } from '../client/dto/update-recruitment.dto';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { read, utils } from 'xlsx';
 import { RecruitmentEventRepository } from './recruitment-event.repository';
-import { UserService, UserServiceToken } from '../../user';
+import {
+  NotFoundSheetNameException,
+  UserService,
+  UserServiceToken,
+} from '../../user';
 import { NotFoundExaminersException } from '../client/exceptions/not-found-examiners.exception';
 import { Page } from 'src/system/query-shape/pagination/entities';
 import { CreateRecruitmentPayload } from '../client/types/create-recruitment-payload';
+import { ImportEmployeesDto } from '../client/dto/import-employees.dto';
+import { RecruitmentEmployeeRepository } from './recruitment-employee.repository';
+import { NotFoundEventException } from '../client/exceptions/not-found-event.exception';
+import { RecruitmentEmployee } from '../client/entities/recruitment-employee.entity';
+import { DuplicatedEventName } from '../client/exceptions/duplicated-name-event.exception';
 
 @Injectable()
 export class RecruitmentEventService {
   constructor(
     private readonly recruitmentEventRepository: RecruitmentEventRepository,
+    private readonly recruitmentEmployeeRepository: RecruitmentEmployeeRepository,
     @Inject(UserServiceToken)
     private readonly userService: UserService,
   ) {}
@@ -23,6 +34,14 @@ export class RecruitmentEventService {
       throw new NotFoundExaminersException();
     }
 
+    if (
+      (await this.recruitmentEventRepository.count({
+        where: { name: createRecruitmentDto.name },
+      })) > 0
+    ) {
+      throw new DuplicatedEventName();
+    }
+
     const newRecruitmentEvent = this.recruitmentEventRepository.create({
       name: createRecruitmentDto.name,
       location: createRecruitmentDto.location,
@@ -30,6 +49,7 @@ export class RecruitmentEventService {
       endDate: createRecruitmentDto.recruitmentRange.toDate,
       examiners,
       authorId: createRecruitmentDto.authorId,
+      scoringStandards: createRecruitmentDto.scoringStandards,
     });
 
     await this.recruitmentEventRepository.save(newRecruitmentEvent);
@@ -47,15 +67,41 @@ export class RecruitmentEventService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} recruitment`;
+  findOne(id: string) {
+    return this.recruitmentEventRepository.findOne(id, {
+      relations: ['examiners', 'employees'],
+    });
   }
 
-  update(id: number, updateRecruitmentDto: UpdateRecruitmentDto) {
-    return `This action updates a #${id} recruitment`;
-  }
+  @Transactional()
+  async importEmployees(dto: ImportEmployeesDto) {
+    const workbook = read(dto.file.buffer, { type: 'buffer' });
 
-  remove(id: number) {
-    return `This action removes a #${id} recruitment`;
+    const sheetName = workbook.SheetNames[0];
+
+    if (!sheetName) {
+      throw new NotFoundSheetNameException();
+    }
+
+    const sheet = workbook.Sheets[sheetName];
+
+    const data = utils.sheet_to_json<object>(sheet);
+
+    const event = await this.recruitmentEventRepository.findOne(dto.eventId);
+
+    if (!event) {
+      throw new NotFoundEventException();
+    }
+
+    const entities = data.map((item) => {
+      const employee = new RecruitmentEmployee();
+
+      employee.organizedBy = event;
+      employee.data = JSON.stringify(item);
+
+      return employee;
+    });
+
+    await this.recruitmentEmployeeRepository.insert(entities);
   }
 }
