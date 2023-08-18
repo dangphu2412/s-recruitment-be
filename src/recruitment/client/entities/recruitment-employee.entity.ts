@@ -19,7 +19,7 @@ export class RecruitmentEmployee {
     type: 'json',
     nullable: false,
   })
-  data: string;
+  data: object;
 
   @ManyToOne(() => RecruitmentEvent)
   @JoinColumn({

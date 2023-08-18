@@ -97,7 +97,7 @@ export class RecruitmentEventService {
       const employee = new RecruitmentEmployee();
 
       employee.organizedBy = event;
-      employee.data = JSON.stringify(item);
+      employee.data = item;
 
       return employee;
     });
