@@ -152,6 +152,7 @@ export class CreateRecruitmentEvent1692097142077 implements MigrationInterface {
             name: 'note',
             type: 'text',
             default: '',
+            isNullable: true,
           },
           {
             name: 'event_id',
