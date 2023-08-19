@@ -74,7 +74,7 @@ export class RecruitmentEventService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, authorId: string) {
     const event = await this.recruitmentEventRepository
       .createQueryBuilder('rce')
       .andWhere('rce.id = :id', { id })
@@ -89,6 +89,11 @@ export class RecruitmentEventService {
     });
 
     const employeeResponse = event.employees.map((employee) => {
+      const myVotedPoint = votedPoints.find(
+        (point) =>
+          point.employeeId === employee.id && authorId === point.authorId,
+      );
+
       return {
         ...employee,
         point: votedPoints.reduce((result, curr) => {
@@ -98,6 +103,7 @@ export class RecruitmentEventService {
 
           return result;
         }, 0),
+        myVotedPoint: myVotedPoint?.point ?? 0,
       };
     });
 

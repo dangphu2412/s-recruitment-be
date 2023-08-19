@@ -55,8 +55,8 @@ export class RecruitmentEventController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.recruitmentEventService.findOne(+id);
+  findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.recruitmentEventService.findOne(+id, user.sub);
   }
 
   @Post('/:eventId/mark')
