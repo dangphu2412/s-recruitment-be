@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 export class MarkEmployeeDto {
   @IsNotEmpty()
@@ -10,4 +10,7 @@ export class MarkEmployeeDto {
 
   @IsNotEmpty()
   point: number;
+
+  @IsOptional()
+  note: string;
 }

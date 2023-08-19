@@ -24,7 +24,9 @@ export class UserServiceImpl implements UserService {
     withRights && relations.push('roles', 'roles.permissions');
 
     return this.userRepository.find({
-      ...userFields,
+      where: {
+        ...userFields,
+      },
       relations: uniq(relations),
       withDeleted,
     });

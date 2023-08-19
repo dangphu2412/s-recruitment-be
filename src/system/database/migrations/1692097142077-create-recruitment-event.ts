@@ -149,6 +149,11 @@ export class CreateRecruitmentEvent1692097142077 implements MigrationInterface {
             type: 'int',
           },
           {
+            name: 'note',
+            type: 'text',
+            default: '',
+          },
+          {
             name: 'event_id',
             type: 'int',
           },

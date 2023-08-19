@@ -24,6 +24,13 @@ export class EmployeeEventPoint {
   point: number;
 
   @Column({
+    name: 'note',
+    type: 'varchar',
+    default: '',
+  })
+  note: string;
+
+  @Column({
     name: 'author_id',
   })
   authorId: string;

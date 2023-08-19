@@ -105,6 +105,7 @@ export class RecruitmentEventService {
           return result;
         }, 0),
         myVotedPoint: myVotedPoint?.point ?? 0,
+        myNote: myVotedPoint?.note ?? '',
       };
     });
 
@@ -151,6 +152,7 @@ export class RecruitmentEventService {
     point,
     eventId,
     authorId,
+    note,
   }: MarkEmployeePointPayload) {
     const [event, employee, markedPoint] = await Promise.all([
       this.recruitmentEventRepository.findOne(eventId),
@@ -182,6 +184,7 @@ export class RecruitmentEventService {
 
     if (markedPoint) {
       markedPoint.point = point;
+      markedPoint.note = note;
       await this.employeeEventPointRepository.save(markedPoint);
       return;
     }
@@ -192,6 +195,7 @@ export class RecruitmentEventService {
     pointEntity.authorId = authorId;
     pointEntity.event = event;
     pointEntity.employee = employee;
+    pointEntity.note = note;
 
     await this.employeeEventPointRepository.insert(pointEntity);
   }
