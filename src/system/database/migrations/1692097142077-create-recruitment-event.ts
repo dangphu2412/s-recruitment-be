@@ -132,6 +132,55 @@ export class CreateRecruitmentEvent1692097142077 implements MigrationInterface {
         referencedTableName: 'recruitment_events',
       }),
     ]);
+
+    await queryRunner.createTable(
+      new Table({
+        name: 'employee_event_points',
+        columns: [
+          {
+            name: 'id',
+            type: 'int',
+            generationStrategy: 'increment',
+            isGenerated: true,
+            isPrimary: true,
+          },
+          {
+            name: 'point',
+            type: 'int',
+          },
+          {
+            name: 'event_id',
+            type: 'int',
+          },
+          {
+            name: 'author_id',
+            type: 'uuid',
+          },
+          {
+            name: 'employee_id',
+            type: 'int',
+          },
+        ],
+      }),
+    );
+
+    await queryRunner.createForeignKeys('employee_event_points', [
+      new TableForeignKey({
+        columnNames: ['event_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'recruitment_events',
+      }),
+      new TableForeignKey({
+        columnNames: ['author_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'users',
+      }),
+      new TableForeignKey({
+        columnNames: ['employee_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'recruitment_employees',
+      }),
+    ]);
   }
 
   public async down(_queryRunner: QueryRunner): Promise<void> {

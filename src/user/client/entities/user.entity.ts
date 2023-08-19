@@ -5,6 +5,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -13,6 +14,7 @@ import { Role } from 'src/authorization/client';
 import { Exclude } from 'class-transformer';
 import { OperationFee } from '../../../monthly-money';
 import { RecruitmentEvent } from '../../../recruitment/client/entities/recruitment-event.entity';
+import { EmployeeEventPoint } from '../../../recruitment/client/entities/employee-event-point.entity';
 
 @Entity({
   name: 'users',
@@ -107,4 +109,7 @@ export class User {
 
   @OneToOne(() => OperationFee, (operationFee) => operationFee.user)
   operationFee?: OperationFee;
+
+  @OneToMany(() => EmployeeEventPoint, (point) => point.author)
+  markedEventPoints: EmployeeEventPoint[];
 }

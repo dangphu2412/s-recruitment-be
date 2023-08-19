@@ -8,6 +8,7 @@ import { Permission } from 'src/authorization/client/entities/permission.entity'
 import { MenuSetting } from '../../../menu/client/entities/menu-settings.entity';
 import { RecruitmentEvent } from '../../../recruitment/client/entities/recruitment-event.entity';
 import { RecruitmentEmployee } from 'src/recruitment/client/entities/recruitment-employee.entity';
+import { EmployeeEventPoint } from '../../../recruitment/client/entities/employee-event-point.entity';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ export const connectionConfig: TypeOrmModuleOptions = {
     Permission,
     RecruitmentEvent,
     RecruitmentEmployee,
+    EmployeeEventPoint,
   ],
   synchronize: process.env.DB_SYNC ? process.env.DB_SYNC === 'true' : false,
   logging: true,

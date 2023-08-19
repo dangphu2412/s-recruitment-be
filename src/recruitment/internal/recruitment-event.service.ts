@@ -9,18 +9,25 @@ import {
 } from '../../user';
 import { NotFoundExaminersException } from '../client/exceptions/not-found-examiners.exception';
 import { Page } from 'src/system/query-shape/pagination/entities';
-import { CreateRecruitmentPayload } from '../client/types/create-recruitment-payload';
+import {
+  CreateRecruitmentPayload,
+  MarkEmployeePointPayload,
+} from '../client/types/create-recruitment-payload';
 import { ImportEmployeesDto } from '../client/dto/import-employees.dto';
 import { RecruitmentEmployeeRepository } from './recruitment-employee.repository';
 import { NotFoundEventException } from '../client/exceptions/not-found-event.exception';
 import { RecruitmentEmployee } from '../client/entities/recruitment-employee.entity';
 import { DuplicatedEventName } from '../client/exceptions/duplicated-name-event.exception';
+import { EmployeeEventPointRepository } from './employee-event-point.repository';
+import { NotFoundEmployeeException } from '../client/exceptions/not-found-employee.exception';
+import { EmployeeEventPoint } from '../client/entities/employee-event-point.entity';
 
 @Injectable()
 export class RecruitmentEventService {
   constructor(
     private readonly recruitmentEventRepository: RecruitmentEventRepository,
     private readonly recruitmentEmployeeRepository: RecruitmentEmployeeRepository,
+    private readonly employeeEventPointRepository: EmployeeEventPointRepository,
     @Inject(UserServiceToken)
     private readonly userService: UserService,
   ) {}
@@ -67,10 +74,37 @@ export class RecruitmentEventService {
     });
   }
 
-  findOne(id: string) {
-    return this.recruitmentEventRepository.findOne(id, {
-      relations: ['examiners', 'employees'],
+  async findOne(id: number) {
+    const event = await this.recruitmentEventRepository
+      .createQueryBuilder('rce')
+      .andWhere('rce.id = :id', { id })
+      .leftJoinAndSelect('rce.examiners', 'examiners')
+      .leftJoinAndSelect('rce.employees', 'employees')
+      .getOne();
+
+    const votedPoints = await this.employeeEventPointRepository.find({
+      where: {
+        eventId: id,
+      },
     });
+
+    const employeeResponse = event.employees.map((employee) => {
+      return {
+        ...employee,
+        point: votedPoints.reduce((result, curr) => {
+          if (curr.eventId === id && curr.employeeId === employee.id) {
+            return result + curr.point;
+          }
+
+          return result;
+        }, 0),
+      };
+    });
+
+    return {
+      ...event,
+      employees: employeeResponse,
+    };
   }
 
   @Transactional()
@@ -103,5 +137,47 @@ export class RecruitmentEventService {
     });
 
     await this.recruitmentEmployeeRepository.insert(entities);
+  }
+
+  async markPointForEmployee({
+    employeeId,
+    point,
+    eventId,
+    authorId,
+  }: MarkEmployeePointPayload) {
+    const [event, employee, markedPoint] = await Promise.all([
+      this.recruitmentEventRepository.findOne(eventId),
+      this.recruitmentEmployeeRepository.findOne(employeeId),
+      this.employeeEventPointRepository.findOne({
+        where: {
+          authorId,
+          eventId,
+          employeeId,
+        },
+      }),
+    ]);
+
+    if (!event) {
+      throw new NotFoundEventException();
+    }
+
+    if (!employee) {
+      throw new NotFoundEmployeeException();
+    }
+
+    if (markedPoint) {
+      markedPoint.point = point;
+      await this.employeeEventPointRepository.save(markedPoint);
+      return;
+    }
+
+    const pointEntity = new EmployeeEventPoint();
+
+    pointEntity.point = point;
+    pointEntity.authorId = authorId;
+    pointEntity.event = event;
+    pointEntity.employee = employee;
+
+    await this.employeeEventPointRepository.insert(pointEntity);
   }
 }

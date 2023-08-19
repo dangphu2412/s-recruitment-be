@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { User } from '../../../user';
 import { RecruitmentEmployee } from './recruitment-employee.entity';
+import { EmployeeEventPoint } from './employee-event-point.entity';
 
 @Entity({
   name: 'recruitment_events',
@@ -84,4 +85,7 @@ export class RecruitmentEvent {
     type: 'json',
   })
   scoringStandards: any[];
+
+  @OneToMany(() => EmployeeEventPoint, (point) => point.event)
+  points: EmployeeEventPoint[];
 }
