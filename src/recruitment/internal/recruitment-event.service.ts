@@ -21,6 +21,7 @@ import { DuplicatedEventName } from '../client/exceptions/duplicated-name-event.
 import { EmployeeEventPointRepository } from './employee-event-point.repository';
 import { NotFoundEmployeeException } from '../client/exceptions/not-found-employee.exception';
 import { EmployeeEventPoint } from '../client/entities/employee-event-point.entity';
+import { ExceedMaxPointException } from '../client/exceptions/exceed-max-point.exception';
 
 @Injectable()
 export class RecruitmentEventService {
@@ -169,6 +170,14 @@ export class RecruitmentEventService {
 
     if (!employee) {
       throw new NotFoundEmployeeException();
+    }
+
+    const maxPoint = event.scoringStandards.reduce((result, curr) => {
+      return result + curr.point;
+    }, 0);
+
+    if (point > maxPoint) {
+      throw new ExceedMaxPointException();
     }
 
     if (markedPoint) {
