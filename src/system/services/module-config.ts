@@ -61,7 +61,7 @@ export class ModuleConfig {
       database: this.getString('DB_DATABASE'),
       synchronize: this.getBoolean('DB_SYNC'),
       entities: migrationConfig.entities,
-      logging: true,
+      logging: this.configService.get('NODE_ENV') === 'development',
       migrationsRun: true,
       migrationsTableName: migrationConfig.migrationsTableName,
       migrations: migrationConfig.migrations,

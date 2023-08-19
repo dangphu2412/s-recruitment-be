@@ -28,10 +28,14 @@ export class AccessRightStorageImpl implements AccessRightStorage {
     this.ttl = ms(refreshTokenExpiration);
   }
 
-  async get(userId: string): Promise<string[] | undefined> {
-    return this.cacheManager.get<string[] | undefined>(
+  async get(userId: string): Promise<string[]> {
+    const rights = this.cacheManager.get<string[] | undefined>(
       AccessRightStorageImpl.genKey(userId),
     );
+
+    if (!rights) return [];
+
+    return rights;
   }
 
   async save(userId: string, roles: Role[]): Promise<string[]> {

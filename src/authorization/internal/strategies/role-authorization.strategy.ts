@@ -26,7 +26,7 @@ export class RoleAuthorizationStrategy
     const accessRights = await this.roleStorage.get(sub);
 
     // TODO: renew instead of kick out
-    if (!accessRights) {
+    if (!accessRights?.length) {
       throw new LogoutRequiredException();
     }
 
