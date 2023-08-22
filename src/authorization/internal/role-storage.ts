@@ -29,13 +29,11 @@ export class AccessRightStorageImpl implements AccessRightStorage {
   }
 
   async get(userId: string): Promise<string[]> {
-    const rights = this.cacheManager.get<string[] | undefined>(
-      AccessRightStorageImpl.genKey(userId),
-    );
+    const rights: string[] | undefined = await this.cacheManager.get<
+      string[] | undefined
+    >(AccessRightStorageImpl.genKey(userId));
 
-    if (!rights) return [];
-
-    return rights;
+    return rights ?? [];
   }
 
   async save(userId: string, roles: Role[]): Promise<string[]> {

@@ -93,7 +93,7 @@ export class User {
   })
   roles?: Role[];
 
-  @ManyToMany(() => Role, (role) => role.users)
+  @ManyToMany(() => RecruitmentEvent, (event) => event.examiners)
   @JoinTable({
     name: 'recruitment_events_examiners',
     joinColumn: {

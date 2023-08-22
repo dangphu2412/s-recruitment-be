@@ -48,7 +48,7 @@ export class RecruitmentEvent {
   })
   endDate: Date;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, (user) => user.joinedRecruitEvents)
   @JoinTable({
     name: 'recruitment_events_examiners',
     joinColumn: {
