@@ -2,7 +2,6 @@ import { MenuRepository } from './menu.repositoryt';
 import { Inject, Injectable } from '@nestjs/common';
 import { Menu, MenuService } from '../client';
 import {
-  AccessRights,
   AccessRightStorage,
   AccessRightStorageToken,
   RoleService,
@@ -23,12 +22,11 @@ export class MenuServiceImpl implements MenuService {
   async findMenusByUserId(userId: string): Promise<Menu[]> {
     const rights = await this.accessRightStorage.get(userId);
 
-    // Hard code for menu manage recruitment
-    const unionRights = [...rights, AccessRights.MANAGE_RECRUITMENT];
+    if (!rights.length) return [];
 
     const [allMenus, permittedMenus] = await Promise.all([
       this.menuRepository.findTrees(),
-      this.menuRepository.findByPermissionNames(unionRights),
+      this.menuRepository.findByPermissionNames(rights),
     ]);
     const permittedMenusKeyByCode = keyBy(permittedMenus, 'code');
 

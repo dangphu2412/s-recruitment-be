@@ -14,7 +14,6 @@ import { UpdateRoleDto } from 'src/authorization/client/dto';
 import { In } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { InvalidRoleUpdateException } from 'src/authorization/client/exceptions/invalid-role-update.exception';
-import { User } from '../../user';
 
 @Injectable()
 export class RoleServiceImpl implements RoleService {
@@ -87,9 +86,5 @@ export class RoleServiceImpl implements RoleService {
 
   findByIds(ids: number[]): Promise<Role[]> {
     return this.roleRepository.findByIds(ids);
-  }
-
-  async updateUserRoles(user: User, roleIds: number[]): Promise<void> {
-    user.roles = await this.roleRepository.findByIds(roleIds);
   }
 }

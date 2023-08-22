@@ -143,7 +143,7 @@ export class DomainUserImpl implements DomainUser {
       }),
     ]);
 
-    if (user) {
+    if (!user) {
       throw new NotFoundUserException(email);
     }
 
@@ -203,7 +203,7 @@ export class DomainUserImpl implements DomainUser {
     }
 
     if (payload.roleIds) {
-      await this.roleService.updateUserRoles(user, payload.roleIds);
+      user.roles = await this.roleService.findByIds(payload.roleIds);
     }
 
     await this.userRepository.save(user);

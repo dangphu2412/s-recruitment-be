@@ -43,7 +43,7 @@ export class Role {
   })
   isEditable: boolean;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, (user) => user.roles)
   @JoinTable({
     name: 'users_roles',
     joinColumn: {
