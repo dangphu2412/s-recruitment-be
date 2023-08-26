@@ -189,7 +189,7 @@ export class CreateRecruitmentEvent1692097142077 implements MigrationInterface {
     ]);
   }
 
-  public async down(_queryRunner: QueryRunner): Promise<void> {
+  public async down(): Promise<void> {
     return;
   }
 }
