@@ -1,0 +1,60 @@
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  setups:
+    name: setup-packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        node: [16.x]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'yarn'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/node_modules/
+          key: cache-node-modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            - cache-node-modules-
+
+      - name: Setup packages
+        run: |
+          yarn install --frozen-lockfile
+          yarn audit --audit-level=critical
+
+  unit-test:
+    name: unit-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        node: [16.x]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'yarn'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/node_modules/
+          key: cache-node-modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            - cache-node-modules-
+
+      - name: Run unit tests
+        run: |
+          yarn test
