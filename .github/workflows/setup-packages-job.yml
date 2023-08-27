@@ -1,22 +1,18 @@
-name: Main branch check
+name: Setup packages
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_call:
 
 jobs:
   setups:
-    uses: ./.github/workflows/setup-packages-job.yml
-
-  unit-test:
-    name: unit-test
-    needs: [setups]
+    name: setup-packages
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
     strategy:
       matrix:
         node: [16.x]
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -32,6 +28,7 @@ jobs:
           restore-keys: |
             - cache-node-modules-
 
-      - name: Run unit tests
+      - name: Setup packages
         run: |
-          yarn test
+          yarn install --frozen-lockfile
+          # yarn audit --audit-level=critical
