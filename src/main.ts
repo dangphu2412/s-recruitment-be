@@ -12,9 +12,9 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { fastifyHelmet } from '@fastify/helmet';
-import compression from 'fastify-compress';
-import { registerPaginationConfig } from 'src/system/query-shape/pagination/config/register-pagination.config';
+import compression from '@fastify/compress';
 import { contentParser } from 'fastify-multer';
+import { registerPaginationConfig } from 'src/system/query-shape/pagination/config/register-pagination.config';
 import { AppModule } from './app.module';
 import { ClientExceptionFilter } from './system/exception/exception.filter';
 import { logAppScaffold } from './system/utils';
@@ -29,6 +29,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
+
   const config = new DocumentBuilder()
     .setTitle('App example')
     .setDescription('The App API description')
@@ -37,7 +38,10 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
 
+  await app.register(compression, { encodings: ['gzip', 'deflate'] });
+  await app.register(contentParser);
   await app.register(fastifyHelmet, {
     contentSecurityPolicy: {
       directives: {
@@ -48,9 +52,6 @@ async function bootstrap() {
       },
     },
   });
-  await app.register(compression, { encodings: ['gzip', 'deflate'] });
-  await app.register(contentParser);
-
   app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({
@@ -58,8 +59,6 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new ClientExceptionFilter());
-
-  SwaggerModule.setup('docs', app, document);
 
   const configService = app.get(ConfigService);
   const port = configService.get<string>('PORT') ?? 3000;

@@ -4,12 +4,12 @@ import { RoleServiceImpl } from './role.service';
 import { RoleRepository } from './repositories/role.repository';
 import { AccessRightStorageImpl } from './role-storage';
 import { RoleAuthorizationStrategy } from './strategies/role-authorization.strategy';
-import { AccessRightStorageToken, RoleServiceToken } from '../client';
+import { AccessRightStorageToken, Role, RoleServiceToken } from '../client';
 import { RoleController } from 'src/authorization/internal/role.controller';
-import { PermissionRepository } from 'src/authorization/internal/repositories/permission.repository';
+import { Permission } from '../client/entities/permission.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RoleRepository, PermissionRepository])],
+  imports: [TypeOrmModule.forFeature([Role, Permission])],
   controllers: [RoleController],
   providers: [
     RoleAuthorizationStrategy,
@@ -21,6 +21,7 @@ import { PermissionRepository } from 'src/authorization/internal/repositories/pe
       provide: AccessRightStorageToken,
       useClass: AccessRightStorageImpl,
     },
+    RoleRepository,
   ],
   exports: [RoleServiceToken, AccessRightStorageToken],
 })

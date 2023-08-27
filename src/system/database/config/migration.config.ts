@@ -6,7 +6,4 @@ export default {
   ...connectionConfig,
   migrations: [join(__dirname, '../../database/migrations/*{.ts,.js}')],
   migrationsTableName: 'migrations',
-  cli: {
-    migrationsDir: 'src/database/migrations',
-  },
 } as TypeOrmModuleOptions;

@@ -18,10 +18,12 @@ export class MonthlyMoneyConfigServiceImpl
     return this.monthlyMoneyConfigRepository.find();
   }
 
-  async findById(id: string): Promise<MonthlyMoneyConfig> {
-    const monthMoneyConfig = await this.monthlyMoneyConfigRepository.findOne(
-      id,
-    );
+  async findById(id: number): Promise<MonthlyMoneyConfig> {
+    const monthMoneyConfig = await this.monthlyMoneyConfigRepository.findOne({
+      where: {
+        id,
+      },
+    });
 
     if (!monthMoneyConfig) {
       throw new NoMonthlyMoneyConfigFoundException();

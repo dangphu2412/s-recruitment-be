@@ -6,5 +6,5 @@ export class UpdateMemberPaidDto {
   newPaid: number;
 
   @IsNumber()
-  operationFeeId: string;
+  operationFeeId: number;
 }

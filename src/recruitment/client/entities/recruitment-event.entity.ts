@@ -17,7 +17,7 @@ import { EmployeeEventPoint } from './employee-event-point.entity';
 })
 export class RecruitmentEvent {
   @PrimaryGeneratedColumn('increment')
-  id: string;
+  id: number;
 
   @Column({
     name: 'name',

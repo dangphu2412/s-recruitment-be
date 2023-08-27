@@ -1,22 +1,18 @@
-name: Main branch check
+name: Build runner app
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_call:
 
 jobs:
   setups:
-    uses: ./.github/workflows/setup-packages-job.yml
-
-  unit-test:
-    name: unit-test
-    needs: [setups]
+    name: builder
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
     strategy:
       matrix:
         node: [16.x]
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -32,6 +28,12 @@ jobs:
           restore-keys: |
             - cache-node-modules-
 
-      - name: Run unit tests
+      - name: Build dist
         run: |
-          yarn test
+          yarn build
+
+      - name: Upload Dist Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist

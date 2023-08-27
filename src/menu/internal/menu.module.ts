@@ -1,24 +1,21 @@
 import { Module } from '@nestjs/common';
 import { MenuController } from './menu.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MenuRepository } from './menu.repositoryt';
 import { MenuServiceImpl } from './menu.service';
-import { MenuServiceToken } from '../client';
+import { Menu, MenuServiceToken } from '../client';
 import { UserModule } from '../../user/internal/user.module';
 import { AuthorizationModule } from 'src/authorization/internal/authorization.module';
+import { MenuRepository } from './menu.repositoryt';
 
 @Module({
-  imports: [
-    UserModule,
-    AuthorizationModule,
-    TypeOrmModule.forFeature([MenuRepository]),
-  ],
+  imports: [UserModule, AuthorizationModule, TypeOrmModule.forFeature([Menu])],
   controllers: [MenuController],
   providers: [
     {
       provide: MenuServiceToken,
       useClass: MenuServiceImpl,
     },
+    MenuRepository,
   ],
 })
 export class MenuModule {}

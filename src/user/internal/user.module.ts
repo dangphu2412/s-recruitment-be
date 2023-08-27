@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserServiceToken, DomainUserToken } from '../client';
+import { UserServiceToken, DomainUserToken, User } from '../client';
 import { DomainUserImpl } from './domain.user';
 import { UserRepository } from './user.repository';
 import { MonthlyMoneyModule } from '../../monthly-money/internal/monthly-money.module';
@@ -12,7 +12,7 @@ import { UserController } from './user.controller';
   imports: [
     AuthorizationModule,
     MonthlyMoneyModule,
-    TypeOrmModule.forFeature([UserRepository]),
+    TypeOrmModule.forFeature([User]),
   ],
   controllers: [UserController],
   providers: [
@@ -24,6 +24,7 @@ import { UserController } from './user.controller';
       provide: UserServiceToken,
       useClass: UserServiceImpl,
     },
+    UserRepository,
   ],
   exports: [DomainUserToken, UserServiceToken],
 })
