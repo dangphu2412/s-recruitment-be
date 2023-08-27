@@ -4,6 +4,7 @@ import {
   MonthlyMoneyConfig,
   MonthlyMoneyConfigServiceToken,
   MonthlyMoneyOperationServiceToken,
+  OperationFee,
 } from '../client';
 import { MonthlyMoneyController } from './monthly-money.controller';
 import { MonthlyMoneyOperationServiceImpl } from './monthly-money-operation.service';
@@ -11,12 +12,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MonthlyMoneyOperationRepository } from './monthly-money-operation.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      MonthlyMoneyOperationRepository,
-      MonthlyMoneyConfig,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([OperationFee, MonthlyMoneyConfig])],
   controllers: [MonthlyMoneyController],
   providers: [
     {
@@ -27,6 +23,7 @@ import { MonthlyMoneyOperationRepository } from './monthly-money-operation.repos
       provide: MonthlyMoneyOperationServiceToken,
       useClass: MonthlyMoneyOperationServiceImpl,
     },
+    MonthlyMoneyOperationRepository,
   ],
   exports: [MonthlyMoneyConfigServiceToken, MonthlyMoneyOperationServiceToken],
 })

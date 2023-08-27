@@ -8,18 +8,19 @@ import {
   Role,
   RoleService,
 } from '../client';
-import { PermissionRepository } from 'src/authorization/internal/repositories/permission.repository';
 import { Permission } from 'src/authorization/client/entities/permission.entity';
 import { UpdateRoleDto } from 'src/authorization/client/dto';
-import { In } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { InvalidRoleUpdateException } from 'src/authorization/client/exceptions/invalid-role-update.exception';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class RoleServiceImpl implements RoleService {
   constructor(
     private readonly roleRepository: RoleRepository,
-    private readonly permissionRepository: PermissionRepository,
+    @InjectRepository(Permission)
+    private readonly permissionRepository: Repository<Permission>,
     @Inject(AccessRightStorageToken)
     private readonly accessRightStorage: AccessRightStorage,
   ) {}
@@ -63,7 +64,8 @@ export class RoleServiceImpl implements RoleService {
     const uniqueIds = uniq(permissionIds);
 
     const [role, permissions] = await Promise.all([
-      this.roleRepository.findOne(id, {
+      this.roleRepository.findOne({
+        where: { id },
         relations: ['users'],
       }),
       this.permissionRepository.find({

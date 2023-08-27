@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { read, utils } from 'xlsx';
-import { RecruitmentEventRepository } from './recruitment-event.repository';
 import {
   NotFoundSheetNameException,
   UserService,
@@ -14,21 +13,25 @@ import {
   MarkEmployeePointPayload,
 } from '../client/types/create-recruitment-payload';
 import { ImportEmployeesDto } from '../client/dto/import-employees.dto';
-import { RecruitmentEmployeeRepository } from './recruitment-employee.repository';
 import { NotFoundEventException } from '../client/exceptions/not-found-event.exception';
 import { RecruitmentEmployee } from '../client/entities/recruitment-employee.entity';
 import { DuplicatedEventName } from '../client/exceptions/duplicated-name-event.exception';
-import { EmployeeEventPointRepository } from './employee-event-point.repository';
 import { NotFoundEmployeeException } from '../client/exceptions/not-found-employee.exception';
 import { EmployeeEventPoint } from '../client/entities/employee-event-point.entity';
 import { ExceedMaxPointException } from '../client/exceptions/exceed-max-point.exception';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { RecruitmentEvent } from '../client/entities/recruitment-event.entity';
 
 @Injectable()
 export class RecruitmentEventService {
   constructor(
-    private readonly recruitmentEventRepository: RecruitmentEventRepository,
-    private readonly recruitmentEmployeeRepository: RecruitmentEmployeeRepository,
-    private readonly employeeEventPointRepository: EmployeeEventPointRepository,
+    @InjectRepository(RecruitmentEvent)
+    private readonly recruitmentEventRepository: Repository<RecruitmentEvent>,
+    @InjectRepository(RecruitmentEmployee)
+    private readonly recruitmentEmployeeRepository: Repository<RecruitmentEmployee>,
+    @InjectRepository(EmployeeEventPoint)
+    private readonly employeeEventPointRepository: Repository<EmployeeEventPoint>,
     @Inject(UserServiceToken)
     private readonly userService: UserService,
   ) {}
@@ -129,7 +132,11 @@ export class RecruitmentEventService {
 
     const data = utils.sheet_to_json<object>(sheet);
 
-    const event = await this.recruitmentEventRepository.findOne(dto.eventId);
+    const event = await this.recruitmentEventRepository.findOne({
+      where: {
+        id: parseInt(dto.eventId),
+      },
+    });
 
     if (!event) {
       throw new NotFoundEventException();
@@ -155,8 +162,16 @@ export class RecruitmentEventService {
     note,
   }: MarkEmployeePointPayload) {
     const [event, employee, markedPoint] = await Promise.all([
-      this.recruitmentEventRepository.findOne(eventId),
-      this.recruitmentEmployeeRepository.findOne(employeeId),
+      this.recruitmentEventRepository.findOne({
+        where: {
+          id: eventId,
+        },
+      }),
+      this.recruitmentEmployeeRepository.findOne({
+        where: {
+          id: employeeId,
+        },
+      }),
       this.employeeEventPointRepository.findOne({
         where: {
           authorId,

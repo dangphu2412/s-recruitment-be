@@ -51,14 +51,20 @@ export class DomainUserImpl implements DomainUser {
   ) {}
 
   async findMyProfile(id: string): Promise<MyProfile | null> {
-    return this.userRepository.findOne(id, {
+    return this.userRepository.findOne({
+      where: {
+        id,
+      },
       select: ['id', 'username'],
     });
   }
 
   async toggleUserIsActive(id: string): Promise<void> {
-    const user = await this.userRepository.findOne(id, {
+    const user = await this.userRepository.findOne({
       withDeleted: true,
+      where: {
+        id,
+      },
     });
 
     if (!user) {
@@ -137,7 +143,7 @@ export class DomainUserImpl implements DomainUser {
     monthlyConfigId,
   }: CreateUsersDto): Promise<void> {
     const [monthlyConfig, user] = await Promise.all([
-      this.monthlyConfigService.findById(monthlyConfigId),
+      this.monthlyConfigService.findById(+monthlyConfigId),
       this.userRepository.findOne({
         where: { email },
       }),
@@ -196,7 +202,12 @@ export class DomainUserImpl implements DomainUser {
     };
 
   async update(id: string, payload: UpdatableUserPayload): Promise<void> {
-    const user = await this.userRepository.findOne(id, { withDeleted: true });
+    const user = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+      withDeleted: true,
+    });
 
     if (!user) {
       throw new NotFoundUserException();

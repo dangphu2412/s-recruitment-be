@@ -6,7 +6,8 @@ export class MarkEmployeeDto {
   eventId: number;
 
   @IsNotEmpty()
-  employeeId: string;
+  @IsNumber()
+  employeeId: number;
 
   @IsNotEmpty()
   point: number;

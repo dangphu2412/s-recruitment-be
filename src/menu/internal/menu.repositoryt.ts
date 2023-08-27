@@ -1,8 +1,17 @@
-import { EntityRepository, TreeRepository } from 'typeorm';
+import { Repository, TreeRepository } from 'typeorm';
 import { Menu } from '../client';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
 
-@EntityRepository(Menu)
+@Injectable()
 export class MenuRepository extends TreeRepository<Menu> {
+  constructor(
+    @InjectRepository(Menu)
+    repository: Repository<Menu>,
+  ) {
+    super(repository.target, repository.manager, repository.queryRunner);
+  }
+
   findByPermissionNames(names: string[]): Promise<Menu[]> {
     return this.createQueryBuilder('menus')
       .leftJoinAndSelect('menus.settings', 'settings')
