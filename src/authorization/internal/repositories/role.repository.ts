@@ -1,13 +1,21 @@
-import { EntityRepository, FindOptionsUtils, Repository } from 'typeorm';
+import { FindOptionsUtils, Repository } from 'typeorm';
 import { AccessControlList, Role } from '../../client';
 import { RelationIdLoader } from 'typeorm/query-builder/relation-id/RelationIdLoader';
 import { RelationIdMetadataToAttributeTransformer } from 'typeorm/query-builder/relation-id/RelationIdMetadataToAttributeTransformer';
 import { RawSqlResultsToEntityTransformer } from 'typeorm/query-builder/transformer/RawSqlResultsToEntityTransformer';
 import { RelationCountLoader } from 'typeorm/query-builder/relation-count/RelationCountLoader';
-// import { QueryExpressionMap } from 'typeorm/query-builder/QueryExpressionMap';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
 
-@EntityRepository(Role)
+@Injectable()
 export class RoleRepository extends Repository<Role> {
+  constructor(
+    @InjectRepository(Role)
+    repository: Repository<Role>,
+  ) {
+    super(repository.target, repository.manager, repository.queryRunner);
+  }
+
   async findAccessControlList(): Promise<AccessControlList> {
     const data = await this.query(`
        SELECT "Role"."id" AS "Role_id", "Role"."name" AS "Role_name", "Role"."description" AS "Role_description", "Role"."updated_at" AS "Role_updated_at", "Role"."is_editable" AS "Role_is_editable", "Role"."update_by_user_id" AS "Role_update_by_user_id", "Role__permissions"."id" AS "Role__permissions_id", "Role__permissions"."name" AS "Role__permissions_name", "Role__permissions"."description" AS "Role__permissions_description" 
@@ -18,7 +26,7 @@ export class RoleRepository extends Repository<Role> {
 
     const qb = this.createQueryBuilder();
 
-    FindOptionsUtils.applyOptionsToQueryBuilder(qb, {
+    FindOptionsUtils.applyOptionsToTreeQueryBuilder(qb, {
       relations: ['permissions'],
     });
 

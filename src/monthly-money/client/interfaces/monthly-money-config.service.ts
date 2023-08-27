@@ -11,5 +11,5 @@ export interface MonthlyMoneyConfigService {
   /**
    * @throws {NoMonthlyMoneyConfigFoundException}
    */
-  findById(id: string): Promise<MonthlyMoneyConfig>;
+  findById(id: number): Promise<MonthlyMoneyConfig>;
 }

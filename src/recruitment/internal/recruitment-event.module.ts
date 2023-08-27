@@ -2,17 +2,17 @@ import { Module } from '@nestjs/common';
 import { RecruitmentEventService } from './recruitment-event.service';
 import { RecruitmentEventController } from './recruitment-event.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RecruitmentEventRepository } from './recruitment-event.repository';
 import { UserModule } from '../../user/internal/user.module';
-import { RecruitmentEmployeeRepository } from './recruitment-employee.repository';
-import { EmployeeEventPointRepository } from './employee-event-point.repository';
+import { RecruitmentEvent } from '../client/entities/recruitment-event.entity';
+import { RecruitmentEmployee } from '../client/entities/recruitment-employee.entity';
+import { EmployeeEventPoint } from '../client/entities/employee-event-point.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      RecruitmentEventRepository,
-      RecruitmentEmployeeRepository,
-      EmployeeEventPointRepository,
+      RecruitmentEvent,
+      RecruitmentEmployee,
+      EmployeeEventPoint,
     ]),
     UserModule,
   ],
