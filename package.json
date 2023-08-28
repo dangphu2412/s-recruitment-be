@@ -63,7 +63,7 @@
     "pg": "8.7.1",
     "qs": "^6.11.0",
     "reflect-metadata": "0.1.13",
-    "rxjs": "7.2.0",
+    "rxjs": "7.8.1",
     "slugify": "^1.6.5",
     "typeorm": "^0.3.17",
     "typeorm-transactional-cls-hooked": "^0.1.21",
