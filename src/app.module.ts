@@ -3,7 +3,7 @@ import { DatabaseModule } from './system/database/database.module';
 import { UserModule } from './user/internal/user.module';
 import { AuthModule } from './authentication/internal/auth.module';
 import { AuthorizationModule } from './authorization/internal/authorization.module';
-import { SharedModule } from './system/shared.module';
+import { SystemModule } from './system/system.module';
 import { MenuModule } from './menu/internal/menu.module';
 import { MonthlyMoneyModule } from './monthly-money/internal/monthly-money.module';
 import { RecruitmentEventModule } from './recruitment/internal/recruitment-event.module';
@@ -14,7 +14,7 @@ import { RecruitmentEventModule } from './recruitment/internal/recruitment-event
     UserModule,
     AuthModule,
     AuthorizationModule,
-    SharedModule,
+    SystemModule,
     MenuModule,
     MonthlyMoneyModule,
     RecruitmentEventModule,

@@ -1,4 +1,4 @@
-import { EnvLoaderUtils } from '../env-loader.utils';
+import { EnvLoaderUtils } from '../../utils/env-loader.utils';
 
 describe('Env loader utils', () => {
   describe('test load env', () => {

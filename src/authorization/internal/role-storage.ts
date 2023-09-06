@@ -2,7 +2,7 @@ import type { Cache } from 'cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import ms from 'ms';
-import { ModuleConfig } from 'src/system/services';
+import { EnvironmentKeyFactory } from 'src/system/services';
 import { AccessRightStorage, Role } from '../client';
 
 @Injectable()
@@ -23,9 +23,10 @@ export class AccessRightStorageImpl implements AccessRightStorage {
   constructor(
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    moduleConfig: ModuleConfig,
+    environmentKeyFactory: EnvironmentKeyFactory,
   ) {
-    const refreshTokenExpiration = moduleConfig.getRefreshTokenExpiration();
+    const refreshTokenExpiration =
+      environmentKeyFactory.getRefreshTokenExpiration();
     this.ttl = ms(refreshTokenExpiration);
   }
 

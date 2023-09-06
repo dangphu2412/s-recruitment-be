@@ -1,4 +1,4 @@
-import { extractOrigins } from '../app.utils';
+import { extractOrigins } from '../../utils/app.utils';
 
 describe('App Utils', () => {
   describe('test extractOrigins', () => {

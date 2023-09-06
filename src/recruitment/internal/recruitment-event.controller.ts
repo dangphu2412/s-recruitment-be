@@ -10,7 +10,7 @@ import {
 import { ApiConsumes, ApiNoContentResponse } from '@nestjs/swagger';
 import { Identified, JwtPayload } from 'src/authentication/client';
 import { CurrentUser } from 'src/authentication/internal/decorators';
-import { FileInterceptor } from '../../system/internal';
+import { FileInterceptor } from '../../system/file';
 import { CreateRecruitmentEventDto } from '../client/dto/create-recruitment-event.dto';
 import { ImportEmployeesDto } from '../client/dto/import-employees.dto';
 import { RecruitmentEventService } from './recruitment-event.service';

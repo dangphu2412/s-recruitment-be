@@ -21,7 +21,7 @@ import {
   UserManagementView,
 } from '../client';
 import { MyProfile } from '../../authentication';
-import { BcryptService } from 'src/system/services';
+import { DigestService } from 'src/system/services';
 import { read, utils } from 'xlsx';
 import {
   MonthlyMoneyConfigService,
@@ -32,7 +32,7 @@ import {
 import { CreateUserType, MemberType } from '../client/constants';
 import { FileCreateUsersDto } from '../client/dtos/file-create-users.dto';
 import { RoleService, RoleServiceToken } from 'src/authorization/client';
-import { Page, PageRequest } from 'src/system/query-shape/pagination/entities';
+import { Page, PageRequest } from 'src/system/query-shape/dto';
 import map from 'lodash/map';
 
 @Injectable()
@@ -41,7 +41,7 @@ export class DomainUserImpl implements DomainUser {
 
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly bcryptService: BcryptService,
+    private readonly digestService: DigestService,
     @Inject(MonthlyMoneyConfigServiceToken)
     private readonly monthlyConfigService: MonthlyMoneyConfigService,
     @Inject(MonthlyMoneyOperationServiceToken)
@@ -132,7 +132,7 @@ export class DomainUserImpl implements DomainUser {
 
   private async getDefaultPassword(): Promise<string> {
     if (!this.cacheDefaultPassword) {
-      this.cacheDefaultPassword = await this.bcryptService.hash('Test12345@@');
+      this.cacheDefaultPassword = await this.digestService.hash('Test12345@@');
     }
 
     return this.cacheDefaultPassword;

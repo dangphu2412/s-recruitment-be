@@ -6,7 +6,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-op
 import migrationConfig from '../database/config/migration.config';
 
 @Injectable()
-export class ModuleConfig {
+export class EnvironmentKeyFactory {
   constructor(private readonly configService: ConfigService) {}
 
   private getNumber(key: string): number {
@@ -43,6 +43,14 @@ export class ModuleConfig {
     }
 
     return value;
+  }
+
+  getPort(): string {
+    return this.configService.get('PORT') ?? '3000';
+  }
+
+  getHost(): string {
+    return this.configService.get('HOST') ?? '0.0.0.0';
   }
 
   getJwtConfig(): JwtModuleOptions {

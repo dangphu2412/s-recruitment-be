@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload, TokenDto, TokenGenerator } from '../client';
-import { ModuleConfig } from 'src/system/services';
+import { EnvironmentKeyFactory } from 'src/system/services';
 
 @Injectable()
 export class TokenGeneratorImpl implements TokenGenerator {
@@ -10,10 +10,12 @@ export class TokenGeneratorImpl implements TokenGenerator {
 
   constructor(
     private readonly jwtService: JwtService,
-    moduleConfig: ModuleConfig,
+    environmentKeyFactory: EnvironmentKeyFactory,
   ) {
-    this.accessTokenExpiration = moduleConfig.getAccessTokenExpiration();
-    this.refreshTokenExpiration = moduleConfig.getRefreshTokenExpiration();
+    this.accessTokenExpiration =
+      environmentKeyFactory.getAccessTokenExpiration();
+    this.refreshTokenExpiration =
+      environmentKeyFactory.getRefreshTokenExpiration();
   }
 
   generate(userId: string): Promise<TokenDto[]>;
