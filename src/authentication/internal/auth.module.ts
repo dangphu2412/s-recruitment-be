@@ -7,16 +7,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { TokenGeneratorImpl } from './token-generator';
 import { AuthServiceToken, TokenGeneratorToken } from '../client';
-import { ModuleConfig } from '../../system/services';
+import { EnvironmentKeyFactory } from '../../system/services';
 
 @Module({
   imports: [
     UserModule,
     AuthorizationModule,
     JwtModule.registerAsync({
-      useFactory: (moduleConfigService: ModuleConfig) =>
-        moduleConfigService.getJwtConfig(),
-      inject: [ModuleConfig],
+      useFactory: (environmentKeyFactory: EnvironmentKeyFactory) =>
+        environmentKeyFactory.getJwtConfig(),
+      inject: [EnvironmentKeyFactory],
     }),
   ],
   controllers: [AuthController],

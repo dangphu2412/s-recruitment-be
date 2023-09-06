@@ -5,7 +5,7 @@ import {
   IsUUID,
   ValidateNested,
 } from 'class-validator';
-import { DateRange } from 'src/system/query-shape/filter/entities/date-range.query';
+import { DateRange } from 'src/system/query-shape/dto/date-range.query';
 import { ScoringStandardDto } from './scoring-standard.dto';
 
 export class CreateRecruitmentEventDto {

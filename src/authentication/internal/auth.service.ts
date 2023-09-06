@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { BcryptService } from 'src/system/services';
+import { DigestService } from 'src/system/services';
 import { extractJwtPayload } from './utils/jwt.utils';
 import {
   AuthService,
@@ -29,7 +29,7 @@ export class AuthServiceImpl implements AuthService {
     @Inject(TokenGeneratorToken)
     private readonly tokenGenerator: TokenGenerator,
     private readonly jwtService: JwtService,
-    private readonly bcryptService: BcryptService,
+    private readonly digestService: DigestService,
   ) {}
 
   async login({
@@ -42,7 +42,7 @@ export class AuthServiceImpl implements AuthService {
     });
 
     const cannotLogin =
-      !user || (await this.bcryptService.compare(password, user.password));
+      !user || (await this.digestService.compare(password, user.password));
 
     if (cannotLogin) {
       throw new IncorrectUsernamePasswordException();

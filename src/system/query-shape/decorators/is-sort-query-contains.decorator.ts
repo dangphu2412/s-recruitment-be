@@ -1,5 +1,5 @@
 import { registerDecorator, ValidationOptions, isEmpty } from 'class-validator';
-import { SortQuery } from '../entities/sort.query';
+import { SortQuery } from '../dto/sort.query';
 
 export function IsSortQueryContains(
   allowFields: string[],

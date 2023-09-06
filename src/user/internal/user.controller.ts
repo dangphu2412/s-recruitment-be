@@ -33,8 +33,8 @@ import {
   MonthlyMoneyOperationService,
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
-import { Page } from 'src/system/query-shape/pagination/types';
-import { FileInterceptor } from '../../system/internal';
+import { Page } from 'src/system/query-shape/types';
+import { FileInterceptor } from '../../system/file';
 import { FileCreateUsersDto } from '../client/dtos/file-create-users.dto';
 import { UpdatableUserDto } from '../client/dtos/updatable-user.dto';
 

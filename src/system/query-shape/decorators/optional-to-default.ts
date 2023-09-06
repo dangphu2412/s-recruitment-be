@@ -1,5 +1,5 @@
 import { Transform, TransformFnParams } from 'class-transformer';
-import { ConfigKeys, ConfigRegistry } from '../../config.registry';
+import { ConfigKeys, ConfigRegistry } from '../config.registry';
 import { isEmpty } from 'class-validator';
 
 export function OptionalToDefault(key: ConfigKeys) {

@@ -7,7 +7,7 @@ import {
   UserServiceToken,
 } from '../../user';
 import { NotFoundExaminersException } from '../client/exceptions/not-found-examiners.exception';
-import { Page } from 'src/system/query-shape/pagination/entities';
+import { Page } from 'src/system/query-shape/dto';
 import {
   CreateRecruitmentPayload,
   MarkEmployeePointPayload,

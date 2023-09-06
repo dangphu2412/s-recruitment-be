@@ -1,18 +1,18 @@
 import { ExceptionFilter, HttpException } from '@nestjs/common';
-import { ClientExceptionFilter } from '../exception.filter';
+import { ClientExceptionFilter } from '../../exception/exception.filter';
 import {
   ArgumentsHost,
   HttpArgumentsHost,
 } from '@nestjs/common/interfaces/features/arguments-host.interface';
-import { isClientException } from '../exception-generator';
+import { isClientException } from '../../exception/exception-generator';
 
-jest.mock('../exception-generator', () => ({
+jest.mock('../../exception/exception-generator', () => ({
   isClientException: jest.fn(),
   generateClientException: jest.fn(),
   generateSystemException: jest.fn(),
 }));
 
-jest.mock('../exception-client-code.constant', () => ({
+jest.mock('../../exception/exception-client-code.constant', () => ({
   SystemExceptionClientCode: {
     GOT_ISSUE: {
       errorCode: 'GOT_ISSUE',

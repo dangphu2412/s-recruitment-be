@@ -2,7 +2,7 @@ import {
   generateClientException,
   generateSystemException,
   isClientException,
-} from '../exception-generator';
+} from '../../exception/exception-generator';
 
 describe('exception generator', () => {
   describe('test generateClientException', () => {

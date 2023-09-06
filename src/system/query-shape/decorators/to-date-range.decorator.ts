@@ -1,7 +1,7 @@
 import { Transform, TransformFnParams } from 'class-transformer';
 import { isString } from 'class-validator';
 import isNil from 'lodash.isempty';
-import { DateRange } from '../entities/date-range.query';
+import { DateRange } from '../dto/date-range.query';
 
 export function ToDateRange() {
   return Transform((params: TransformFnParams) => {

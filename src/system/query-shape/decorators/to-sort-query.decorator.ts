@@ -1,5 +1,5 @@
 import { Transform, TransformFnParams } from 'class-transformer';
-import { SortQuery } from '../entities/sort.query';
+import { SortQuery } from '../dto/sort.query';
 import { SortDirection } from '../constants/sort-direction.enum';
 
 export function ToSortQuery() {
