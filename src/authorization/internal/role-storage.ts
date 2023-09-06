@@ -1,5 +1,6 @@
 import type { Cache } from 'cache-manager';
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import ms from 'ms';
 import { ModuleConfig } from 'src/system/services';
 import { AccessRightStorage, Role } from '../client';
