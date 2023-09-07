@@ -7,10 +7,10 @@ import {
   Logger,
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
-import { isClientException } from './exception-generator';
 import { SystemExceptionClientCode } from './exception-client-code.constant';
 import { HttpToClientCodeMapper } from './mapper/http-to-client-code.mapper';
 import { Mapper } from '../client/mapper.interface';
+import { isClientException } from './factories';
 
 @Catch()
 export class ClientExceptionFilter implements ExceptionFilter {

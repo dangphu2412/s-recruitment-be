@@ -4,14 +4,9 @@ import {
   ArgumentsHost,
   HttpArgumentsHost,
 } from '@nestjs/common/interfaces/features/arguments-host.interface';
-import { isClientException } from '../../exception/exception-generator';
+import { isClientException } from '../../exception/factories';
 
-jest.mock('../../exception/exception-generator', () => ({
-  isClientException: jest.fn(),
-  generateClientException: jest.fn(),
-  generateSystemException: jest.fn(),
-}));
-
+jest.mock('../../exception/factories');
 jest.mock('../../exception/exception-client-code.constant', () => ({
   SystemExceptionClientCode: {
     GOT_ISSUE: {
