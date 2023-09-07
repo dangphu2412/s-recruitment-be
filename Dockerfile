@@ -1,27 +1,21 @@
-# Builder
-FROM node:16-alpine AS builder
-
-WORKDIR /usr/backend
-
-COPY ["package.json", "yarn.lock", "./"]
+FROM node:16-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
 COPY . .
 
-RUN yarn install --frozen-lockfile && yarn build
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile --ignore-scripts
 
-WORKDIR /usr/backend/prod
+FROM base AS builder
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
 
-COPY ["package.json", "yarn.lock", "./"]
-
-RUN yarn install --frozen-lockfile --production
-
-# Runner
-FROM node:16-alpine AS runner
-
-WORKDIR /usr/backend
-
-COPY --from=builder /usr/backend/prod/node_modules  ./node_modules
-COPY --from=builder /usr/backend/dist ./dist
+FROM base
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=builder /app/dist /app/dist
 
 EXPOSE 3000
-
-CMD ["node", "dist/main"]
+CMD [ "node", "dist/main" ]

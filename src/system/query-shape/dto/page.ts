@@ -1,8 +1,5 @@
 import { OffsetPagination } from 'src/system/query-shape/dto/offset-pagination.request';
-import {
-  CreatePage,
-  PaginationMetadata,
-} from 'src/system/query-shape/types';
+import { CreatePage, PaginationMetadata } from 'src/system/query-shape/types';
 
 export class Page<T> {
   items: T[];
