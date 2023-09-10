@@ -6,8 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "node": ">=16",
-    "pnpm": ">=8.0.0"
+    "node": ">=16"
   },
   "scripts": {
     "prebuild": "rimraf dist",
