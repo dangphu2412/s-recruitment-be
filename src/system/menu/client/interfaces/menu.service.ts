@@ -1,5 +1,5 @@
 import { Menu } from '../entities/menu.entity';
-import { createInterfaceToken } from '../../../system/utils';
+import { createInterfaceToken } from '../../../utils';
 
 export const MenuServiceToken = createInterfaceToken('MenuService');
 
