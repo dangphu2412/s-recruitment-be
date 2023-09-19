@@ -5,7 +5,7 @@ import {
   CurrentUser,
   Identified,
   JwtPayload,
-} from '../../account-service/authentication';
+} from '../../../account-service/authentication';
 
 @Controller({
   path: 'menus',

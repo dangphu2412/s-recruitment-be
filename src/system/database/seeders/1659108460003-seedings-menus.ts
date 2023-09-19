@@ -1,6 +1,6 @@
 import { In, MigrationInterface, QueryRunner } from 'typeorm';
 import { omit, keyBy } from 'lodash';
-import { Menu } from '../../../menu';
+import { Menu } from '../../menu';
 
 type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
   subMenus?: InsertMenu[];
