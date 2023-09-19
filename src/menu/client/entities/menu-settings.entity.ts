@@ -1,6 +1,6 @@
 import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Menu } from './menu.entity';
-import { Permission } from 'src/authorization/client/entities/permission.entity';
+import { Permission } from 'src/account-service/authorization/client/entities/permission.entity';
 
 @Entity({
   name: 'menu_settings',

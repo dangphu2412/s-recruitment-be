@@ -6,7 +6,7 @@ import {
   AccessRightStorageToken,
   RoleService,
   RoleServiceToken,
-} from 'src/authorization/client';
+} from 'src/account-service/authorization/client';
 import keyBy from 'lodash/keyBy';
 
 @Injectable()

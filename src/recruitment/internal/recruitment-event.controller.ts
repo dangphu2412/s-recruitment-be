@@ -8,8 +8,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiConsumes, ApiNoContentResponse } from '@nestjs/swagger';
-import { Identified, JwtPayload } from 'src/authentication/client';
-import { CurrentUser } from 'src/authentication/internal/decorators';
+import {
+  Identified,
+  JwtPayload,
+} from 'src/account-service/authentication/client';
+import { CurrentUser } from 'src/account-service/authentication/internal/decorators';
 import { FileInterceptor } from '../../system/file';
 import { CreateRecruitmentEventDto } from '../client/dto/create-recruitment-event.dto';
 import { ImportEmployeesDto } from '../client/dto/import-employees.dto';

@@ -8,7 +8,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../../../user';
+import { User } from '../../../account-service/user';
 import { RecruitmentEmployee } from './recruitment-employee.entity';
 import { EmployeeEventPoint } from './employee-event-point.entity';
 
