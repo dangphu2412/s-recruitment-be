@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { RecruitmentEvent } from './recruitment-event.entity';
-import { User } from '../../../user';
+import { User } from '../../../account-service/user';
 import { RecruitmentEmployee } from './recruitment-employee.entity';
 
 @Entity({

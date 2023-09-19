@@ -1,7 +1,11 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { MenuService, MenuServiceToken } from '../client';
-import { CurrentUser, Identified, JwtPayload } from '../../authentication';
+import {
+  CurrentUser,
+  Identified,
+  JwtPayload,
+} from '../../account-service/authentication';
 
 @Controller({
   path: 'menus',

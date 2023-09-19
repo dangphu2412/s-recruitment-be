@@ -5,7 +5,7 @@ import {
   NotFoundSheetNameException,
   UserService,
   UserServiceToken,
-} from '../../user';
+} from '../../account-service/user';
 import { NotFoundExaminersException } from '../client/exceptions/not-found-examiners.exception';
 import { Page } from 'src/system/query-shape/dto';
 import {
