@@ -1,4 +1,4 @@
-import { MyProfile } from 'src/authentication/client';
+import { MyProfile, UserDetail } from 'src/authentication/client';
 import { createInterfaceToken } from '../../../system/utils';
 import { CreateUsersDto } from '../dtos/create-users.dto';
 import { FileCreateUsersDto } from '../dtos/file-create-users.dto';
@@ -11,6 +11,7 @@ export const DomainUserToken = createInterfaceToken('DomainUser');
 
 export interface DomainUser {
   findMyProfile(id: string): Promise<MyProfile>;
+  findUserDetail(id: string): Promise<UserDetail>;
 
   search(query: UserManagementQueryDto): Promise<Page<UserManagementView>>;
 

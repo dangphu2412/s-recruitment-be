@@ -18,6 +18,7 @@ import { UserService, UserServiceToken } from '../../user';
 import { IncorrectUsernamePasswordException } from '../client/exceptions';
 import { InvalidTokenFormatException } from '../client/exceptions/invalid-token-format.exception';
 import { LogoutRequiredException } from '../client/exceptions/logout-required.exception';
+import isEmpty from 'lodash/isEmpty';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
@@ -42,7 +43,8 @@ export class AuthServiceImpl implements AuthService {
     });
 
     const cannotLogin =
-      !user || (await this.digestService.compare(password, user.password));
+      isEmpty(user) ||
+      (await this.digestService.compare(password, user.password));
 
     if (cannotLogin) {
       throw new IncorrectUsernamePasswordException();

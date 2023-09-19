@@ -4,6 +4,7 @@ import {
   Get,
   Inject,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -58,6 +59,14 @@ export class UserController {
   @ApiOkResponse()
   findMyProfile(@CurrentUser() user: JwtPayload) {
     return this.domainUser.findMyProfile(user.sub);
+  }
+
+  @CanAccessBy(AccessRights.VIEW_USERS, AccessRights.EDIT_MEMBER_USER)
+  @Get('/users/:id')
+  findUserDetail(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) userId: string,
+  ) {
+    return this.domainUser.findUserDetail(userId);
   }
 
   @CanAccessBy(AccessRights.VIEW_USERS, AccessRights.EDIT_MEMBER_USER)
