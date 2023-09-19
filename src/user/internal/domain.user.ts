@@ -20,7 +20,7 @@ import {
   UserManagementQueryDto,
   UserManagementView,
 } from '../client';
-import { MyProfile } from '../../authentication';
+import { MyProfile, UserDetail } from '../../authentication';
 import { DigestService } from 'src/system/services';
 import { read, utils } from 'xlsx';
 import {
@@ -34,6 +34,7 @@ import { FileCreateUsersDto } from '../client/dtos/file-create-users.dto';
 import { RoleService, RoleServiceToken } from 'src/authorization/client';
 import { Page, PageRequest } from 'src/system/query-shape/dto';
 import map from 'lodash/map';
+import { omit } from 'lodash';
 
 @Injectable()
 export class DomainUserImpl implements DomainUser {
@@ -50,13 +51,24 @@ export class DomainUserImpl implements DomainUser {
     private readonly roleService: RoleService,
   ) {}
 
+  findUserDetail(id: string): Promise<UserDetail> {
+    return this.userRepository.findOneBy({
+      id,
+    });
+  }
+
   async findMyProfile(id: string): Promise<MyProfile | null> {
-    return this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: {
         id,
       },
-      select: ['id', 'username'],
     });
+
+    if (!user) {
+      return null;
+    }
+
+    return omit(user, 'password');
   }
 
   async toggleUserIsActive(id: string): Promise<void> {

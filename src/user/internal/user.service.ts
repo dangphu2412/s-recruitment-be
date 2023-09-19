@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import uniq from 'lodash/uniq';
 import { User, UserQuery, UserService } from '../client';
 import { UserRepository } from './user.repository';
+import { In } from 'typeorm';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -9,10 +10,10 @@ export class UserServiceImpl implements UserService {
 
   find(query: UserQuery | string[]): Promise<User[]> {
     if (Array.isArray(query)) {
-      return this.userRepository.findByIds(query);
+      return this.userRepository.findBy({
+        id: In(query),
+      });
     }
-
-    const relations = [];
 
     const {
       withDeleted,
@@ -20,6 +21,9 @@ export class UserServiceImpl implements UserService {
       withRights = false,
       ...userFields
     } = query;
+
+    const relations = [];
+
     withRoles && relations.push('roles');
     withRights && relations.push('roles', 'roles.permissions');
 
