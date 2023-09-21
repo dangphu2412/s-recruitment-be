@@ -13,8 +13,8 @@ import {
 import { Role } from 'src/account-service/authorization/client';
 import { Exclude } from 'class-transformer';
 import { OperationFee } from '../../../../monthly-money';
-import { RecruitmentEvent } from '../../../../recruitment/client/entities/recruitment-event.entity';
-import { EmployeeEventPoint } from '../../../../recruitment/client/entities/employee-event-point.entity';
+import { RecruitmentEvent } from '../../../../recruitment/domain/entities/recruitment-event.entity';
+import { EmployeeEventPoint } from '../../../../recruitment/domain/entities/employee-event-point.entity';
 
 @Entity({
   name: 'users',

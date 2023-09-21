@@ -6,9 +6,9 @@ import { Menu } from '../../menu';
 import { MonthlyMoneyConfig, OperationFee } from '../../../monthly-money';
 import { Permission } from 'src/account-service/authorization/client/entities/permission.entity';
 import { MenuSetting } from '../../menu/client/entities/menu-settings.entity';
-import { RecruitmentEvent } from '../../../recruitment/client/entities/recruitment-event.entity';
-import { RecruitmentEmployee } from 'src/recruitment/client/entities/recruitment-employee.entity';
-import { EmployeeEventPoint } from '../../../recruitment/client/entities/employee-event-point.entity';
+import { RecruitmentEvent } from '../../../recruitment/domain/entities/recruitment-event.entity';
+import { RecruitmentEmployee } from 'src/recruitment/domain/entities/recruitment-employee.entity';
+import { EmployeeEventPoint } from '../../../recruitment/domain/entities/employee-event-point.entity';
 
 dotenv.config();
 

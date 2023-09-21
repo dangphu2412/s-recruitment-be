@@ -6,7 +6,7 @@ import { AuthorizationModule } from './account-service/authorization/internal/au
 import { SystemModule } from './system/system.module';
 import { MenuModule } from './system/menu/internal/menu.module';
 import { MonthlyMoneyModule } from './monthly-money/internal/monthly-money.module';
-import { RecruitmentEventModule } from './recruitment/internal/recruitment-event.module';
+import { RecruitmentEventModule } from './recruitment/infrastructure/recruitment-event.module';
 
 @Module({
   imports: [

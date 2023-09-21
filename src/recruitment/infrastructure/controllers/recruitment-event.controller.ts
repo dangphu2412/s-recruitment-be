@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Post,
   UploadedFile,
@@ -13,17 +14,24 @@ import {
   JwtPayload,
 } from 'src/account-service/authentication/client';
 import { CurrentUser } from 'src/account-service/authentication/internal/decorators';
-import { FileInterceptor } from '../../system/file';
-import { CreateRecruitmentEventDto } from '../client/dto/create-recruitment-event.dto';
-import { ImportEmployeesDto } from '../client/dto/import-employees.dto';
-import { RecruitmentEventService } from './recruitment-event.service';
-import { MarkEmployeeDto } from '../client/dto/mark-employee.dto';
+import { FileInterceptor } from 'src/system/file';
+import { Page } from 'src/system/query-shape/dto';
+import {
+  MarkEmployeeDto,
+  ImportEmployeesDto,
+  CreateRecruitmentEventDto,
+} from '../external-dtos';
+import {
+  RecruitmentEventUseCase,
+  RecruitmentEventUseCaseToken,
+} from 'src/recruitment/app/interfaces/recruitment-event.usecase';
 
 @Identified
 @Controller('recruitments/events')
 export class RecruitmentEventController {
   constructor(
-    private readonly recruitmentEventService: RecruitmentEventService,
+    @Inject(RecruitmentEventUseCaseToken)
+    private readonly recruitmentEventUseCase: RecruitmentEventUseCase,
   ) {}
 
   @Post()
@@ -31,7 +39,7 @@ export class RecruitmentEventController {
     @Body() createRecruitmentDto: CreateRecruitmentEventDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.recruitmentEventService.create({
+    return this.recruitmentEventUseCase.create({
       ...createRecruitmentDto,
       authorId: user.sub,
     });
@@ -42,24 +50,31 @@ export class RecruitmentEventController {
   @ApiNoContentResponse()
   @Post('employees')
   importRecruitmentEventEmployees(
+    @Body()
     importEmployeesDto: ImportEmployeesDto,
     @UploadedFile()
     file: Express.Multer.File,
   ) {
-    return this.recruitmentEventService.importEmployees({
+    return this.recruitmentEventUseCase.importEmployees({
       ...importEmployeesDto,
       file,
     });
   }
 
   @Get()
-  findAll() {
-    return this.recruitmentEventService.findAll();
+  async findAll() {
+    const events = await this.recruitmentEventUseCase.findAll();
+
+    return Page.of({
+      items: events,
+      totalRecords: events.length,
+      query: { size: 10, page: 1 },
+    });
   }
 
   @Get(':id')
   findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.recruitmentEventService.findOne(+id, user.sub);
+    return this.recruitmentEventUseCase.findOne(+id, user.sub);
   }
 
   @Post('/:eventId/mark')
@@ -67,7 +82,7 @@ export class RecruitmentEventController {
     @Body() markEmployeeDto: MarkEmployeeDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.recruitmentEventService.markPointForEmployee({
+    return this.recruitmentEventUseCase.markPointForEmployee({
       ...markEmployeeDto,
       authorId: user.sub,
     });
