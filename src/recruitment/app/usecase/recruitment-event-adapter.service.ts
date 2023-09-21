@@ -1,30 +1,29 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { read, utils } from 'xlsx';
 import {
   NotFoundSheetNameException,
   UserService,
   UserServiceToken,
-} from '../../account-service/user';
-import { NotFoundExaminersException } from '../client/exceptions/not-found-examiners.exception';
-import { Page } from 'src/system/query-shape/dto';
+} from '../../../account-service/user';
+import { NotFoundExaminersException } from '../../domain/exceptions/not-found-examiners.exception';
 import {
-  CreateRecruitmentPayload,
-  MarkEmployeePointPayload,
-} from '../client/types/create-recruitment-payload';
-import { ImportEmployeesDto } from '../client/dto/import-employees.dto';
-import { NotFoundEventException } from '../client/exceptions/not-found-event.exception';
-import { RecruitmentEmployee } from '../client/entities/recruitment-employee.entity';
-import { DuplicatedEventName } from '../client/exceptions/duplicated-name-event.exception';
-import { NotFoundEmployeeException } from '../client/exceptions/not-found-employee.exception';
-import { EmployeeEventPoint } from '../client/entities/employee-event-point.entity';
-import { ExceedMaxPointException } from '../client/exceptions/exceed-max-point.exception';
+  CreateRecruitmentCommand,
+  ImportEmployeesCommand,
+  MarkEmployeePointCommand,
+} from '../types/recruitment-event-command';
+import { NotFoundEventException } from '../../domain/exceptions/not-found-event.exception';
+import { RecruitmentEmployee } from '../../domain/entities/recruitment-employee.entity';
+import { DuplicatedEventName } from '../../domain/exceptions/duplicated-name-event.exception';
+import { NotFoundEmployeeException } from '../../domain/exceptions/not-found-employee.exception';
+import { EmployeeEventPoint } from '../../domain/entities/employee-event-point.entity';
+import { ExceedMaxPointException } from '../../domain/exceptions/exceed-max-point.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RecruitmentEvent } from '../client/entities/recruitment-event.entity';
+import { RecruitmentEvent } from '../../domain/entities/recruitment-event.entity';
+import { RecruitmentEventUseCase } from '../interfaces/recruitment-event.usecase';
 
 @Injectable()
-export class RecruitmentEventService {
+export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
   constructor(
     @InjectRepository(RecruitmentEvent)
     private readonly recruitmentEventRepository: Repository<RecruitmentEvent>,
@@ -36,10 +35,8 @@ export class RecruitmentEventService {
     private readonly userService: UserService,
   ) {}
 
-  async create(createRecruitmentDto: CreateRecruitmentPayload): Promise<void> {
-    const examiners = await this.userService.find(
-      createRecruitmentDto.examinerIds,
-    );
+  async create(command: CreateRecruitmentCommand): Promise<void> {
+    const examiners = await this.userService.find(command.examinerIds);
 
     if (!examiners.length) {
       throw new NotFoundExaminersException();
@@ -47,38 +44,32 @@ export class RecruitmentEventService {
 
     if (
       (await this.recruitmentEventRepository.count({
-        where: { name: createRecruitmentDto.name },
+        where: { name: command.name },
       })) > 0
     ) {
       throw new DuplicatedEventName();
     }
 
     const newRecruitmentEvent = this.recruitmentEventRepository.create({
-      name: createRecruitmentDto.name,
-      location: createRecruitmentDto.location,
-      startDate: createRecruitmentDto.recruitmentRange.fromDate,
-      endDate: createRecruitmentDto.recruitmentRange.toDate,
+      name: command.name,
+      location: command.location,
+      startDate: command.recruitmentRange.fromDate,
+      endDate: command.recruitmentRange.toDate,
       examiners,
-      authorId: createRecruitmentDto.authorId,
-      scoringStandards: createRecruitmentDto.scoringStandards,
+      authorId: command.authorId,
+      scoringStandards: command.scoringStandards,
     });
 
     await this.recruitmentEventRepository.save(newRecruitmentEvent);
   }
 
-  async findAll() {
-    const items = await this.recruitmentEventRepository.find({
+  findAll() {
+    return this.recruitmentEventRepository.find({
       relations: ['createdBy', 'examiners'],
-    });
-
-    return Page.of({
-      items,
-      totalRecords: items.length,
-      query: { size: 10, page: 1 },
     });
   }
 
-  async findOne(id: number, authorId: string) {
+  async findOne(id: number, authorId: string): Promise<any> {
     const event = await this.recruitmentEventRepository
       .createQueryBuilder('rce')
       .andWhere('rce.id = :id', { id })
@@ -118,9 +109,8 @@ export class RecruitmentEventService {
     };
   }
 
-  @Transactional()
-  async importEmployees(dto: ImportEmployeesDto) {
-    const workbook = read(dto.file.buffer, { type: 'buffer' });
+  async importEmployees(command: ImportEmployeesCommand): Promise<void> {
+    const workbook = read(command.file.buffer, { type: 'buffer' });
 
     const sheetName = workbook.SheetNames[0];
 
@@ -134,7 +124,7 @@ export class RecruitmentEventService {
 
     const event = await this.recruitmentEventRepository.findOne({
       where: {
-        id: parseInt(dto.eventId),
+        id: parseInt(command.eventId),
       },
     });
 
@@ -160,7 +150,7 @@ export class RecruitmentEventService {
     eventId,
     authorId,
     note,
-  }: MarkEmployeePointPayload) {
+  }: MarkEmployeePointCommand) {
     const [event, employee, markedPoint] = await Promise.all([
       this.recruitmentEventRepository.findOne({
         where: {

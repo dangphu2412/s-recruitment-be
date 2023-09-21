@@ -62,7 +62,7 @@ export class UserController {
   }
 
   @CanAccessBy(AccessRights.VIEW_USERS, AccessRights.EDIT_MEMBER_USER)
-  @Get('/users/:id')
+  @Get('/:id')
   findUserDetail(
     @Param('id', new ParseUUIDPipe({ version: '4' })) userId: string,
   ) {
