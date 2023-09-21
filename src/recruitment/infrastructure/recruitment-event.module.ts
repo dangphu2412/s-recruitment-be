@@ -7,6 +7,8 @@ import { RecruitmentEvent } from '../domain/entities/recruitment-event.entity';
 import { RecruitmentEmployee } from '../domain/entities/recruitment-employee.entity';
 import { EmployeeEventPoint } from '../domain/entities/employee-event-point.entity';
 import { RecruitmentEventUseCaseToken } from '../app/interfaces/recruitment-event.usecase';
+import { RecruitmentEventRepositoryToken } from '../app/interfaces/recruitment-event.repository';
+import { RecruitmentEventRepositoryAdapter } from './persistence/recruitment-event-repository.adapter';
 
 @Module({
   imports: [
@@ -22,6 +24,10 @@ import { RecruitmentEventUseCaseToken } from '../app/interfaces/recruitment-even
     {
       provide: RecruitmentEventUseCaseToken,
       useClass: RecruitmentEventUseCaseAdapter,
+    },
+    {
+      provide: RecruitmentEventRepositoryToken,
+      useClass: RecruitmentEventRepositoryAdapter,
     },
   ],
 })
