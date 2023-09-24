@@ -33,7 +33,7 @@ jobs:
 
       - name: Build dist
         run: |
-          yarn build
+          pnpm build
 
       - name: Upload Dist Artifacts
         uses: actions/upload-artifact@v3

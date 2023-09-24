@@ -19,14 +19,18 @@ import { EmployeeEventPoint } from '../../domain/entities/employee-event-point.e
 import { ExceedMaxPointException } from '../../domain/exceptions/exceed-max-point.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RecruitmentEvent } from '../../domain/entities/recruitment-event.entity';
 import { RecruitmentEventUseCase } from '../interfaces/recruitment-event.usecase';
+import {
+  RecruitmentEventRepository,
+  RecruitmentEventRepositoryToken,
+} from '../interfaces/recruitment-event.repository';
+import { RecruitmentEvent } from '../../domain/entities/recruitment-event.entity';
 
 @Injectable()
 export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
   constructor(
-    @InjectRepository(RecruitmentEvent)
-    private readonly recruitmentEventRepository: Repository<RecruitmentEvent>,
+    @Inject(RecruitmentEventRepositoryToken)
+    private readonly recruitmentEventRepository: RecruitmentEventRepository,
     @InjectRepository(RecruitmentEmployee)
     private readonly recruitmentEmployeeRepository: Repository<RecruitmentEmployee>,
     @InjectRepository(EmployeeEventPoint)
@@ -42,40 +46,32 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
       throw new NotFoundExaminersException();
     }
 
-    if (
-      (await this.recruitmentEventRepository.count({
-        where: { name: command.name },
-      })) > 0
-    ) {
+    if (await this.recruitmentEventRepository.isNameExisted(command.name)) {
       throw new DuplicatedEventName();
     }
 
-    const newRecruitmentEvent = this.recruitmentEventRepository.create({
-      name: command.name,
-      location: command.location,
-      startDate: command.recruitmentRange.fromDate,
-      endDate: command.recruitmentRange.toDate,
-      examiners,
-      authorId: command.authorId,
-      scoringStandards: command.scoringStandards,
-    });
+    const newRecruitmentEvent = new RecruitmentEvent();
 
-    await this.recruitmentEventRepository.save(newRecruitmentEvent);
+    newRecruitmentEvent.name = command.name;
+    newRecruitmentEvent.location = command.location;
+    newRecruitmentEvent.startDate = new Date(command.recruitmentRange.fromDate);
+    newRecruitmentEvent.endDate = new Date(command.recruitmentRange.toDate);
+    newRecruitmentEvent.examiners = examiners;
+    newRecruitmentEvent.authorId = command.authorId;
+    newRecruitmentEvent.scoringStandards = command.scoringStandards;
+
+    await this.recruitmentEventRepository.insert(newRecruitmentEvent);
   }
 
   findAll() {
-    return this.recruitmentEventRepository.find({
-      relations: ['createdBy', 'examiners'],
-    });
+    return this.recruitmentEventRepository.findAllEventsWithAuthorAndExaminers();
   }
 
   async findOne(id: number, authorId: string): Promise<any> {
-    const event = await this.recruitmentEventRepository
-      .createQueryBuilder('rce')
-      .andWhere('rce.id = :id', { id })
-      .leftJoinAndSelect('rce.examiners', 'examiners')
-      .leftJoinAndSelect('rce.employees', 'employees')
-      .getOne();
+    const event =
+      await this.recruitmentEventRepository.findOneWithExaminersAndEmployeeById(
+        id,
+      );
 
     const votedPoints = await this.employeeEventPointRepository.find({
       where: {
@@ -122,11 +118,9 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
 
     const data = utils.sheet_to_json<object>(sheet);
 
-    const event = await this.recruitmentEventRepository.findOne({
-      where: {
-        id: parseInt(command.eventId),
-      },
-    });
+    const event = await this.recruitmentEventRepository.findOneById(
+      parseInt(command.eventId),
+    );
 
     if (!event) {
       throw new NotFoundEventException();
@@ -152,11 +146,7 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
     note,
   }: MarkEmployeePointCommand) {
     const [event, employee, markedPoint] = await Promise.all([
-      this.recruitmentEventRepository.findOne({
-        where: {
-          id: eventId,
-        },
-      }),
+      this.recruitmentEventRepository.findOneById(eventId),
       this.recruitmentEmployeeRepository.findOne({
         where: {
           id: employeeId,

@@ -37,7 +37,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          yarn test
+          pnpm test
 
   build:
     name: Build dist
