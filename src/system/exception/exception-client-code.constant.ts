@@ -1,6 +1,6 @@
-import { generateSystemException } from './exception-generator';
+import { createSystemClientCode } from './factories';
 
 export const SystemExceptionClientCode = {
-  MAINTENANCE: generateSystemException('MAINTENANCE'),
-  GOT_ISSUE: generateSystemException('GOT_ISSUE'),
+  MAINTENANCE: createSystemClientCode('MAINTENANCE'),
+  GOT_ISSUE: createSystemClientCode('GOT_ISSUE'),
 };

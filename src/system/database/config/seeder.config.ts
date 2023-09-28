@@ -1,9 +1,10 @@
 import { connectionConfig } from './base-connection.config';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
 import { join } from 'path';
+import { DataSource } from 'typeorm';
+import { DataSourceOptions } from 'typeorm/data-source/DataSourceOptions';
 
-export default {
+export default new DataSource({
   ...connectionConfig,
   migrations: [join(__dirname, '../../database/seeders/*{.ts,.js}')],
   migrationsTableName: 'seeder',
-} as TypeOrmModuleOptions;
+} as DataSourceOptions);

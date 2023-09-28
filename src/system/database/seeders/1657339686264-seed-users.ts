@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { SystemRoles, Role } from '../../../authorization';
-import { User } from '../../../user';
-import { BcryptService, ModuleConfig } from '../../services';
+import { SystemRoles, Role } from '../../../account-service/authorization';
+import { User } from '../../../account-service/user';
+import { DigestService, EnvironmentKeyFactory } from '../../services';
 
 export class SeedUsers1657339686264 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -14,10 +14,12 @@ export class SeedUsers1657339686264 implements MigrationInterface {
         name: SystemRoles.CHAIRMAN,
       },
     });
-    const bcryptService = new BcryptService(
-      new ModuleConfig(new ConfigService<Record<string, unknown>, false>()),
+    const digestService = new DigestService(
+      new EnvironmentKeyFactory(
+        new ConfigService<Record<string, unknown>, false>(),
+      ),
     );
-    const password = await bcryptService.hash('test123');
+    const password = await digestService.hash('test123');
     const user = new User();
     user.fullName = 'Phu Dep Trai';
     user.email = 'test@gmail.com';

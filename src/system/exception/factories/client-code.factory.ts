@@ -1,10 +1,10 @@
-import { ClientError } from '../exception-generator';
+import { ClientError } from '../../client/exception.interface';
 
 export type ClientCodeFactory = (
   errorOrErrorCode: ClientError | string,
 ) => ClientError;
 
-export function createClientCodeFactory(module = 'SYSTEM'): ClientCodeFactory {
+export function createClientCodeFactory(module: string): ClientCodeFactory {
   return (errorOrErrorCode) => {
     if (typeof errorOrErrorCode === 'string') {
       return {
@@ -20,4 +20,8 @@ export function createClientCodeFactory(module = 'SYSTEM'): ClientCodeFactory {
   };
 }
 
-export const createSystemClientCode = createClientCodeFactory();
+export const createSystemClientCode = createClientCodeFactory('SYS_');
+
+export function isClientException(response: any): response is ClientError {
+  return !!(response as ClientError).errorCode;
+}

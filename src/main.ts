@@ -1,5 +1,4 @@
 import { NestFactory } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {
@@ -14,16 +13,15 @@ import {
 import { fastifyHelmet } from '@fastify/helmet';
 import compression from '@fastify/compress';
 import { contentParser } from 'fastify-multer';
-import { registerPaginationConfig } from 'src/system/query-shape/pagination/config/register-pagination.config';
 import { AppModule } from './app.module';
 import { ClientExceptionFilter } from './system/exception/exception.filter';
 import { logAppScaffold } from './system/utils';
+import { EnvironmentKeyFactory } from './system/services';
 
 async function bootstrap() {
   initializeTransactionalContext();
   patchTypeORMRepositoryWithBaseRepository();
   patchTypeORMTreeRepositoryWithBaseTreeRepository();
-  registerPaginationConfig();
 
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
@@ -60,9 +58,9 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new ClientExceptionFilter());
 
-  const configService = app.get(ConfigService);
-  const port = configService.get<string>('PORT') ?? 3000;
-  const host = configService.get<string>('HOST') ?? '0.0.0.0';
+  const environmentKeyFactory = app.get(EnvironmentKeyFactory);
+  const port = environmentKeyFactory.getPort();
+  const host = environmentKeyFactory.getHost();
 
   await app.listen(port, host, (err, address) => {
     if (err) {
@@ -72,7 +70,7 @@ async function bootstrap() {
     Logger.log(`Server is listening on: ${address}`, 'AppBootstrap');
   });
 
-  logAppScaffold(app);
+  await logAppScaffold(app);
 }
 
 bootstrap();
