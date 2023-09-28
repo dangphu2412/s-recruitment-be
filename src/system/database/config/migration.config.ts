@@ -1,9 +1,9 @@
+import { DataSource } from 'typeorm';
+import { DataSourceOptions } from 'typeorm/data-source/DataSourceOptions';
 import { connectionConfig } from './base-connection.config';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
-import { join } from 'path';
+import { MIGRATION_CONFIGS } from './entities-declaration';
 
-export default {
+export default new DataSource({
   ...connectionConfig,
-  migrations: [join(__dirname, '../../database/migrations/*{.ts,.js}')],
-  migrationsTableName: 'migrations',
-} as TypeOrmModuleOptions;
+  ...MIGRATION_CONFIGS,
+} as DataSourceOptions);

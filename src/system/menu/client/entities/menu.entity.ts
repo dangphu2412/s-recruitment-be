@@ -2,13 +2,13 @@ import {
   Column,
   Entity,
   JoinColumn,
-  OneToMany,
+  ManyToMany,
   PrimaryGeneratedColumn,
   Tree,
   TreeChildren,
   TreeParent,
 } from 'typeorm';
-import { MenuSetting } from './menu-settings.entity';
+import { Permission } from '../../../../account-service/authorization/client/entities/permission.entity';
 
 @Entity({
   name: 'menus',
@@ -56,6 +56,6 @@ export class Menu {
   })
   parent: Menu;
 
-  @OneToMany(() => MenuSetting, (settings) => settings.menu)
-  settings?: MenuSetting[];
+  @ManyToMany(() => Permission, (permission) => permission.menuSettings)
+  permissionSettings?: Permission[];
 }
