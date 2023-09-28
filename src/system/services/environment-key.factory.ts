@@ -3,7 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModuleOptions } from '@nestjs/jwt';
 import { isBooleanString } from 'class-validator';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
-import migrationConfig from '../database/config/migration.config';
+import {
+  APP_ENTITIES,
+  MIGRATION_CONFIGS,
+} from '../database/config/entities-declaration';
 
 @Injectable()
 export class EnvironmentKeyFactory {
@@ -68,11 +71,11 @@ export class EnvironmentKeyFactory {
       port: this.getNumber('DB_PORT'),
       database: this.getString('DB_DATABASE'),
       synchronize: this.getBoolean('DB_SYNC'),
-      entities: migrationConfig.entities,
+      entities: APP_ENTITIES,
       logging: this.configService.get('NODE_ENV') === 'development',
       migrationsRun: true,
-      migrationsTableName: migrationConfig.migrationsTableName,
-      migrations: migrationConfig.migrations,
+      migrationsTableName: MIGRATION_CONFIGS.migrationsTableName,
+      migrations: MIGRATION_CONFIGS.migrations,
     };
   }
 

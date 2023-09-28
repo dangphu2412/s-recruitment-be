@@ -1,4 +1,4 @@
-import { Repository, TreeRepository } from 'typeorm';
+import { In, Repository, TreeRepository } from 'typeorm';
 import { Menu } from '../client';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
@@ -13,10 +13,15 @@ export class MenuRepository extends TreeRepository<Menu> {
   }
 
   findByPermissionNames(names: string[]): Promise<Menu[]> {
-    return this.createQueryBuilder('menus')
-      .leftJoinAndSelect('menus.settings', 'settings')
-      .leftJoinAndSelect('settings.permission', 'permission')
-      .andWhere('permission.name IN (:...names)', { names })
-      .getMany();
+    return this.find({
+      relations: {
+        permissionSettings: true,
+      },
+      where: {
+        permissionSettings: {
+          name: In(names),
+        },
+      },
+    });
   }
 }
