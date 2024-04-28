@@ -11,11 +11,11 @@ jobs:
 
     strategy:
       matrix:
-        node: [16.x]
+        node: [18.x]
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
         with:
           version: 8
       - uses: actions/setup-node@v3
@@ -24,7 +24,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Cache node_modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/node_modules/
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
