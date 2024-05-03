@@ -2,7 +2,7 @@ import { User } from '../../../account-service/user';
 import { Role } from '../../../account-service/authorization';
 import { Menu } from '../../menu';
 import { MonthlyMoneyConfig, OperationFee } from '../../../monthly-money';
-import { Permission } from '../../../account-service/authorization/client/entities/permission.entity';
+import { Permission } from '../../../account-service/authorization/domain/entities/permission.entity';
 import { RecruitmentEvent } from '../../../recruitment/domain/entities/recruitment-event.entity';
 import { RecruitmentEmployee } from '../../../recruitment/domain/entities/recruitment-employee.entity';
 import { EmployeeEventPoint } from '../../../recruitment/domain/entities/employee-event-point.entity';

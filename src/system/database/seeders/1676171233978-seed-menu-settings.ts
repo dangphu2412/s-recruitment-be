@@ -1,6 +1,6 @@
 import { In, MigrationInterface, QueryRunner } from 'typeorm';
-import { Permission } from 'src/account-service/authorization/client/entities/permission.entity';
-import { AccessRights } from 'src/account-service/authorization/internal/constants/role-def.enum';
+import { Permission } from 'src/account-service/authorization/domain/entities/permission.entity';
+import { AccessRights } from 'src/account-service/authorization/domain/constants/role-def.enum';
 import { Menu } from '../../menu';
 import keyBy from 'lodash/keyBy';
 
