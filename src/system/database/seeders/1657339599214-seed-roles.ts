@@ -4,7 +4,7 @@ import {
   Role,
   AccessRights,
 } from '../../../account-service/authorization';
-import { Permission } from 'src/account-service/authorization/client/entities/permission.entity';
+import { Permission } from 'src/account-service/authorization/domain/entities/permission.entity';
 import keyBy from 'lodash/keyBy';
 
 export class SeedRoles1657339599214 implements MigrationInterface {

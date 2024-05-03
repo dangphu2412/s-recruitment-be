@@ -12,8 +12,8 @@ import { ApiConsumes, ApiNoContentResponse } from '@nestjs/swagger';
 import {
   Identified,
   JwtPayload,
-} from 'src/account-service/authentication/client';
-import { CurrentUser } from 'src/account-service/authentication/internal/decorators';
+} from 'src/account-service/authentication/domain';
+import { CurrentUser } from 'src/account-service/authentication/adapters/decorators';
 import { FileInterceptor } from 'src/system/file';
 import { Page } from 'src/system/query-shape/dto';
 import {
