@@ -8,11 +8,29 @@ import {
   MIGRATION_CONFIGS,
 } from '../database/config/entities-declaration';
 
+type Env = {
+  PORT: string;
+  HOST: string;
+  JWT_SECRET: string;
+  DB_HOST: string;
+  DB_USERNAME: string;
+  DB_PASSWORD: string;
+  DB_PORT: string;
+  DB_DATABASE: string;
+  DB_SYNC: string;
+  SALT_ROUNDS: string;
+  ACCESS_TOKEN_EXPIRATION: string;
+  REFRESH_TOKEN_EXPIRATION: string;
+  NODE_ENV: string;
+};
+
+type EnvKey = keyof Env;
+
 @Injectable()
 export class EnvironmentKeyFactory {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService<Env>) {}
 
-  private getNumber(key: string): number {
+  private getNumber(key: EnvKey): number {
     const value = Number(this.get(key));
 
     if (isNaN(value)) {
@@ -22,7 +40,7 @@ export class EnvironmentKeyFactory {
     return value;
   }
 
-  private getBoolean(key: string): boolean {
+  private getBoolean(key: EnvKey): boolean {
     const value = this.get(key).toLowerCase();
 
     if (!isBooleanString(value)) {
@@ -32,13 +50,13 @@ export class EnvironmentKeyFactory {
     return value === 'true';
   }
 
-  private getString(key: string): string {
+  private getString(key: EnvKey): string {
     const value = this.get(key);
 
     return value.replace(/\\n/g, '\n');
   }
 
-  private get(key: string): string {
+  private get(key: EnvKey): string {
     const value = this.configService.get(key);
 
     if (!value) {
@@ -89,5 +107,9 @@ export class EnvironmentKeyFactory {
 
   getRefreshTokenExpiration(): string {
     return this.getString('REFRESH_TOKEN_EXPIRATION');
+  }
+
+  getEnv() {
+    return this.configService.get('NODE_ENV');
   }
 }
