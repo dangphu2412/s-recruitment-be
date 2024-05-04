@@ -1,3 +1,3 @@
-import { createClientCodeFactory } from '../../../../system/exception/factories';
+import { createClientCodeFactory } from '../../../../system/exception';
 
 export const createAuthClientCode = createClientCodeFactory('AUTH__');

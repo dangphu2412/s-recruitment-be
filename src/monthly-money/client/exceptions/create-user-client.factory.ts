@@ -1,4 +1,4 @@
-import { createClientCodeFactory } from '../../../system/exception/factories';
+import { createClientCodeFactory } from '../../../system/exception';
 
 export const createMonthlyMoneyClientCode =
   createClientCodeFactory('MONTHLY_MONEY__');

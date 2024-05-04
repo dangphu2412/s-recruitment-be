@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { ToManyString } from '../../../../system/decorators/transformer';
+import { ToManyString } from '../../../../system/query-shape/decorators/transformer';
 
 export class ExtractNewUserQueryDto {
   field: string;

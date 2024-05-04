@@ -1,4 +1,4 @@
-import { createSystemClientCode } from './factories';
+import { createSystemClientCode } from './index';
 
 export const SystemExceptionClientCode = {
   MAINTENANCE: createSystemClientCode('MAINTENANCE'),

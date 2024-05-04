@@ -1,13 +1,13 @@
-import { ExceptionFilter, HttpException } from '@nestjs/common';
-import { ClientExceptionFilter } from '../../exception/exception.filter';
+import { ExceptionFilter, HttpException, Logger } from '@nestjs/common';
+import { ClientExceptionFilter } from '../exception.filter';
 import {
   ArgumentsHost,
   HttpArgumentsHost,
 } from '@nestjs/common/interfaces/features/arguments-host.interface';
-import { isClientException } from '../../exception/factories';
+import { isClientException } from '../index';
 
-jest.mock('../../exception/factories');
-jest.mock('../../exception/exception-client-code.constant', () => ({
+jest.mock('../index');
+jest.mock('../exception-client-code.constant', () => ({
   SystemExceptionClientCode: {
     GOT_ISSUE: {
       errorCode: 'GOT_ISSUE',
@@ -21,7 +21,7 @@ describe('ClientExceptionFilter', () => {
   let filter: ExceptionFilter<HttpException>;
 
   beforeEach(() => {
-    filter = new ClientExceptionFilter();
+    filter = new ClientExceptionFilter(new Logger());
   });
 
   afterAll(() => {
@@ -132,16 +132,16 @@ describe('ClientExceptionFilter', () => {
       expect(mockHttpArgumentsHost).toBeCalledTimes(1);
       expect(mockHttpArgumentsHost().getResponse).toBeCalledTimes(1);
       expect(mockHttpArgumentsHost().getResponse().status).toBeCalledTimes(1);
-      expect(mockHttpArgumentsHost().getResponse().status).toBeCalledWith(400);
+      expect(mockHttpArgumentsHost().getResponse().status).toBeCalledWith(500);
       expect(
         mockHttpArgumentsHost().getResponse().status().send,
       ).toBeCalledTimes(1);
       expect(
         mockHttpArgumentsHost().getResponse().status().send,
       ).toBeCalledWith({
-        errorCode: '400',
-        statusCode: 400,
-        message: 'test',
+        errorCode: 'GOT_ISSUE',
+        statusCode: 500,
+        message: 'There is a system error',
       });
     });
 
