@@ -27,10 +27,8 @@ export class RecruitmentEventRepositoryAdapter
   }
 
   async isNameExisted(name: string): Promise<boolean> {
-    return (
-      (await this.count({
-        where: { name },
-      })) > 0
-    );
+    return await this.exists({
+      where: { name },
+    });
   }
 }

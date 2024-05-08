@@ -6,9 +6,9 @@ import {
   OperationFee,
   UpdatePaid,
 } from '../client';
-import { NoOperationFeeFound } from '../../account-service/authorization';
 import { MonthlyMoneyOperationRepository } from './monthly-money-operation.repository';
 import { Injectable } from '@nestjs/common';
+import { NoOperationFeeFound } from '../client/exceptions/no-operation-fee-found.exception';
 
 @Injectable()
 export class MonthlyMoneyOperationServiceImpl

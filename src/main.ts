@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {
   FastifyAdapter,
@@ -11,6 +11,7 @@ import { contentParser } from 'fastify-multer';
 import { AppModule } from './app.module';
 import { ClientExceptionFilter } from './system/exception/exception.filter';
 import { EnvironmentKeyFactory } from './system/services';
+import { createSystemClientCode } from './system/exception';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -44,6 +45,14 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
+      exceptionFactory: (errors) => {
+        return new BadRequestException(
+          createSystemClientCode({
+            errorCode: 'BAD_REQUEST',
+            message: errors.toString(),
+          }),
+        );
+      },
     }),
   );
 

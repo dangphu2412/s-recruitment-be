@@ -4,8 +4,8 @@ import { MenuService, MenuServiceToken } from '../client';
 import {
   CurrentUser,
   Identified,
-  JwtPayload,
-} from '../../../account-service/authentication';
+} from '../../../account-service/adapters/decorators';
+import { JwtPayload } from '../../../account-service/domain/dtos/jwt-payload';
 
 @Controller({
   path: 'menus',
