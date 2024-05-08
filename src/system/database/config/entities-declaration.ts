@@ -1,12 +1,12 @@
-import { User } from '../../../account-service/user';
-import { Role } from '../../../account-service/authorization';
 import { Menu } from '../../menu';
 import { MonthlyMoneyConfig, OperationFee } from '../../../monthly-money';
-import { Permission } from '../../../account-service/authorization/domain/entities/permission.entity';
 import { RecruitmentEvent } from '../../../recruitment/domain/entities/recruitment-event.entity';
 import { RecruitmentEmployee } from '../../../recruitment/domain/entities/recruitment-employee.entity';
 import { EmployeeEventPoint } from '../../../recruitment/domain/entities/employee-event-point.entity';
 import { join } from 'path';
+import { User } from '../../../account-service/domain/entities/user.entity';
+import { Role } from '../../../account-service/domain/entities/role.entity';
+import { Permission } from '../../../account-service/domain/entities/permission.entity';
 
 export const APP_ENTITIES = [
   User,

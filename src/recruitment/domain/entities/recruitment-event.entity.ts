@@ -8,9 +8,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../../../account-service/user';
 import { RecruitmentEmployee } from './recruitment-employee.entity';
 import { EmployeeEventPoint } from './employee-event-point.entity';
+import { User } from '../../../account-service/domain/entities/user.entity';
 
 @Entity({
   name: 'recruitment_events',

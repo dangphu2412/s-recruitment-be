@@ -1,11 +1,11 @@
 import { MenuRepository } from './menu.repositoryt';
 import { Inject, Injectable } from '@nestjs/common';
 import { Menu, MenuService } from '../client';
+import keyBy from 'lodash/keyBy';
 import {
   AccessRightStorage,
   AccessRightStorageToken,
-} from 'src/account-service/authorization/domain';
-import keyBy from 'lodash/keyBy';
+} from '../../../account-service/domain/interfaces/access-right-storage';
 
 @Injectable()
 export class MenuServiceImpl implements MenuService {

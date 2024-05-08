@@ -22,6 +22,7 @@ type Env = {
   ACCESS_TOKEN_EXPIRATION: string;
   REFRESH_TOKEN_EXPIRATION: string;
   NODE_ENV: string;
+  DEFAULT_PASSWORD: string;
 };
 
 type EnvKey = keyof Env;
@@ -111,5 +112,9 @@ export class EnvironmentKeyFactory {
 
   getEnv() {
     return this.configService.get('NODE_ENV');
+  }
+
+  getDefaultPwd() {
+    return this.configService.get('DEFAULT_PASSWORD') || 'Test12345@@';
   }
 }

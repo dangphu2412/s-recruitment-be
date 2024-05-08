@@ -1,8 +1,10 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { SystemRoles, Role } from '../../../account-service/authorization';
-import { User } from '../../../account-service/user';
-import { DigestService, EnvironmentKeyFactory } from '../../services';
+import { EnvironmentKeyFactory } from '../../services';
+import { PasswordManager } from '../../../account-service/app/password-manager';
+import { User } from '../../../account-service/domain/entities/user.entity';
+import { Role } from '../../../account-service/domain/entities/role.entity';
+import { SystemRoles } from '../../../account-service/domain/constants/role-def.enum';
 
 export class SeedUsers1657339686264 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -14,12 +16,12 @@ export class SeedUsers1657339686264 implements MigrationInterface {
         name: SystemRoles.CHAIRMAN,
       },
     });
-    const digestService = new DigestService(
+    const passwordManager = new PasswordManager(
       new EnvironmentKeyFactory(
         new ConfigService<Record<string, unknown>, false>(),
       ),
     );
-    const password = await digestService.hash('test123');
+    const password = await passwordManager.generate('test123');
     const user = new User();
     user.fullName = 'Phu Dep Trai';
     user.email = 'test@gmail.com';
