@@ -66,7 +66,7 @@
     "rxjs": "7.2.0",
     "slugify": "^1.6.5",
     "typeorm": "^0.3.17",
-    "typeorm-transactional-cls-hooked": "^0.1.21",
+    "typeorm-transactional": "^0.5.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

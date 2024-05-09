@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from './system/database/database.module';
-import { AccountServiceModule } from './account-service/infrastructure/account-service.module';
+import { AccountServiceModule } from './account-service';
 import { SystemModule } from './system/system.module';
 import { MenuModule } from './system/menu/internal/menu.module';
 import { MonthlyMoneyModule } from './monthly-money/internal/monthly-money.module';
