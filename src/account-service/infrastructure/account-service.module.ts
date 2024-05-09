@@ -14,7 +14,7 @@ import { RoleRepository } from '../app/role.repository';
 import { RoleController } from '../adapters/role.controller';
 import { Permission } from '../domain/entities/permission.entity';
 import { MonthlyMoneyModule } from '../../monthly-money/internal/monthly-money.module';
-import { UserController } from '../app/user.controller';
+import { UserController } from '../adapters/user.controller';
 import { DomainUserImpl } from '../app/domain.user';
 import { UserRepository } from '../app/user.repository';
 import { AuthServiceToken, TokenGeneratorToken } from '../domain/interfaces';

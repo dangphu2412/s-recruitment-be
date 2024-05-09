@@ -22,8 +22,8 @@ import {
   MonthlyMoneyOperationService,
   MonthlyMoneyOperationServiceToken,
 } from 'src/monthly-money';
-import { CurrentUser, Identified } from '../adapters/decorators';
-import { CanAccessBy } from '../adapters/decorators/can-access-by.decorator';
+import { CurrentUser, Identified } from './decorators';
+import { CanAccessBy } from './decorators/can-access-by.decorator';
 import { Page } from '../../system/query-shape/types';
 import { UpdatableUserDto } from '../domain/dtos/updatable-user.dto';
 import { UpdateMemberPaidDto } from '../domain/dtos/update-member-paid.dto';

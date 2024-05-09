@@ -12,8 +12,11 @@ import { AppModule } from './app.module';
 import { ClientExceptionFilter } from './system/exception/exception.filter';
 import { EnvironmentKeyFactory } from './system/services';
 import { createSystemClientCode } from './system/exception';
+import { initializeTransactionalContext } from 'typeorm-transactional';
 
 async function bootstrap() {
+  initializeTransactionalContext();
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),

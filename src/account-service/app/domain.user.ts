@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -18,8 +19,10 @@ import {
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
 import {
+  FieldMappingsRequest,
   FileCreateUsersDto,
-  PublicFieldMapping,
+  FileRow,
+  PublicUserFields,
 } from '../domain/dtos/file-create-users.dto';
 import { CreateUserType, MemberType } from '../domain/constants/user-constant';
 import { read, utils } from 'xlsx';
@@ -46,6 +49,7 @@ import {
   UserManagementQuery,
   UserManagementView,
 } from '../domain/vos/user-management-view.vo';
+import { Transactional } from 'typeorm-transactional';
 
 @Injectable()
 export class DomainUserImpl implements DomainUser {
@@ -169,6 +173,7 @@ export class DomainUserImpl implements DomainUser {
     });
   }
 
+  @Transactional()
   private createUsersByFile(dto: FileCreateUsersDto) {
     const workbook = read(dto.file.buffer, { type: 'buffer' });
 
@@ -176,10 +181,10 @@ export class DomainUserImpl implements DomainUser {
       workbook.SheetNames.map(async (name) => {
         const sheet = workbook.Sheets[name];
 
-        const rows = utils.sheet_to_json<Record<string, string>>(sheet);
-        const users = await this.buildEntitiesByMapping(
+        const rows = utils.sheet_to_json<FileRow>(sheet);
+        const users = await this.createEntitiesByFieldRequest(
           rows,
-          JSON.parse(dto.fieldMappings) as Record<string, PublicFieldMapping>,
+          dto.fieldMappings,
         );
 
         await this.userRepository.insertIgnoreDuplicated(users);
@@ -187,21 +192,36 @@ export class DomainUserImpl implements DomainUser {
     );
   }
 
-  private async buildEntitiesByMapping(
-    rows: Record<string, string>[],
-    mappings: Record<string, PublicFieldMapping>,
-  ): Promise<User[]> {
-    const mappingPublicToEntity: Record<PublicFieldMapping, keyof User> = {
+  private getMappingsRequest(input: string): FieldMappingsRequest {
+    try {
+      return JSON.parse(input) as FieldMappingsRequest;
+    } catch {
+      throw new BadRequestException('Invalid field mappings format');
+    }
+  }
+
+  private getDirectMapping(
+    fieldMappingRaw: string,
+  ): Record<string, keyof User> {
+    const mappings = this.getMappingsRequest(fieldMappingRaw);
+    const mappingPublicToEntity: Record<PublicUserFields, keyof User> = {
       email: 'email',
       birthday: 'birthday',
       fullName: 'fullName',
     };
-    const mappingUserInputToEntity: Record<string, keyof User> = Object.keys(
-      mappings,
-    ).reduce((acc, key) => {
+
+    return Object.keys(mappings).reduce((acc, key) => {
       acc[key] = mappingPublicToEntity[mappings[key]] as keyof User;
       return acc;
     }, {} as Record<string, keyof User>);
+  }
+
+  private async createEntitiesByFieldRequest(
+    rows: FileRow[],
+    rawMapping: string,
+  ): Promise<User[]> {
+    const directMappingToEntity: Record<string, keyof User> =
+      this.getDirectMapping(rawMapping);
 
     const defaultPwd = await this.passwordManager.getDefaultPassword();
 
@@ -209,7 +229,9 @@ export class DomainUserImpl implements DomainUser {
       const user = new User();
 
       Object.keys(row).forEach((key) => {
-        user[mappingUserInputToEntity[key] as any] = row[key];
+        const entityField = directMappingToEntity[key];
+
+        user[entityField as any] = row[key];
       });
 
       user.password = defaultPwd;
@@ -243,7 +265,7 @@ export class DomainUserImpl implements DomainUser {
     const { search, joinedIn, memberType } = query;
     const { offset, size } = PageRequest.of(query);
 
-    if (memberType === MemberType.DEBTOR) {
+    if (MemberType.DEBTOR === memberType) {
       const memberOperationFees =
         await this.moneyOperationService.findDebtOperationFee({
           size,
