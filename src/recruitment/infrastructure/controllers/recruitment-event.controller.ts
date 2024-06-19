@@ -10,10 +10,9 @@ import {
 } from '@nestjs/common';
 import { ApiConsumes, ApiNoContentResponse } from '@nestjs/swagger';
 import {
+  CurrentUser,
   Identified,
-  JwtPayload,
-} from 'src/account-service/authentication/client';
-import { CurrentUser } from 'src/account-service/authentication/internal/decorators';
+} from 'src/account-service/adapters/decorators';
 import { FileInterceptor } from 'src/system/file';
 import { Page } from 'src/system/query-shape/dto';
 import {
@@ -25,6 +24,7 @@ import {
   RecruitmentEventUseCase,
   RecruitmentEventUseCaseToken,
 } from 'src/recruitment/app/interfaces/recruitment-event.usecase';
+import { JwtPayload } from '../../../account-service/domain/dtos/jwt-payload';
 
 @Identified
 @Controller('recruitments/events')

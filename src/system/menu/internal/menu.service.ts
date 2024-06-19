@@ -1,13 +1,11 @@
 import { MenuRepository } from './menu.repositoryt';
 import { Inject, Injectable } from '@nestjs/common';
 import { Menu, MenuService } from '../client';
+import keyBy from 'lodash/keyBy';
 import {
   AccessRightStorage,
   AccessRightStorageToken,
-  RoleService,
-  RoleServiceToken,
-} from 'src/account-service/authorization/client';
-import keyBy from 'lodash/keyBy';
+} from '../../../account-service/domain/interfaces/access-right-storage';
 
 @Injectable()
 export class MenuServiceImpl implements MenuService {
@@ -15,8 +13,6 @@ export class MenuServiceImpl implements MenuService {
     private readonly menuRepository: MenuRepository,
     @Inject(AccessRightStorageToken)
     private readonly accessRightStorage: AccessRightStorage,
-    @Inject(RoleServiceToken)
-    private readonly roleService: RoleService,
   ) {}
 
   async findMenusByUserId(userId: string): Promise<Menu[]> {

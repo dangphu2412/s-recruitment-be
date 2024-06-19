@@ -6,8 +6,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { RecruitmentEvent } from './recruitment-event.entity';
-import { User } from '../../../account-service/user';
 import { RecruitmentEmployee } from './recruitment-employee.entity';
+import { User } from '../../../account-service/domain/entities/user.entity';
 
 @Entity({
   name: 'employee_event_points',

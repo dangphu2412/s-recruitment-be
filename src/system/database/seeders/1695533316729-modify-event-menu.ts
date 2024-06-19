@@ -1,8 +1,8 @@
 import { In, MigrationInterface, QueryRunner } from 'typeorm';
 import { MenuProcessor } from '../processors/menu.processor';
 import { Menu } from '../../menu';
-import { AccessRights } from '../../../account-service/authorization';
-import { Permission } from '../../../account-service/authorization/client/entities/permission.entity';
+import { Permission } from '../../../account-service/domain/entities/permission.entity';
+import { AccessRights } from '../../../account-service/domain/constants/role-def.enum';
 
 export class ModifyEventMenu1695533316729 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

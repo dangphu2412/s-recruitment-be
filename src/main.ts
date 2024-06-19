@@ -1,11 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import {
-  initializeTransactionalContext,
-  patchTypeORMRepositoryWithBaseRepository,
-  patchTypeORMTreeRepositoryWithBaseTreeRepository,
-} from 'typeorm-transactional-cls-hooked';
 import {
   FastifyAdapter,
   NestFastifyApplication,
@@ -15,13 +10,12 @@ import compression from '@fastify/compress';
 import { contentParser } from 'fastify-multer';
 import { AppModule } from './app.module';
 import { ClientExceptionFilter } from './system/exception/exception.filter';
-import { logAppScaffold } from './system/utils';
 import { EnvironmentKeyFactory } from './system/services';
+import { createSystemClientCode } from './system/exception';
+import { initializeTransactionalContext } from 'typeorm-transactional';
 
 async function bootstrap() {
   initializeTransactionalContext();
-  patchTypeORMRepositoryWithBaseRepository();
-  patchTypeORMTreeRepositoryWithBaseTreeRepository();
 
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
@@ -54,23 +48,45 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
+      exceptionFactory: (errors) => {
+        return new BadRequestException(
+          createSystemClientCode({
+            errorCode: 'BAD_REQUEST',
+            message: errors.toString(),
+          }),
+        );
+      },
     }),
   );
-  app.useGlobalFilters(new ClientExceptionFilter());
+
+  const logger = new Logger();
+  app.useGlobalFilters(new ClientExceptionFilter(logger));
 
   const environmentKeyFactory = app.get(EnvironmentKeyFactory);
-  const port = environmentKeyFactory.getPort();
-  const host = environmentKeyFactory.getHost();
 
-  await app.listen(port, host, (err, address) => {
-    if (err) {
-      Logger.log(err);
-    }
+  await app.listen(
+    environmentKeyFactory.getPort(),
+    environmentKeyFactory.getHost(),
+    (err, address) => {
+      if (err) {
+        logger.log(err);
+        return;
+      }
 
-    Logger.log(`Server is listening on: ${address}`, 'AppBootstrap');
-  });
+      logger.log(`Server is listening on: ${address}`, 'AppBootstrap');
+      const memUsage = Math.floor(process.memoryUsage().heapUsed / 1024 / 1024);
 
-  await logAppScaffold(app);
+      logger.log(
+        `Application is running in ${environmentKeyFactory.getEnv()} mode`,
+      );
+      logger.log(
+        `Memory usage: ${memUsage} MB -` +
+          'CPU usage: ' +
+          process.cpuUsage().user / 1000 +
+          '%',
+      );
+    },
+  );
 }
 
 bootstrap();

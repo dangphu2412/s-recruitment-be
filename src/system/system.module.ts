@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
-import { DigestService, EnvironmentKeyFactory } from './services';
+import { EnvironmentKeyFactory } from './services';
 import { HttpQueryModule } from './query-shape/http-query.module';
 
 @Global()
@@ -15,7 +15,7 @@ import { HttpQueryModule } from './query-shape/http-query.module';
     }),
     HttpQueryModule.register(),
   ],
-  providers: [DigestService, EnvironmentKeyFactory],
-  exports: [DigestService, EnvironmentKeyFactory],
+  providers: [EnvironmentKeyFactory],
+  exports: [EnvironmentKeyFactory],
 })
 export class SystemModule {}

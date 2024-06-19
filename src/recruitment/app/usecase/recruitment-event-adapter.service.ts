@@ -1,10 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { read, utils } from 'xlsx';
-import {
-  NotFoundSheetNameException,
-  UserService,
-  UserServiceToken,
-} from '../../../account-service/user';
 import { NotFoundExaminersException } from '../../domain/exceptions/not-found-examiners.exception';
 import {
   CreateRecruitmentCommand,
@@ -25,6 +20,11 @@ import {
   RecruitmentEventRepositoryToken,
 } from '../interfaces/recruitment-event.repository';
 import { RecruitmentEvent } from '../../domain/entities/recruitment-event.entity';
+import { NotFoundSheetNameException } from '../../domain/exceptions/not-found-sheet-import.exception';
+import {
+  DomainUser,
+  DomainUserToken,
+} from '../../../account-service/domain/interfaces/domain-user';
 
 @Injectable()
 export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
@@ -35,8 +35,8 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
     private readonly recruitmentEmployeeRepository: Repository<RecruitmentEmployee>,
     @InjectRepository(EmployeeEventPoint)
     private readonly employeeEventPointRepository: Repository<EmployeeEventPoint>,
-    @Inject(UserServiceToken)
-    private readonly userService: UserService,
+    @Inject(DomainUserToken)
+    private readonly userService: DomainUser,
   ) {}
 
   async create(command: CreateRecruitmentCommand): Promise<void> {
