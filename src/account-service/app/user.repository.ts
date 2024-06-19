@@ -23,7 +23,13 @@ export class UserRepository extends Repository<User> {
     search = '',
   }: UserManagementQuery) {
     const qb = this.createQueryBuilder('users')
-      .select()
+      .select([
+        'users.id',
+        'users.username',
+        'users.email',
+        'users.createdAt',
+        'users.deletedAt',
+      ])
       .skip(offset)
       .take(size)
       .withDeleted()
@@ -38,9 +44,11 @@ export class UserRepository extends Repository<User> {
       });
     }
 
-    qb.andWhere('users.email LIKE :email', {
-      email: `%${search}%`,
-    });
+    if (search) {
+      qb.andWhere('users.email LIKE :email', {
+        email: `%${search}%`,
+      });
+    }
 
     return qb.getManyAndCount();
   }
@@ -51,7 +59,13 @@ export class UserRepository extends Repository<User> {
     userIds,
   }: DebtorManagementQuery) {
     const qb = this.createQueryBuilder('users')
-      .select()
+      .select([
+        'users.id',
+        'users.username',
+        'users.email',
+        'users.createdAt',
+        'users.deletedAt',
+      ])
       .withDeleted()
       .leftJoinAndSelect('users.roles', 'roles')
       .leftJoinAndSelect('users.operationFee', 'operationFee')
@@ -64,18 +78,26 @@ export class UserRepository extends Repository<User> {
       });
     }
 
-    qb.andWhere('users.email LIKE :email', {
-      email: `%${search}%`,
-    }).andWhere(`users.id IN (:...userIds)`, { userIds });
+    if (search) {
+      qb.andWhere('users.email LIKE :email', {
+        email: `%${search}%`,
+      }).andWhere(`users.id IN (:...userIds)`, { userIds });
+    }
 
     return qb.getManyAndCount();
   }
 
   insertIgnoreDuplicated(users: User[]) {
-    return this.createQueryBuilder()
-      .insert()
-      .values(users)
-      .orIgnore()
-      .execute();
+    return (
+      this.createQueryBuilder()
+        .insert()
+        .values(users)
+        .orUpdate({
+          conflict_target: ['email'],
+          overwrite: ['username'],
+        })
+        // .orIgnore()
+        .execute()
+    );
   }
 }
