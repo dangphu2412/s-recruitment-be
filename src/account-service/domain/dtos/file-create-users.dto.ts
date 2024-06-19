@@ -1,7 +1,7 @@
 import { Equals, IsOptional, IsString } from 'class-validator';
 import { CreateUserType } from '../constants/user-constant';
 
-export type PublicUserFields = 'email' | 'fullName' | 'birthday';
+export type PublicUserFields = 'email' | 'fullName' | 'birthday' | 'username';
 
 export type FieldMappingsRequest = Record<string, PublicUserFields>;
 
