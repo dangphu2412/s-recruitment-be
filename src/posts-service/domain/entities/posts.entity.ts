@@ -16,7 +16,7 @@ import { User } from '../../../account-service/domain/entities/user.entity';
 })
 export class Post {
   @PrimaryGeneratedColumn('increment')
-  id: string;
+  id: number;
 
   @Column({
     name: 'slug',
@@ -38,6 +38,9 @@ export class Post {
   content: string;
 
   @RelationId((post: Post) => post.author)
+  @Column({
+    name: 'author_id',
+  })
   authorId: string;
 
   @ManyToOne(() => User, (user) => user.posts)
