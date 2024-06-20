@@ -15,6 +15,7 @@ import { OperationFee } from '../../../monthly-money';
 import { RecruitmentEvent } from '../../../recruitment/domain/entities/recruitment-event.entity';
 import { EmployeeEventPoint } from '../../../recruitment/domain/entities/employee-event-point.entity';
 import { Role } from './role.entity';
+import { Post } from '../../../posts-service/domain/entities/posts.entity';
 
 @Entity({
   name: 'users',
@@ -112,4 +113,7 @@ export class User {
 
   @OneToMany(() => EmployeeEventPoint, (point) => point.author)
   markedEventPoints: EmployeeEventPoint[];
+
+  @OneToMany(() => Post, (post) => post.author)
+  posts?: Post[];
 }
