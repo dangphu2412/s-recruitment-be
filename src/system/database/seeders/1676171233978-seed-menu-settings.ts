@@ -26,7 +26,12 @@ export class SeedMenuSettings1676171233978 implements MigrationInterface {
     const [permissions, menus] = await Promise.all([
       permissionRepo.find({
         where: {
-          name: In(Object.values(AccessRights)),
+          name: In([
+            AccessRights.VIEW_ACCESS_RIGHTS,
+            AccessRights.EDIT_MEMBER_USER,
+            AccessRights.VIEW_USERS,
+            AccessRights.EDIT_ACCESS_RIGHTS,
+          ]),
         },
       }),
       menuRepository.findTrees(),
@@ -39,10 +44,6 @@ export class SeedMenuSettings1676171233978 implements MigrationInterface {
       [AccessRights.EDIT_MEMBER_USER]: ['ADMIN'],
       [AccessRights.VIEW_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
       [AccessRights.EDIT_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
-      [AccessRights.MANAGE_RECRUITMENT]: [
-        'RECRUITMENT',
-        'RECRUITMENT_OVERVIEW',
-      ],
     };
 
     const linkedEntities = Object.keys(permissionDefineMenus).map(

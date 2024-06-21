@@ -44,17 +44,6 @@ export class Role {
   isEditable: boolean;
 
   @ManyToMany(() => User, (user) => user.roles)
-  @JoinTable({
-    name: 'users_roles',
-    joinColumn: {
-      name: 'role_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-  })
   users?: User[];
 
   @ManyToMany(() => Permission, (permission) => permission.roles)
