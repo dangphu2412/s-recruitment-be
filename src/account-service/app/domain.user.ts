@@ -208,6 +208,7 @@ export class DomainUserImpl implements DomainUser {
       email: 'email',
       birthday: 'birthday',
       fullName: 'fullName',
+      username: 'username',
     };
 
     return Object.keys(mappings).reduce((acc, key) => {
