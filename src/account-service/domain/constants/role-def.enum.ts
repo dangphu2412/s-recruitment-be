@@ -11,4 +11,5 @@ export enum AccessRights {
   VIEW_ACCESS_RIGHTS = 'View access rights',
   EDIT_ACCESS_RIGHTS = 'Edit access rights',
   MANAGE_RECRUITMENT = 'Manage recruitments',
+  MANGE_POSTS = 'Manage posts',
 }
