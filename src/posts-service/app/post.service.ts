@@ -4,6 +4,7 @@ import { PostService } from '../domain/services/post.service';
 import { PostRepository } from './post.repository';
 import slugify from 'slugify';
 import { Injectable } from '@nestjs/common';
+import { OffsetPagination, Page } from '../../system/query-shape/dto';
 
 @Injectable()
 export class PostServiceImpl implements PostService {
@@ -24,7 +25,13 @@ export class PostServiceImpl implements PostService {
     return this.postRepository.findOneBy({ id });
   }
 
-  getAll() {
-    return this.postRepository.find();
+  async search(query: OffsetPagination) {
+    const [items, total] = await this.postRepository.findAndCount();
+
+    return Page.of({
+      items,
+      totalRecords: total,
+      query,
+    });
   }
 }

@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { PostService, PostServiceToken } from '../domain/services/post.service';
@@ -14,6 +15,7 @@ import { CanAccessBy } from '../../account-service/adapters/decorators/can-acces
 import { AccessRights } from '../../account-service/domain/constants/role-def.enum';
 import { CurrentUser } from '../../account-service/adapters/decorators';
 import { JwtPayload } from '../../account-service/domain/dtos/jwt-payload';
+import { OffsetPagination } from '../../system/query-shape/dto';
 
 @ApiTags('posts')
 @Controller({
@@ -38,7 +40,7 @@ export class PostController {
   }
 
   @Get('/')
-  getAll() {
-    return this.postService.getAll();
+  getAll(@Query() query: OffsetPagination) {
+    return this.postService.search(query);
   }
 }
