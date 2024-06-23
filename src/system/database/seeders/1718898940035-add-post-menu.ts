@@ -26,7 +26,7 @@ export class AddPostMenu1718898940035 implements MigrationInterface {
     );
 
     await permissionRepository.save({
-      name: AccessRights.MANGE_POSTS,
+      name: AccessRights.MANAGE_POSTS,
       description: 'Manage public posts of S-Group',
     });
 
@@ -46,12 +46,12 @@ export class AddPostMenu1718898940035 implements MigrationInterface {
     ]);
 
     await menuSettingsProcessor.process({
-      permissionCode: AccessRights.MANGE_POSTS,
+      permissionCode: AccessRights.MANAGE_POSTS,
       menuCodes: ['POSTS_OVERVIEW', 'POST'],
     });
     await rolePermissionProcessor.process({
       roleName: SystemRoles.CHAIRMAN,
-      permissionCodes: [AccessRights.MANGE_POSTS],
+      permissionCodes: [AccessRights.MANAGE_POSTS],
     });
   }
 
@@ -74,7 +74,7 @@ export class AddPostMenu1718898940035 implements MigrationInterface {
     // unlink menu and permission
     const postPermission = await permissionRepository.findOne({
       where: {
-        name: AccessRights.MANGE_POSTS,
+        name: AccessRights.MANAGE_POSTS,
       },
       relations: ['menuSettings'],
     });
@@ -97,7 +97,7 @@ export class AddPostMenu1718898940035 implements MigrationInterface {
     ]);
 
     await permissionRepository.delete({
-      name: AccessRights.MANGE_POSTS,
+      name: AccessRights.MANAGE_POSTS,
     });
   }
 }
