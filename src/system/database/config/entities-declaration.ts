@@ -8,6 +8,7 @@ import { User } from '../../../account-service/domain/entities/user.entity';
 import { Role } from '../../../account-service/domain/entities/role.entity';
 import { Permission } from '../../../account-service/domain/entities/permission.entity';
 import { Post } from '../../../posts-service/domain/entities/posts.entity';
+import { Category } from '../../../posts-service/domain/entities/category.entity';
 
 export const APP_ENTITIES = [
   User,
@@ -20,6 +21,7 @@ export const APP_ENTITIES = [
   RecruitmentEmployee,
   EmployeeEventPoint,
   Post,
+  Category,
 ];
 
 export const MIGRATION_CONFIGS = {

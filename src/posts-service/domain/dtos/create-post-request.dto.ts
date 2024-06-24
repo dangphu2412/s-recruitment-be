@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreatePostRequestDto {
   @IsNotEmpty()
@@ -6,4 +6,13 @@ export class CreatePostRequestDto {
 
   @IsNotEmpty()
   content: string;
+
+  previewImage: string;
+
+  @IsNotEmpty()
+  summary: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  categoryCodes: string[];
 }
