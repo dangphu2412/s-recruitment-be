@@ -36,7 +36,7 @@ export class PostController {
     @Body() dto: CreatePostRequestDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.postService.createOne(dto, user.sub);
+    return this.postService.createOne({ ...dto, authorId: user.sub });
   }
 
   @CanAccessBy(AccessRights.MANAGE_POSTS)
