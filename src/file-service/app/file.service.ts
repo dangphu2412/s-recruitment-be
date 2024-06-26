@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateFileCommand, FileUploadResponse } from '../domain/dto/file.dto';
 import { FileService } from '../domain/services/file.service';
 import { EnvironmentKeyFactory } from '../../system/services';
-import { writeFile, readFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 
 @Injectable()
 export class FileServiceImpl implements FileService {
@@ -30,9 +30,5 @@ export class FileServiceImpl implements FileService {
     return {
       path,
     };
-  }
-
-  getFile(path: string): Promise<Buffer> {
-    return readFile(this.getFullPath(path));
   }
 }
