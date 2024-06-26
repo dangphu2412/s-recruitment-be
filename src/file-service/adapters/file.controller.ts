@@ -1,10 +1,7 @@
 import {
   Controller,
-  Get,
   Inject,
-  Param,
   Post,
-  StreamableFile,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -32,12 +29,5 @@ export class FileController {
     file: Express.Multer.File,
   ) {
     return this.fileService.upload(file);
-  }
-
-  @Get('/upload/:path')
-  async getFile(@Param('path') path: string) {
-    const file = await this.fileService.getFile(path);
-
-    return new StreamableFile(file);
   }
 }
