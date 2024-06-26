@@ -7,7 +7,6 @@ import {
   APP_ENTITIES,
   MIGRATION_CONFIGS,
 } from '../database/config/entities-declaration';
-import path from 'node:path';
 
 type Env = {
   PORT: string;
@@ -121,6 +120,6 @@ export class EnvironmentKeyFactory {
   }
 
   getUploadDir() {
-    return path.join(process.cwd(), this.getString('UPLOAD_DIR'));
+    return this.getString('UPLOAD_DIR');
   }
 }
