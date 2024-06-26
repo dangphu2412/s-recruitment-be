@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModuleOptions } from '@nestjs/jwt';
 import { isBooleanString } from 'class-validator';
@@ -7,6 +7,7 @@ import {
   APP_ENTITIES,
   MIGRATION_CONFIGS,
 } from '../database/config/entities-declaration';
+import { join } from 'path';
 
 type Env = {
   PORT: string;
@@ -120,6 +121,10 @@ export class EnvironmentKeyFactory {
   }
 
   getUploadDir() {
-    return this.getString('UPLOAD_DIR');
+    Logger.log(process.cwd());
+    const uploadDir = join(process.cwd(), this.getString('UPLOAD_DIR'));
+    Logger.log(uploadDir);
+
+    return uploadDir;
   }
 }
