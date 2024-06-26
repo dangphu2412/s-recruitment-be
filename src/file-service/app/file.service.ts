@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateFileCommand, FileUploadResponse } from '../domain/dto/file.dto';
 import { FileService } from '../domain/services/file.service';
 import { EnvironmentKeyFactory } from '../../system/services';
@@ -12,20 +12,23 @@ export class FileServiceImpl implements FileService {
     this.uploadDir = environmentKeyFactory.getUploadDir();
   }
 
-  private getFullPath(path: string): string {
+  private generateFullPath(path: string): string {
     return `${this.uploadDir}/${path}`;
   }
 
-  private generatePath(originalName: string): string {
+  private generatePublicPath(originalName: string): string {
     const date = new Date();
 
     return `${date.getFullYear()}-${date.getMonth()}-${originalName}`;
   }
 
   async upload(fileCommand: CreateFileCommand): Promise<FileUploadResponse> {
-    const path = this.generatePath(fileCommand.originalname);
+    const path = this.generatePublicPath(fileCommand.originalname);
+    const fullPath = this.generateFullPath(path);
 
-    await writeFile(this.getFullPath(path), fileCommand.buffer);
+    Logger.log(`Uploading file to ${fullPath}`, FileServiceImpl.name);
+
+    await writeFile(fullPath, fileCommand.buffer);
 
     return {
       path,
