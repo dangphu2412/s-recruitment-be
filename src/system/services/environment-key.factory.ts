@@ -7,6 +7,7 @@ import {
   APP_ENTITIES,
   MIGRATION_CONFIGS,
 } from '../database/config/entities-declaration';
+import path from 'node:path';
 
 type Env = {
   PORT: string;
@@ -23,6 +24,7 @@ type Env = {
   REFRESH_TOKEN_EXPIRATION: string;
   NODE_ENV: string;
   DEFAULT_PASSWORD: string;
+  UPLOAD_DIR: string;
 };
 
 type EnvKey = keyof Env;
@@ -116,5 +118,9 @@ export class EnvironmentKeyFactory {
 
   getDefaultPwd() {
     return this.configService.get('DEFAULT_PASSWORD') || 'Test12345@@';
+  }
+
+  getUploadDir() {
+    return path.join(process.cwd(), this.getString('UPLOAD_DIR'));
   }
 }
