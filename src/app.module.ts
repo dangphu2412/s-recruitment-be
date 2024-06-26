@@ -6,6 +6,7 @@ import { MenuModule } from './system/menu/internal/menu.module';
 import { MonthlyMoneyModule } from './monthly-money/internal/monthly-money.module';
 import { RecruitmentEventModule } from './recruitment/infrastructure/recruitment-event.module';
 import { PostsServiceModule } from './posts-service/infrastructure';
+import { FileServiceModule } from './file-service/infrastructure/file-service.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PostsServiceModule } from './posts-service/infrastructure';
     MonthlyMoneyModule,
     RecruitmentEventModule,
     PostsServiceModule,
+    FileServiceModule,
   ],
 })
 export class AppModule {}
