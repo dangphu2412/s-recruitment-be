@@ -62,7 +62,7 @@ export class AddPostMenu1718898940035 implements MigrationInterface {
     const menuProcessor = new MenuProcessor(menuRepository);
 
     // unlink role and permission
-    const chairman = await roleRepository.findOne({
+    const chairman = await roleRepository.findOneOrFail({
       where: {
         name: SystemRoles.CHAIRMAN,
       },
@@ -72,7 +72,7 @@ export class AddPostMenu1718898940035 implements MigrationInterface {
     await roleRepository.save(chairman);
 
     // unlink menu and permission
-    const postPermission = await permissionRepository.findOne({
+    const postPermission = await permissionRepository.findOneOrFail({
       where: {
         name: AccessRights.MANAGE_POSTS,
       },

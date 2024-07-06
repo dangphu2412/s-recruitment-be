@@ -127,7 +127,7 @@ export class DomainUserImpl implements DomainUser {
   }
 
   private async create(payload: CreateUserPayload): Promise<void> {
-    const isEmailDuplicated = await this.userRepository.exists({
+    const isEmailDuplicated = await this.userRepository.exist({
       where: {
         email: payload.email,
       },

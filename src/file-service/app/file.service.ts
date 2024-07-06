@@ -3,6 +3,7 @@ import { CreateFileCommand, FileUploadResponse } from '../domain/dto/file.dto';
 import { FileService } from '../domain/services/file.service';
 import { EnvironmentKeyFactory } from '../../system/services';
 import { writeFile } from 'node:fs/promises';
+import { createReadStream, ReadStream } from 'node:fs';
 
 @Injectable()
 export class FileServiceImpl implements FileService {
@@ -33,5 +34,11 @@ export class FileServiceImpl implements FileService {
     return {
       path,
     };
+  }
+
+  get(filePath: string): ReadStream {
+    const fullPath = this.generateFullPath(filePath);
+
+    return createReadStream(fullPath);
   }
 }
