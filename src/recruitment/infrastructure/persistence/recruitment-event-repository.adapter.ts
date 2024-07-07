@@ -27,7 +27,7 @@ export class RecruitmentEventRepositoryAdapter
   }
 
   async isNameExisted(name: string): Promise<boolean> {
-    return await this.exists({
+    return await this.exist({
       where: { name },
     });
   }
