@@ -50,6 +50,8 @@ export class FileController {
 
     response.header('ETag', etag(filePath));
     response.header('Cache-Control', 'max-age=86400');
+    response.header('Cross-Origin-Resource-Policy', 'cross-origin');
+    response.header('Cross-Origin-Opener-Policy', 'cross-origin');
 
     return new StreamableFile(file, {
       type: type === false ? 'application/octet-stream' : type,
