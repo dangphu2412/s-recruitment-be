@@ -39,6 +39,13 @@ export class ClientExceptionFilter implements ExceptionFilter {
       });
     }
 
+    if (exception instanceof HttpException) {
+      return response.status(exception.getStatus()).send({
+        ...SystemExceptionClientCode.GOT_ISSUE,
+        statusCode: exception.getStatus(),
+      });
+    }
+
     this.logger.error(exception.message, exception.stack);
 
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
