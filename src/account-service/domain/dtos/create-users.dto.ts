@@ -19,6 +19,12 @@ export class CreateUsersDto {
   @IsString()
   fullName: string;
 
+  @IsString()
+  domainId: string;
+
+  @IsString()
+  periodId: string;
+
   @IsOptional()
   @IsString()
   birthday: string;

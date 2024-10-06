@@ -1,26 +1,26 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { Menu } from '../../menu';
-import { MenuProcessor } from '../processors/menu.processor';
+import { MenuFactory } from '../processors/menu.factory';
 import { Permission } from '../../../account-service/domain/entities/permission.entity';
 import {
   AccessRights,
   SystemRoles,
 } from '../../../account-service/domain/constants/role-def.enum';
 import { Role } from '../../../account-service/domain/entities/role.entity';
-import { MenuSettingsProcessor } from '../processors/menu-settings.processor';
-import { RolePermissionProcessor } from '../processors/role-permission.processor';
+import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
+import { RolePermissionConnector } from '../processors/role-permission.connector';
 
 export class AddPostMenu1718898940035 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const menuRepository = queryRunner.manager.getTreeRepository(Menu);
     const permissionRepository = queryRunner.manager.getRepository(Permission);
     const roleRepository = queryRunner.manager.getRepository(Role);
-    const menuProcessor = new MenuProcessor(menuRepository);
-    const menuSettingsProcessor = new MenuSettingsProcessor(
+    const menuProcessor = new MenuFactory(menuRepository);
+    const menuSettingsProcessor = new PermissionMenuSettingsConnector(
       permissionRepository,
       menuRepository,
     );
-    const rolePermissionProcessor = new RolePermissionProcessor(
+    const rolePermissionProcessor = new RolePermissionConnector(
       roleRepository,
       permissionRepository,
     );
@@ -30,7 +30,7 @@ export class AddPostMenu1718898940035 implements MigrationInterface {
       description: 'Manage public posts of S-Group',
     });
 
-    await menuProcessor.process([
+    await menuProcessor.create([
       {
         name: 'Posts',
         iconCode: 'POST_ICON',
@@ -59,7 +59,7 @@ export class AddPostMenu1718898940035 implements MigrationInterface {
     const menuRepository = queryRunner.manager.getTreeRepository(Menu);
     const permissionRepository = queryRunner.manager.getRepository(Permission);
     const roleRepository = queryRunner.manager.getRepository(Role);
-    const menuProcessor = new MenuProcessor(menuRepository);
+    const menuProcessor = new MenuFactory(menuRepository);
 
     // unlink role and permission
     const chairman = await roleRepository.findOneOrFail({
