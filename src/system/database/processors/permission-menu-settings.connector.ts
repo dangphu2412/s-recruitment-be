@@ -7,14 +7,14 @@ type MenuSettings = {
   menuCodes: string[];
 };
 
-export class MenuSettingsProcessor {
+export class PermissionMenuSettingsConnector {
   constructor(
     private readonly permissionRepository: Repository<Permission>,
     private readonly menuRepository: Repository<Menu>,
   ) {}
 
   async process({ permissionCode, menuCodes }: MenuSettings) {
-    const postPermission = await this.permissionRepository.findOne({
+    const permission = await this.permissionRepository.findOne({
       where: {
         name: permissionCode,
       },
@@ -25,8 +25,8 @@ export class MenuSettingsProcessor {
       code: In(menuCodes),
     });
 
-    postPermission.menuSettings = postPermission.menuSettings.concat(newMenu);
+    permission.menuSettings = permission.menuSettings.concat(newMenu);
 
-    await this.permissionRepository.save(postPermission);
+    await this.permissionRepository.save(permission);
   }
 }

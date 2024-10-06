@@ -1,7 +1,7 @@
 FROM node:18-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN npm install pnpm@8.5.1 -g
+RUN npm install pnpm -g
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 

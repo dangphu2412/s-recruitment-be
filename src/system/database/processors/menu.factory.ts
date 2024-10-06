@@ -6,7 +6,7 @@ type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
   subMenus?: InsertMenu[];
 };
 
-export class MenuProcessor {
+export class MenuFactory {
   constructor(private readonly menuRepository: TreeRepository<Menu>) {}
 
   private static excludeSubMenus(
@@ -16,10 +16,10 @@ export class MenuProcessor {
   }
 
   private buildParents(menus: InsertMenu[]) {
-    return this.menuRepository.save(menus.map(MenuProcessor.excludeSubMenus));
+    return this.menuRepository.save(menus.map(MenuFactory.excludeSubMenus));
   }
 
-  async process(menus: InsertMenu[]) {
+  async create(menus: InsertMenu[]) {
     const createdParent = await this.buildParents(menus);
 
     const childMenu = await this.menuRepository.save(

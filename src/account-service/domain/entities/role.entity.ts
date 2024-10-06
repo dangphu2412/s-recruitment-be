@@ -6,8 +6,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Permission } from 'src/account-service/domain/entities/permission.entity';
 import { User } from './user.entity';
+import { Permission } from './permission.entity';
 
 @Entity({
   name: 'roles',

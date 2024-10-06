@@ -3,8 +3,10 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -16,6 +18,7 @@ import { RecruitmentEvent } from '../../../recruitment/domain/entities/recruitme
 import { EmployeeEventPoint } from '../../../recruitment/domain/entities/employee-event-point.entity';
 import { Role } from './role.entity';
 import { Post } from '../../../posts-service/domain/entities/posts.entity';
+import { MasterDataCommon } from '../../../master-data/entities/master-data.entity';
 
 @Entity({
   name: 'users',
@@ -64,6 +67,16 @@ export class User {
     nullable: true,
   })
   phoneNumber: string;
+
+  @Column({
+    name: 'domain_id',
+  })
+  domainId: string;
+
+  @Column({
+    name: 'period_id',
+  })
+  periodId: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -116,4 +129,12 @@ export class User {
 
   @OneToMany(() => Post, (post) => post.author)
   posts?: Post[];
+
+  @ManyToOne(() => MasterDataCommon, (common) => common.domainUser)
+  @JoinColumn({ name: 'domain_id' })
+  domain: MasterDataCommon;
+
+  @ManyToOne(() => MasterDataCommon, (common) => common.periodUser)
+  @JoinColumn({ name: 'period_id' })
+  period: MasterDataCommon;
 }

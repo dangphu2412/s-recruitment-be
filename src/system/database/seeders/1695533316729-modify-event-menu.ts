@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { MenuProcessor } from '../processors/menu.processor';
+import { MenuFactory } from '../processors/menu.factory';
 import { Menu } from '../../menu';
 import { Permission } from '../../../account-service/domain/entities/permission.entity';
 import {
@@ -7,20 +7,20 @@ import {
   SystemRoles,
 } from '../../../account-service/domain/constants/role-def.enum';
 import { Role } from '../../../account-service/domain/entities/role.entity';
-import { MenuSettingsProcessor } from '../processors/menu-settings.processor';
-import { RolePermissionProcessor } from '../processors/role-permission.processor';
+import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
+import { RolePermissionConnector } from '../processors/role-permission.connector';
 
 export class ModifyEventMenu1695533316729 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const menuRepository = queryRunner.manager.getTreeRepository(Menu);
     const permissionRepository = queryRunner.manager.getRepository(Permission);
     const roleRepository = queryRunner.manager.getRepository(Role);
-    const menuProcessor = new MenuProcessor(menuRepository);
-    const menuSettingsProcessor = new MenuSettingsProcessor(
+    const menuProcessor = new MenuFactory(menuRepository);
+    const menuSettingsProcessor = new PermissionMenuSettingsConnector(
       permissionRepository,
       menuRepository,
     );
-    const rolePermissionProcessor = new RolePermissionProcessor(
+    const rolePermissionProcessor = new RolePermissionConnector(
       roleRepository,
       permissionRepository,
     );
@@ -29,7 +29,7 @@ export class ModifyEventMenu1695533316729 implements MigrationInterface {
       name: AccessRights.MANAGE_RECRUITMENT,
       description: 'Manage recruitment',
     });
-    await menuProcessor.process([
+    await menuProcessor.create([
       {
         name: 'Recruitment',
         iconCode: 'RECRUITMENT_ICON',

@@ -65,8 +65,11 @@ export class DomainUserImpl implements DomainUser {
   ) {}
 
   findUserDetail(id: string): Promise<UserDetail> {
-    return this.userRepository.findOneBy({
-      id,
+    return this.userRepository.findOne({
+      where: {
+        id,
+      },
+      relations: ['domain', 'period'],
     });
   }
 

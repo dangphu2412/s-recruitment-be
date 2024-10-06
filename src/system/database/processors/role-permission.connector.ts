@@ -7,7 +7,7 @@ type MenuSettings = {
   permissionCodes: string[];
 };
 
-export class RolePermissionProcessor {
+export class RolePermissionConnector {
   constructor(
     private readonly roleRepository: Repository<Role>,
     private readonly permissionRepository: Repository<Permission>,

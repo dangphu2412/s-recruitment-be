@@ -9,6 +9,7 @@ import { Role } from '../../../account-service/domain/entities/role.entity';
 import { Permission } from '../../../account-service/domain/entities/permission.entity';
 import { Post } from '../../../posts-service/domain/entities/posts.entity';
 import { Category } from '../../../posts-service/domain/entities/category.entity';
+import { MasterDataCommon } from '../../../master-data/entities/master-data.entity';
 
 export const APP_ENTITIES = [
   User,
@@ -22,6 +23,7 @@ export const APP_ENTITIES = [
   EmployeeEventPoint,
   Post,
   Category,
+  MasterDataCommon,
 ];
 
 export const MIGRATION_CONFIGS = {
