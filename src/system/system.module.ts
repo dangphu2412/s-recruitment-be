@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { EnvironmentKeyFactory } from './services';
 import { HttpQueryModule } from './query-shape/http-query.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Global()
 @Module({
@@ -14,6 +15,7 @@ import { HttpQueryModule } from './query-shape/http-query.module';
       isGlobal: true,
     }),
     HttpQueryModule.register(),
+    EventEmitterModule.forRoot(),
   ],
   providers: [EnvironmentKeyFactory],
   exports: [EnvironmentKeyFactory],

@@ -10,34 +10,32 @@ import { MonthlyMoneyConfig } from './monthly-money-config.entity';
 import { User } from '../../../account-service/domain/entities/user.entity';
 
 @Entity({
-  name: 'operation_fees',
+  name: 'payments',
 })
-export class OperationFee {
+export class Payment {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
   @Column({
-    name: 'paid_money',
+    name: 'amount',
     nullable: false,
     type: 'int',
   })
-  paidMoney: number;
+  amount: number;
 
   @Column({
-    name: 'paid_months',
+    name: 'paid_at',
+    // default: 'now()',
+    type: 'timetz',
   })
-  paidMonths: number;
+  paidAt: Date;
 
   @Column({
-    name: 'remain_months',
+    name: 'note',
+    type: 'varchar',
+    default: '',
   })
-  remainMonths: number;
-
-  @Column({
-    name: 'joined_at',
-    default: 'now()',
-  })
-  joinedAt: Date;
+  note: string;
 
   @Column({
     name: 'user_id',

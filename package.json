@@ -43,6 +43,7 @@
     "@nestjs/common": "9.4.3",
     "@nestjs/config": "^2.3.4",
     "@nestjs/core": "9.4.3",
+    "@nestjs/event-emitter": "^2.0.4",
     "@nestjs/jwt": "^10.0.0",
     "@nestjs/passport": "^10.0.1",
     "@nestjs/platform-fastify": "^9.4.3",
@@ -76,13 +77,13 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@swc/cli": "0.3.12",
-    "@swc/core": "1.4.16",
     "@commitlint/cli": "16.2.3",
     "@commitlint/config-angular": "16.2.3",
     "@nestjs/cli": "^9.5.0",
     "@nestjs/schematics": "^9.2.0",
     "@nestjs/testing": "^9.4.3",
+    "@swc/cli": "0.3.12",
+    "@swc/core": "1.4.16",
     "@types/bcryptjs": "^2.4.2",
     "@types/cache-manager": "^4.0.1",
     "@types/etag": "^1.8.3",

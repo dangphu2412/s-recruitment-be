@@ -25,8 +25,7 @@ import {
 import { CurrentUser, Identified } from './decorators';
 import { CanAccessBy } from './decorators/can-access-by.decorator';
 import { Page } from '../../system/query-shape/types';
-import { UpdatableUserDto } from '../domain/dtos/updatable-user.dto';
-import { UpdateMemberPaidDto } from '../domain/dtos/update-member-paid.dto';
+import { UpdateUserRolesDto } from '../domain/dtos/update-user-roles.dto';
 import { FileInterceptor } from '../../system/file';
 import { FileCreateUsersDto } from '../domain/dtos/file-create-users.dto';
 import { AccessRights } from '../domain/constants/role-def.enum';
@@ -35,6 +34,8 @@ import { UserManagementView } from '../domain/vos/user-management-view.vo';
 import { DomainUser, DomainUserToken } from '../domain/interfaces/domain-user';
 import { JwtPayload } from '../domain/dtos/jwt-payload';
 import { CreateUsersDto } from '../domain/dtos/create-users.dto';
+import { PaymentService } from '../../monthly-money/internal/payment.service';
+import { CreatePaymentDto } from '../domain/dtos/create-payment.dto';
 
 @ApiTags('users')
 @Controller({
@@ -47,6 +48,7 @@ export class UserController {
     private readonly domainUser: DomainUser,
     @Inject(MonthlyMoneyOperationServiceToken)
     private readonly moneyOperationService: MonthlyMoneyOperationService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   @Identified
@@ -67,10 +69,10 @@ export class UserController {
   @CanAccessBy(AccessRights.VIEW_USERS, AccessRights.EDIT_MEMBER_USER)
   @Get('/')
   @ApiOkResponse()
-  async search(
+  async searchOverviewUsers(
     @Query() query: UserManagementQueryDto,
   ): Promise<Page<UserManagementView>> {
-    return this.domainUser.search(query);
+    return this.domainUser.searchOverviewUsers(query);
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
@@ -95,9 +97,9 @@ export class UserController {
   @ApiNoContentResponse()
   async updateUserRoles(
     @Param('id') userId: string,
-    @Body() dto: UpdatableUserDto,
+    @Body() dto: UpdateUserRolesDto,
   ) {
-    await this.domainUser.update(userId, dto);
+    await this.domainUser.updateUserRoles(userId, dto);
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
@@ -105,20 +107,6 @@ export class UserController {
   @ApiCreatedResponse()
   async createUsers(@Body() createUsersDto: CreateUsersDto) {
     await this.domainUser.createUserUseCase(createUsersDto);
-  }
-
-  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
-  @Patch('/:id/monthly-moneys')
-  @ApiNoContentResponse()
-  updateMemberPaid(
-    @Param('id') userId: string,
-    @Body() { newPaid, operationFeeId }: UpdateMemberPaidDto,
-  ) {
-    return this.moneyOperationService.updateNewPaid({
-      userId,
-      newPaid,
-      operationFeeId,
-    });
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
@@ -132,5 +120,21 @@ export class UserController {
     file: Express.Multer.File,
   ) {
     return this.domainUser.createUserUseCase({ ...dto, file });
+  }
+
+  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
+  @Post('/:userId/payments')
+  async createPayment(
+    @Body() createPaymentDto: CreatePaymentDto,
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ) {
+    await this.domainUser.isIdExist(userId);
+    await this.paymentService.createPayment({ ...createPaymentDto, userId });
+  }
+
+  @CanAccessBy(AccessRights.VIEW_USERS)
+  @Get('/:userId/payments')
+  async findUserPayments(@Param('userId') userId: string) {
+    return this.paymentService.findUserPaymentsByUserId(userId);
   }
 }

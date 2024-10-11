@@ -2,10 +2,7 @@ import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../domain/entities/user.entity';
-import {
-  DebtorManagementQuery,
-  UserManagementQuery,
-} from '../domain/vos/user-management-view.vo';
+import { UserManagementQuery } from '../domain/vos/user-management-view.vo';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -48,40 +45,6 @@ export class UserRepository extends Repository<User> {
       qb.andWhere('users.email LIKE :email', {
         email: `%${search}%`,
       });
-    }
-
-    return qb.getManyAndCount();
-  }
-
-  findDebtorForManagement({
-    joinedIn,
-    search = '',
-    userIds,
-  }: DebtorManagementQuery) {
-    const qb = this.createQueryBuilder('users')
-      .select([
-        'users.id',
-        'users.username',
-        'users.email',
-        'users.createdAt',
-        'users.deletedAt',
-      ])
-      .withDeleted()
-      .leftJoinAndSelect('users.roles', 'roles')
-      .leftJoinAndSelect('users.operationFee', 'operationFee')
-      .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig');
-
-    if (joinedIn) {
-      qb.andWhere('users.createdAt BETWEEN :from AND :to', {
-        from: joinedIn.fromDate,
-        to: joinedIn.toDate,
-      });
-    }
-
-    if (search) {
-      qb.andWhere('users.email LIKE :email', {
-        email: `%${search}%`,
-      }).andWhere(`users.id IN (:...userIds)`, { userIds });
     }
 
     return qb.getManyAndCount();

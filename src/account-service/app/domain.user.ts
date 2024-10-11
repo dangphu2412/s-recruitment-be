@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { Page, PageRequest } from 'src/system/query-shape/dto';
-import map from 'lodash/map';
 import { omit } from 'lodash';
 import { In } from 'typeorm';
 import uniq from 'lodash/uniq';
@@ -24,7 +23,7 @@ import {
   FileRow,
   PublicUserFields,
 } from '../domain/dtos/file-create-users.dto';
-import { CreateUserType, MemberType } from '../domain/constants/user-constant';
+import { CreateUserType } from '../domain/constants/user-constant';
 import { read, utils } from 'xlsx';
 import {
   RoleService,
@@ -38,11 +37,7 @@ import {
   NotFoundUserException,
 } from '../domain/exceptions';
 import { CreateUsersDto } from '../domain/dtos/create-users.dto';
-import {
-  CreateUserPayload,
-  UpdatableUserPayload,
-  UserQuery,
-} from '../domain/vos/user-service.vo';
+import { CreateUserPayload, UserQuery } from '../domain/vos/user-service.vo';
 import { User } from '../domain/entities/user.entity';
 import { UserManagementQueryDto } from '../domain/dtos/user-management-query.dto';
 import {
@@ -50,6 +45,8 @@ import {
   UserManagementView,
 } from '../domain/vos/user-management-view.vo';
 import { Transactional } from 'typeorm-transactional';
+import { UpdateUserRolesDto } from '../domain/dtos/update-user-roles.dto';
+import { differenceInMonths } from 'date-fns';
 
 @Injectable()
 export class DomainUserImpl implements DomainUser {
@@ -244,7 +241,10 @@ export class DomainUserImpl implements DomainUser {
     });
   }
 
-  async update(id: string, payload: UpdatableUserPayload): Promise<void> {
+  async updateUserRoles(
+    id: string,
+    payload: UpdateUserRolesDto,
+  ): Promise<void> {
     const user = await this.userRepository.findOne({
       where: {
         id,
@@ -263,50 +263,45 @@ export class DomainUserImpl implements DomainUser {
     await this.userRepository.save(user);
   }
 
-  async search(
+  async searchOverviewUsers(
     query: UserManagementQueryDto,
   ): Promise<Page<UserManagementView>> {
     const { search, joinedIn, memberType } = query;
     const { offset, size } = PageRequest.of(query);
 
-    if (MemberType.DEBTOR === memberType) {
-      const memberOperationFees =
-        await this.moneyOperationService.findDebtOperationFee({
-          size,
-          offset,
-        });
-
-      const userIds = map(memberOperationFees, 'userId');
-
-      if (!userIds.length) {
-        return Page.of({
-          query,
-          totalRecords: 0,
-          items: [],
-        });
-      }
-
-      const [items, totalRecords] =
-        await this.userRepository.findDebtorForManagement({
-          joinedIn,
-          userIds,
-          search,
-          memberType,
-        });
-
-      return Page.of({
-        query,
-        totalRecords,
-        items,
-      });
-    }
-
-    const [items, totalRecords] =
+    const [data, totalRecords] =
       await this.userRepository.findUsersForManagement({
-        ...query,
+        search,
+        joinedIn,
+        memberType,
         offset,
         size,
       } as UserManagementQuery);
+
+    const items = data.map<UserManagementView>((user) => {
+      const { username, id, email, createdAt, deletedAt, roles, operationFee } =
+        user;
+
+      // Subtract today with created date to get estimated paid months using date-fns
+      const estimatedPaidMonths = operationFee
+        ? Math.min(
+            differenceInMonths(new Date(), createdAt),
+            operationFee.monthlyConfig.monthRange,
+          )
+        : 0;
+
+      return {
+        username,
+        id,
+        email,
+        createdAt,
+        deletedAt,
+        roles,
+        remainMonths: operationFee?.remainMonths ?? 0,
+        paidMonths: operationFee?.paidMonths ?? 0,
+        estimatedPaidMonths,
+      };
+    });
 
     return Page.of({
       query,
@@ -351,5 +346,13 @@ export class DomainUserImpl implements DomainUser {
     }
 
     return records[0];
+  }
+
+  isIdExist(id: string): Promise<boolean> {
+    return this.userRepository.exist({
+      where: {
+        id,
+      },
+    });
   }
 }

@@ -6,7 +6,7 @@ export type CreateUserPayload = {
   birthday?: string;
 };
 
-export type UpdatableUserPayload = {
+export type UpdateUserRole = {
   roleIds?: number[];
 };
 
