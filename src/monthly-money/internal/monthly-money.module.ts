@@ -10,9 +10,15 @@ import { MonthlyMoneyController } from './monthly-money.controller';
 import { MonthlyMoneyOperationServiceImpl } from './monthly-money-operation.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MonthlyMoneyOperationRepository } from './monthly-money-operation.repository';
+import { PaymentService } from './payment.service';
+import { PaymentRepository } from './payment.repository';
+import { Payment } from '../client/entities/payment.entity';
+import { UserPaidCalculator } from './user-paid-calculator.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OperationFee, MonthlyMoneyConfig])],
+  imports: [
+    TypeOrmModule.forFeature([OperationFee, MonthlyMoneyConfig, Payment]),
+  ],
   controllers: [MonthlyMoneyController],
   providers: [
     {
@@ -24,7 +30,14 @@ import { MonthlyMoneyOperationRepository } from './monthly-money-operation.repos
       useClass: MonthlyMoneyOperationServiceImpl,
     },
     MonthlyMoneyOperationRepository,
+    PaymentService,
+    PaymentRepository,
+    UserPaidCalculator,
   ],
-  exports: [MonthlyMoneyConfigServiceToken, MonthlyMoneyOperationServiceToken],
+  exports: [
+    MonthlyMoneyConfigServiceToken,
+    MonthlyMoneyOperationServiceToken,
+    PaymentService,
+  ],
 })
 export class MonthlyMoneyModule {}

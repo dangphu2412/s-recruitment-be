@@ -10,6 +10,7 @@ import { Permission } from '../../../account-service/domain/entities/permission.
 import { Post } from '../../../posts-service/domain/entities/posts.entity';
 import { Category } from '../../../posts-service/domain/entities/category.entity';
 import { MasterDataCommon } from '../../../master-data/entities/master-data.entity';
+import { Payment } from '../../../monthly-money/client/entities/payment.entity';
 
 export const APP_ENTITIES = [
   User,
@@ -24,6 +25,7 @@ export const APP_ENTITIES = [
   Post,
   Category,
   MasterDataCommon,
+  Payment,
 ];
 
 export const MIGRATION_CONFIGS = {

@@ -4,9 +4,10 @@ import { Page } from 'src/system/query-shape/dto';
 import { UserManagementView } from '../vos/user-management-view.vo';
 import { CreateUsersDto } from '../dtos/create-users.dto';
 import { FileCreateUsersDto } from '../dtos/file-create-users.dto';
-import { UpdatableUserPayload, UserQuery } from '../vos/user-service.vo';
+import { UserQuery } from '../vos/user-service.vo';
 import { User } from '../entities/user.entity';
 import { MyProfile, UserDetail } from '../dtos/my-profile';
+import { UpdateUserRolesDto } from '../dtos/update-user-roles.dto';
 
 export const DomainUserToken = createInterfaceToken('DomainUser');
 
@@ -17,7 +18,11 @@ export interface DomainUser {
   find(ids: string[]): Promise<User[]>;
   findOne(query: UserQuery): Promise<User>;
 
-  search(query: UserManagementQueryDto): Promise<Page<UserManagementView>>;
+  isIdExist(id: string): Promise<boolean>;
+
+  searchOverviewUsers(
+    query: UserManagementQueryDto,
+  ): Promise<Page<UserManagementView>>;
 
   /**
    * @throws {InsertUserFailedException}
@@ -25,7 +30,7 @@ export interface DomainUser {
   createUserUseCase(dto: CreateUsersDto): Promise<void>;
   createUserUseCase(dto: FileCreateUsersDto): Promise<void>;
 
-  update(id: string, payload: UpdatableUserPayload): Promise<void>;
+  updateUserRoles(id: string, payload: UpdateUserRolesDto): Promise<void>;
 
   toggleUserIsActive(id: string): Promise<void>;
 }

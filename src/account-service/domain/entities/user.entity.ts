@@ -19,6 +19,7 @@ import { EmployeeEventPoint } from '../../../recruitment/domain/entities/employe
 import { Role } from './role.entity';
 import { Post } from '../../../posts-service/domain/entities/posts.entity';
 import { MasterDataCommon } from '../../../master-data/entities/master-data.entity';
+import { Payment } from '../../../monthly-money/client/entities/payment.entity';
 
 @Entity({
   name: 'users',
@@ -123,6 +124,9 @@ export class User {
 
   @OneToOne(() => OperationFee, (operationFee) => operationFee.user)
   operationFee?: OperationFee;
+
+  @OneToOne(() => Payment, (payment) => payment.user)
+  payments?: Payment;
 
   @OneToMany(() => EmployeeEventPoint, (point) => point.author)
   markedEventPoints: EmployeeEventPoint[];

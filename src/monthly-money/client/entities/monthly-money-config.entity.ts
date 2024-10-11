@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { OperationFee } from './operation-fee.entity';
+import { Payment } from './payment.entity';
 
 @Entity({
   name: 'monthly_money_configs',
@@ -24,4 +25,7 @@ export class MonthlyMoneyConfig {
 
   @OneToMany(() => OperationFee, (operationFee) => operationFee.monthlyConfig)
   operationFees: OperationFee[];
+
+  @OneToMany(() => Payment, (payment) => payment.monthlyConfig)
+  payments: Payment[];
 }
