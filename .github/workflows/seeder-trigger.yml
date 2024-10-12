@@ -49,6 +49,7 @@ jobs:
           echo "DB_USERNAME=${{ vars.DB_USERNAME }}" >> .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "DB_DATABASE=${{ vars.DB_DATABASE }}" >> .env
+          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> .env
 
       - name: Run seed runner
         run: |

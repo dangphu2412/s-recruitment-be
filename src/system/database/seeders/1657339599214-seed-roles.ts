@@ -14,18 +14,18 @@ export class SeedRoles1657339599214 implements MigrationInterface {
 
     const savedRoles = await roleRepository.save([
       {
-        name: SystemRoles.CHAIRMAN,
-        description: 'Chairman of group',
+        name: SystemRoles.SUPER_ADMIN,
+        description: 'The highest role in the system',
         isEditable: false,
       },
       {
-        name: SystemRoles.DOMAIN_CHIEF,
-        description: 'User who is the chief of a domain knowledge in group',
+        name: SystemRoles.LEADER,
+        description: 'User who is the leader of a domain or group',
       },
       {
-        name: SystemRoles.DOMAIN_LEADER,
+        name: SystemRoles.TRAINER,
         description:
-          'User who is the leader of a domain knowledge in group, support chief',
+          'User who is the trainer of a domain or group, can view and edit users',
       },
       {
         name: SystemRoles.MEMBER,
@@ -54,17 +54,17 @@ export class SeedRoles1657339599214 implements MigrationInterface {
     const nameMapToPermissions = keyBy(savedPermissions, 'name');
 
     const roleNameMapToPermissionNames = {
-      [SystemRoles.CHAIRMAN]: [
+      [SystemRoles.SUPER_ADMIN]: [
         AccessRights.VIEW_USERS,
         AccessRights.EDIT_MEMBER_USER,
         AccessRights.EDIT_ACCESS_RIGHTS,
         AccessRights.VIEW_ACCESS_RIGHTS,
       ],
-      [SystemRoles.DOMAIN_CHIEF]: [
+      [SystemRoles.LEADER]: [
         AccessRights.VIEW_USERS,
         AccessRights.EDIT_MEMBER_USER,
       ],
-      [SystemRoles.DOMAIN_LEADER]: [
+      [SystemRoles.TRAINER]: [
         AccessRights.VIEW_USERS,
         AccessRights.EDIT_MEMBER_USER,
       ],
@@ -76,7 +76,8 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         const role = nameMapToRoles[roleName];
 
         role.permissions = roleNameMapToPermissionNames[roleName].map(
-          (permissionName) => nameMapToPermissions[permissionName],
+          (permissionName: string | number) =>
+            nameMapToPermissions[permissionName],
         );
 
         return role;

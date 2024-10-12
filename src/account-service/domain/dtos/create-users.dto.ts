@@ -1,6 +1,5 @@
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -9,9 +8,6 @@ import {
 import { CreateUserType } from '../constants/user-constant';
 
 export class CreateUsersDto {
-  @IsEnum(CreateUserType)
-  createUserType: CreateUserType;
-
   @IsString()
   @IsEmail()
   email: string;

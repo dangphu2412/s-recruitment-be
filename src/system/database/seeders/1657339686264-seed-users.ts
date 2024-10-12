@@ -13,7 +13,7 @@ export class SeedUsers1657339686264 implements MigrationInterface {
 
     const adminRole = await roleRepository.findOne({
       where: {
-        name: SystemRoles.CHAIRMAN,
+        name: SystemRoles.SUPER_ADMIN,
       },
     });
     const passwordManager = new PasswordManager(
@@ -21,11 +21,11 @@ export class SeedUsers1657339686264 implements MigrationInterface {
         new ConfigService<Record<string, unknown>, false>(),
       ),
     );
-    const password = await passwordManager.generate('test123');
+    const password = await passwordManager.getDefaultPassword();
     const user = new User();
     user.fullName = 'Phu Dep Trai';
-    user.email = 'test@gmail.com';
-    user.username = 'test';
+    user.email = 'noibosgroup@gmail.com';
+    user.username = 'noibosgroup@gmail.com';
     user.password = password;
     user.roles = [adminRole];
     await userRepository.save(user);
@@ -34,7 +34,7 @@ export class SeedUsers1657339686264 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     const userRepository = queryRunner.manager.getRepository(User);
     await userRepository.delete({
-      username: 'test',
+      username: 'noibosgroup@gmail.com',
     });
   }
 }
