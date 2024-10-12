@@ -14,6 +14,7 @@ export type UserManagementView = {
   paidMonths: number;
   remainMonths: number;
   estimatedPaidMonths: number;
+  isProbation: boolean;
 };
 
 export type UserManagementQuery = Required<UserManagementQueryDto> &

@@ -50,7 +50,7 @@ export class AddPostMenu1718898940035 implements MigrationInterface {
       menuCodes: ['POSTS_OVERVIEW', 'POST'],
     });
     await rolePermissionProcessor.process({
-      roleName: SystemRoles.CHAIRMAN,
+      roleName: SystemRoles.SUPER_ADMIN,
       permissionCodes: [AccessRights.MANAGE_POSTS],
     });
   }
@@ -64,7 +64,7 @@ export class AddPostMenu1718898940035 implements MigrationInterface {
     // unlink role and permission
     const chairman = await roleRepository.findOneOrFail({
       where: {
-        name: SystemRoles.CHAIRMAN,
+        name: SystemRoles.SUPER_ADMIN,
       },
       relations: ['permissions'],
     });

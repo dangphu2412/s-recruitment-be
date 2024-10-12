@@ -61,7 +61,7 @@ export class AddMasterDataMenu1728101199639 implements MigrationInterface {
       menuCodes: [PARENT_MENU_CODE, DOMAIN_MENU_CODE, PERIOD_MENU_CODE],
     });
     await rolePermissionConnector.process({
-      roleName: SystemRoles.CHAIRMAN,
+      roleName: SystemRoles.SUPER_ADMIN,
       permissionCodes: [AccessRights.MANAGE_MASTER_DATA],
     });
 

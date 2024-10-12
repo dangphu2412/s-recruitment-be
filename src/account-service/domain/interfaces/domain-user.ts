@@ -8,6 +8,9 @@ import { UserQuery } from '../vos/user-service.vo';
 import { User } from '../entities/user.entity';
 import { MyProfile, UserDetail } from '../dtos/my-profile';
 import { UpdateUserRolesDto } from '../dtos/update-user-roles.dto';
+import { UserProbationOutput } from '../output/user-probation.output';
+import { UserProbationQueryInput } from '../inputs/user-probation-query.input';
+import { UpgradeUserMemberInput } from '../inputs/upgrade-user-member.input';
 
 export const DomainUserToken = createInterfaceToken('DomainUser');
 
@@ -17,6 +20,9 @@ export interface DomainUser {
   find(query: UserQuery): Promise<User[]>;
   find(ids: string[]): Promise<User[]>;
   findOne(query: UserQuery): Promise<User>;
+  findProbationUsers(
+    userProbationQueryInput: UserProbationQueryInput,
+  ): Promise<UserProbationOutput>;
 
   isIdExist(id: string): Promise<boolean>;
 
@@ -28,9 +34,11 @@ export interface DomainUser {
    * @throws {InsertUserFailedException}
    */
   createUserUseCase(dto: CreateUsersDto): Promise<void>;
-  createUserUseCase(dto: FileCreateUsersDto): Promise<void>;
+  createUsersByFile(dto: FileCreateUsersDto): Promise<void>;
 
   updateUserRoles(id: string, payload: UpdateUserRolesDto): Promise<void>;
-
+  upgradeToMembers(
+    upgradeUserMemberInput: UpgradeUserMemberInput,
+  ): Promise<void>;
   toggleUserIsActive(id: string): Promise<void>;
 }

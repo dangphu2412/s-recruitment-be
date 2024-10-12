@@ -1,7 +1,7 @@
 export enum SystemRoles {
-  CHAIRMAN = 'Chairman',
-  DOMAIN_CHIEF = 'Domain Chief',
-  DOMAIN_LEADER = 'Domain Leader',
+  SUPER_ADMIN = 'Super Admin',
+  LEADER = 'Leader',
+  TRAINER = 'Trainer',
   MEMBER = 'Member',
 }
 

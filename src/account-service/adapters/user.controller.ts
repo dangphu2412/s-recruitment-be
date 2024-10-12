@@ -18,10 +18,6 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  MonthlyMoneyOperationService,
-  MonthlyMoneyOperationServiceToken,
-} from 'src/monthly-money';
 import { CurrentUser, Identified } from './decorators';
 import { CanAccessBy } from './decorators/can-access-by.decorator';
 import { Page } from '../../system/query-shape/types';
@@ -36,6 +32,8 @@ import { JwtPayload } from '../domain/dtos/jwt-payload';
 import { CreateUsersDto } from '../domain/dtos/create-users.dto';
 import { PaymentService } from '../../monthly-money/internal/payment.service';
 import { CreatePaymentDto } from '../domain/dtos/create-payment.dto';
+import { UserProbationQueryInputDto } from '../domain/inputs/user-probation-query.input';
+import { UpgradeUserMemberInputDto } from '../domain/inputs/upgrade-user-member.input';
 
 @ApiTags('users')
 @Controller({
@@ -46,8 +44,6 @@ export class UserController {
   constructor(
     @Inject(DomainUserToken)
     private readonly domainUser: DomainUser,
-    @Inject(MonthlyMoneyOperationServiceToken)
-    private readonly moneyOperationService: MonthlyMoneyOperationService,
     private readonly paymentService: PaymentService,
   ) {}
 
@@ -119,7 +115,7 @@ export class UserController {
     @UploadedFile()
     file: Express.Multer.File,
   ) {
-    return this.domainUser.createUserUseCase({ ...dto, file });
+    return this.domainUser.createUsersByFile({ ...dto, file });
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
@@ -136,5 +132,21 @@ export class UserController {
   @Get('/:userId/payments')
   async findUserPayments(@Param('userId') userId: string) {
     return this.paymentService.findUserPaymentsByUserId(userId);
+  }
+
+  @CanAccessBy(AccessRights.VIEW_USERS)
+  @Get('/probation')
+  findProbationUsers(
+    @Query() userProbationQueryInputDto: UserProbationQueryInputDto,
+  ) {
+    return this.domainUser.findProbationUsers(userProbationQueryInputDto);
+  }
+
+  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
+  @Patch('/members')
+  upgradeToMembers(
+    @Body() upgradeUserMemberInputDto: UpgradeUserMemberInputDto,
+  ) {
+    return this.domainUser.upgradeToMembers(upgradeUserMemberInputDto);
   }
 }

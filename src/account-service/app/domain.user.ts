@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -8,7 +9,7 @@ import {
 import { UserRepository } from './user.repository';
 import { Page, PageRequest } from 'src/system/query-shape/dto';
 import { omit } from 'lodash';
-import { In } from 'typeorm';
+import { In, IsNull } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { PasswordManager } from './password-manager';
 import {
@@ -46,7 +47,11 @@ import {
 } from '../domain/vos/user-management-view.vo';
 import { Transactional } from 'typeorm-transactional';
 import { UpdateUserRolesDto } from '../domain/dtos/update-user-roles.dto';
-import { differenceInMonths } from 'date-fns';
+import { addMonths, differenceInMonths } from 'date-fns';
+import { UserProbationOutput } from '../domain/output/user-probation.output';
+import { UserProbationQueryInput } from '../domain/inputs/user-probation-query.input';
+import { UpgradeUserMemberInput } from '../domain/inputs/upgrade-user-member.input';
+import { SystemRoles } from '../domain/constants/role-def.enum';
 
 @Injectable()
 export class DomainUserImpl implements DomainUser {
@@ -61,13 +66,67 @@ export class DomainUserImpl implements DomainUser {
     private readonly roleService: RoleService,
   ) {}
 
-  findUserDetail(id: string): Promise<UserDetail> {
-    return this.userRepository.findOne({
+  upgradeToMembers(
+    upgradeUserMemberInput: UpgradeUserMemberInput,
+  ): Promise<void> {
+    return this.moneyOperationService.createOperationFee({
+      userIds: upgradeUserMemberInput.ids,
+      monthlyConfigId: upgradeUserMemberInput.monthlyConfigId,
+    });
+  }
+
+  async findProbationUsers(
+    userProbationQueryInput: UserProbationQueryInput,
+  ): Promise<UserProbationOutput> {
+    const { domainId, periodId } = userProbationQueryInput;
+    const { offset, size } = PageRequest.of(userProbationQueryInput);
+
+    const [users, totalRecords] = await this.userRepository.findAndCount({
+      where: {
+        ...(domainId ? { domainId } : {}),
+        periodId,
+        operationFee: {
+          id: IsNull(),
+        },
+      },
+      relations: ['operationFee'],
+      take: size,
+      skip: offset,
+    });
+
+    const items = users.map((user) => {
+      return {
+        id: user.id,
+        email: user.email,
+        probationEndDate: addMonths(user.createdAt, 1),
+        createdAt: user.createdAt,
+      };
+    });
+
+    return Page.of({
+      items,
+      totalRecords,
+      query: userProbationQueryInput,
+    });
+  }
+
+  async findUserDetail(id: string): Promise<UserDetail> {
+    const user = await this.userRepository.findOne({
       where: {
         id,
       },
-      relations: ['domain', 'period'],
+      relations: ['domain', 'period', 'roles', 'operationFee'],
     });
+
+    return {
+      id: user.id,
+      username: user.username,
+      domain: user.domain,
+      period: user.period,
+      roles: user.roles,
+      createdAt: user.createdAt,
+      isProbation: !user.operationFee,
+    };
   }
 
   async findMyProfile(id: string): Promise<MyProfile | null> {
@@ -90,7 +149,16 @@ export class DomainUserImpl implements DomainUser {
       where: {
         id,
       },
+      relations: ['roles'],
     });
+
+    if (
+      user.roles.some(
+        (role) => role.name === (SystemRoles.SUPER_ADMIN as string),
+      )
+    ) {
+      throw new ForbiddenException('Cannot deactivate super admin');
+    }
 
     if (!user) {
       throw new NotFoundUserException();
@@ -104,29 +172,7 @@ export class DomainUserImpl implements DomainUser {
     await this.userRepository.restore(id);
   }
 
-  createUserUseCase(dto: FileCreateUsersDto): Promise<void>;
-  createUserUseCase(dto: CreateUsersDto): Promise<void>;
-  async createUserUseCase(
-    dto: CreateUsersDto | FileCreateUsersDto,
-  ): Promise<void> {
-    switch (dto.createUserType) {
-      case CreateUserType.NEWBIE:
-        await this.create(dto as CreateUsersDto);
-        break;
-      case CreateUserType.NEW_MEMBERS:
-        await this.createMember(dto as CreateUsersDto);
-        break;
-      case CreateUserType.EXCEL:
-        await this.createUsersByFile(dto as FileCreateUsersDto);
-        break;
-      default:
-        throw new InternalServerErrorException(
-          `Non support create user type: ${dto.createUserType}`,
-        );
-    }
-  }
-
-  private async create(payload: CreateUserPayload): Promise<void> {
+  async createUserUseCase(payload: CreateUserPayload): Promise<void> {
     const isEmailDuplicated = await this.userRepository.exist({
       where: {
         email: payload.email,
@@ -152,32 +198,11 @@ export class DomainUserImpl implements DomainUser {
     }
   }
 
-  private async createMember({
-    email,
-    monthlyConfigId,
-  }: CreateUsersDto): Promise<void> {
-    const [monthlyConfig, user] = await Promise.all([
-      this.monthlyConfigService.findById(+monthlyConfigId),
-      this.userRepository.findOne({
-        where: { email },
-      }),
-    ]);
-
-    if (!user) {
-      throw new NotFoundUserException(email);
-    }
-
-    await this.moneyOperationService.createOperationFee({
-      monthlyConfigId: monthlyConfig.id,
-      userIds: [user.id],
-    });
-  }
-
   @Transactional()
-  private createUsersByFile(dto: FileCreateUsersDto) {
+  async createUsersByFile(dto: FileCreateUsersDto) {
     const workbook = read(dto.file.buffer, { type: 'buffer' });
 
-    return Promise.all(
+    await Promise.all(
       workbook.SheetNames.map(async (name) => {
         const sheet = workbook.Sheets[name];
 
@@ -300,6 +325,7 @@ export class DomainUserImpl implements DomainUser {
         remainMonths: operationFee?.remainMonths ?? 0,
         paidMonths: operationFee?.paidMonths ?? 0,
         estimatedPaidMonths,
+        isProbation: !operationFee,
       };
     });
 

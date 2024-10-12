@@ -48,7 +48,7 @@ export class ModifyEventMenu1695533316729 implements MigrationInterface {
       menuCodes: ['RECRUITMENT', 'RECRUITMENT_OVERVIEW'],
     });
     await rolePermissionProcessor.process({
-      roleName: SystemRoles.CHAIRMAN,
+      roleName: SystemRoles.SUPER_ADMIN,
       permissionCodes: [AccessRights.MANAGE_RECRUITMENT],
     });
   }
