@@ -72,12 +72,12 @@ export class User {
   @Column({
     name: 'domain_id',
   })
-  domainId: string;
+  domainId: number;
 
   @Column({
     name: 'period_id',
   })
-  periodId: string;
+  periodId: number;
 
   @CreateDateColumn({
     name: 'created_at',

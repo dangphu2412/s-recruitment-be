@@ -2,8 +2,8 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 import { OffsetPagination } from '../../../system/query-shape/dto';
 
 export type UserProbationQueryInput = {
-  domainId?: string;
-  periodId: string;
+  domainId?: number;
+  periodId: number;
 } & OffsetPagination;
 
 export class UserProbationQueryInputDto
@@ -11,8 +11,8 @@ export class UserProbationQueryInputDto
   implements UserProbationQueryInput
 {
   @IsNotEmpty()
-  periodId: string;
+  periodId: number;
 
   @IsOptional()
-  domainId?: string;
+  domainId?: number;
 }
