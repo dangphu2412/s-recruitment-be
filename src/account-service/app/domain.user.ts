@@ -58,8 +58,6 @@ export class DomainUserImpl implements DomainUser {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly passwordManager: PasswordManager,
-    @Inject(MonthlyMoneyConfigServiceToken)
-    private readonly monthlyConfigService: MonthlyMoneyConfigService,
     @Inject(MonthlyMoneyOperationServiceToken)
     private readonly moneyOperationService: MonthlyMoneyOperationService,
     @Inject(RoleServiceToken)
@@ -210,9 +208,19 @@ export class DomainUserImpl implements DomainUser {
         const users = await this.createEntitiesByFieldRequest(
           rows,
           dto.fieldMappings,
+          dto.periodId,
         );
 
-        await this.userRepository.insertIgnoreDuplicated(users);
+        const insertResult = await this.userRepository.insertIgnoreDuplicated(
+          users,
+        );
+
+        if (dto.monthlyConfigId) {
+          await this.moneyOperationService.createOperationFee({
+            userIds: insertResult.identifiers.map((item) => item.id),
+            monthlyConfigId: dto.monthlyConfigId,
+          });
+        }
       }),
     );
   }
@@ -245,6 +253,7 @@ export class DomainUserImpl implements DomainUser {
   private async createEntitiesByFieldRequest(
     rows: FileRow[],
     rawMapping: string,
+    periodId: number,
   ): Promise<User[]> {
     const directMappingToEntity: Record<string, keyof User> =
       this.getDirectMapping(rawMapping);
@@ -258,6 +267,7 @@ export class DomainUserImpl implements DomainUser {
         const entityField = directMappingToEntity[key];
 
         user[entityField as any] = row[key];
+        user.periodId = periodId;
       });
 
       user.password = defaultPwd;
