@@ -27,7 +27,10 @@ import { FileCreateUsersDto } from '../domain/dtos/file-create-users.dto';
 import { AccessRights } from '../domain/constants/role-def.enum';
 import { UserManagementQueryDto } from '../domain/dtos/user-management-query.dto';
 import { UserManagementView } from '../domain/vos/user-management-view.vo';
-import { DomainUser, DomainUserToken } from '../domain/interfaces/domain-user';
+import {
+  UserService,
+  UserServiceToken,
+} from '../domain/interfaces/user-service';
 import { JwtPayload } from '../domain/dtos/jwt-payload';
 import { CreateUsersDto } from '../domain/dtos/create-users.dto';
 import { PaymentService } from '../../monthly-money/internal/payment.service';
@@ -42,8 +45,8 @@ import { UpgradeUserMemberInputDto } from '../domain/inputs/upgrade-user-member.
 })
 export class UserController {
   constructor(
-    @Inject(DomainUserToken)
-    private readonly domainUser: DomainUser,
+    @Inject(UserServiceToken)
+    private readonly domainUser: UserService,
     private readonly paymentService: PaymentService,
   ) {}
 

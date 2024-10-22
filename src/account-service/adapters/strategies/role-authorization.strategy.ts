@@ -3,18 +3,17 @@ import { AuthorizationStrategy } from 'src/account-service/domain/interfaces/aut
 import { registerStrategy } from './authorization-strategy.register';
 import { JwtPayload } from '../../domain/dtos/jwt-payload';
 import {
-  AccessRightStorage,
-  AccessRightStorageToken,
-} from '../../domain/interfaces/access-right-storage';
-import { LogoutRequiredException } from '../../domain/exceptions';
+  RoleService,
+  RoleServiceToken,
+} from '../../domain/interfaces/role.service';
 
 @Injectable()
 export class RoleAuthorizationStrategy
   implements AuthorizationStrategy<JwtPayload, string[]>
 {
   constructor(
-    @Inject(AccessRightStorageToken)
-    private readonly roleStorage: AccessRightStorage,
+    @Inject(RoleServiceToken)
+    private readonly roleService: RoleService,
   ) {
     registerStrategy(RoleAuthorizationStrategy.name, this);
   }
@@ -23,12 +22,7 @@ export class RoleAuthorizationStrategy
     { sub }: JwtPayload,
     requiredRights: string[],
   ): Promise<boolean> {
-    const accessRights = await this.roleStorage.get(sub);
-
-    // TODO: renew instead of kick out
-    if (!accessRights?.length) {
-      throw new LogoutRequiredException();
-    }
+    const accessRights = await this.roleService.getAccessRightsByUserId(sub);
 
     return requiredRights.some((role) =>
       accessRights.some((right) => right === role),

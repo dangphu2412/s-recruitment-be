@@ -12,9 +12,9 @@ import { UserProbationOutput } from '../output/user-probation.output';
 import { UserProbationQueryInput } from '../inputs/user-probation-query.input';
 import { UpgradeUserMemberInput } from '../inputs/upgrade-user-member.input';
 
-export const DomainUserToken = createInterfaceToken('DomainUser');
+export const UserServiceToken = createInterfaceToken('UserServiceToken');
 
-export interface DomainUser {
+export interface UserService {
   findMyProfile(id: string): Promise<MyProfile>;
   findUserDetail(id: string): Promise<UserDetail>;
   find(query: UserQuery): Promise<User[]>;
