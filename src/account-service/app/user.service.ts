@@ -3,7 +3,6 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
-  InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
@@ -13,8 +12,6 @@ import { In, IsNull } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { PasswordManager } from './password-manager';
 import {
-  MonthlyMoneyConfigService,
-  MonthlyMoneyConfigServiceToken,
   MonthlyMoneyOperationService,
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
@@ -24,20 +21,18 @@ import {
   FileRow,
   PublicUserFields,
 } from '../domain/dtos/file-create-users.dto';
-import { CreateUserType } from '../domain/constants/user-constant';
 import { read, utils } from 'xlsx';
 import {
   RoleService,
   RoleServiceToken,
 } from '../domain/interfaces/role.service';
-import { DomainUser } from '../domain/interfaces/domain-user';
+import { UserService } from '../domain/interfaces/user-service';
 import { MyProfile, UserDetail } from '../domain/dtos/my-profile';
 import {
   EmailExistedException,
   InsertUserFailedException,
   NotFoundUserException,
 } from '../domain/exceptions';
-import { CreateUsersDto } from '../domain/dtos/create-users.dto';
 import { CreateUserPayload, UserQuery } from '../domain/vos/user-service.vo';
 import { User } from '../domain/entities/user.entity';
 import { UserManagementQueryDto } from '../domain/dtos/user-management-query.dto';
@@ -54,7 +49,7 @@ import { UpgradeUserMemberInput } from '../domain/inputs/upgrade-user-member.inp
 import { SystemRoles } from '../domain/constants/role-def.enum';
 
 @Injectable()
-export class DomainUserImpl implements DomainUser {
+export class UserServiceImpl implements UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly passwordManager: PasswordManager,
@@ -191,7 +186,7 @@ export class DomainUserImpl implements DomainUser {
     try {
       await this.userRepository.insert(newUser);
     } catch (error) {
-      Logger.error(error.message, error.stack, DomainUserImpl.name);
+      Logger.error(error.message, error.stack, UserServiceImpl.name);
       throw new InsertUserFailedException();
     }
   }

@@ -15,20 +15,23 @@ import {
   TokenGenerator,
   TokenGeneratorToken,
 } from '../domain/interfaces';
-import { DomainUser, DomainUserToken } from '../domain/interfaces/domain-user';
 import {
-  AccessRightStorage,
-  AccessRightStorageToken,
-} from '../domain/interfaces/access-right-storage';
+  UserService,
+  UserServiceToken,
+} from '../domain/interfaces/user-service';
 import { JwtPayload } from '../domain/dtos/jwt-payload';
+import {
+  RoleService,
+  RoleServiceToken,
+} from '../domain/interfaces/role.service';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
   constructor(
-    @Inject(DomainUserToken)
-    private readonly userService: DomainUser,
-    @Inject(AccessRightStorageToken)
-    private readonly accessRightStorage: AccessRightStorage,
+    @Inject(UserServiceToken)
+    private readonly userService: UserService,
+    @Inject(RoleServiceToken)
+    private readonly roleService: RoleService,
     @Inject(TokenGeneratorToken)
     private readonly tokenGenerator: TokenGenerator,
     private readonly jwtService: JwtService,
@@ -41,7 +44,7 @@ export class AuthServiceImpl implements AuthService {
       return;
     }
 
-    return this.accessRightStorage.clean(jwtPayload.sub);
+    return this.roleService.clean(jwtPayload.sub);
   }
 
   async login({
@@ -63,7 +66,7 @@ export class AuthServiceImpl implements AuthService {
 
     const [tokens] = await Promise.all([
       this.tokenGenerator.generate(user.id),
-      this.accessRightStorage.save(user.id, user.roles),
+      this.roleService.save(user.id, user.roles),
     ]);
 
     return {
@@ -83,7 +86,7 @@ export class AuthServiceImpl implements AuthService {
 
       const [tokens] = await Promise.all([
         this.tokenGenerator.generate(sub, refreshToken),
-        this.accessRightStorage.save(user.id, user.roles),
+        this.roleService.save(user.id, user.roles),
       ]);
 
       // TODO: Missing access token in cache when server restart
@@ -97,7 +100,7 @@ export class AuthServiceImpl implements AuthService {
         throw new InvalidTokenFormatException();
       }
 
-      await this.accessRightStorage.clean(jwtPayload.sub);
+      await this.roleService.clean(jwtPayload.sub);
 
       throw new LogoutRequiredException();
     }

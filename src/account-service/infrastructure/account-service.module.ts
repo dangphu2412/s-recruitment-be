@@ -9,20 +9,18 @@ import { PasswordManager } from '../app/password-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleAuthorizationStrategy } from '../adapters/strategies/role-authorization.strategy';
 import { RoleServiceImpl } from '../app/role.service';
-import { AccessRightStorageImpl } from '../app/access-right-storage';
 import { RoleRepository } from '../app/role.repository';
 import { RoleController } from '../adapters/role.controller';
 import { Permission } from '../domain/entities/permission.entity';
 import { MonthlyMoneyModule } from '../../monthly-money/internal/monthly-money.module';
 import { UserController } from '../adapters/user.controller';
-import { DomainUserImpl } from '../app/domain.user';
+import { UserServiceImpl } from '../app/user.service';
 import { UserRepository } from '../app/user.repository';
 import { AuthServiceToken, TokenGeneratorToken } from '../domain/interfaces';
 import { User } from '../domain/entities/user.entity';
 import { Role } from '../domain/entities/role.entity';
 import { RoleServiceToken } from '../domain/interfaces/role.service';
-import { AccessRightStorageToken } from '../domain/interfaces/access-right-storage';
-import { DomainUserToken } from '../domain/interfaces/domain-user';
+import { UserServiceToken } from '../domain/interfaces/user-service';
 
 @Module({
   imports: [
@@ -54,14 +52,10 @@ import { DomainUserToken } from '../domain/interfaces/domain-user';
       useClass: RoleServiceImpl,
     },
     {
-      provide: AccessRightStorageToken,
-      useClass: AccessRightStorageImpl,
-    },
-    {
-      provide: DomainUserToken,
-      useClass: DomainUserImpl,
+      provide: UserServiceToken,
+      useClass: UserServiceImpl,
     },
   ],
-  exports: [PasswordManager, DomainUserToken, AccessRightStorageToken],
+  exports: [PasswordManager, UserServiceToken, RoleServiceToken],
 })
 export class AccountServiceModule {}

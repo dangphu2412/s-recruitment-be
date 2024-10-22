@@ -22,9 +22,9 @@ import {
 import { RecruitmentEvent } from '../../domain/entities/recruitment-event.entity';
 import { NotFoundSheetNameException } from '../../domain/exceptions/not-found-sheet-import.exception';
 import {
-  DomainUser,
-  DomainUserToken,
-} from '../../../account-service/domain/interfaces/domain-user';
+  UserService,
+  UserServiceToken,
+} from '../../../account-service/domain/interfaces/user-service';
 
 @Injectable()
 export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
@@ -35,8 +35,8 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
     private readonly recruitmentEmployeeRepository: Repository<RecruitmentEmployee>,
     @InjectRepository(EmployeeEventPoint)
     private readonly employeeEventPointRepository: Repository<EmployeeEventPoint>,
-    @Inject(DomainUserToken)
-    private readonly userService: DomainUser,
+    @Inject(UserServiceToken)
+    private readonly userService: UserService,
   ) {}
 
   async create(command: CreateRecruitmentCommand): Promise<void> {
