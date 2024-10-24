@@ -1,10 +1,20 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
-export type PublicUserFields = 'email' | 'fullName' | 'birthday' | 'username';
+export type PublicUserFields =
+  | 'email'
+  | 'fullName'
+  | 'birthday'
+  | 'username'
+  | 'joinedAt';
 
 export type FieldMappingsRequest = Record<string, PublicUserFields>;
 
-export type FileRow = Record<string, string>;
+export type FileRow = {
+  'Họ và Tên:': string;
+  Email: string;
+  Username: string;
+  'Join At': string;
+};
 
 export class FileCreateUsersDto {
   @IsNotEmpty()
@@ -15,7 +25,4 @@ export class FileCreateUsersDto {
   monthlyConfigId?: number;
 
   file: Express.Multer.File;
-
-  @IsString()
-  fieldMappings: string;
 }

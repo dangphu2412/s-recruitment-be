@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../domain/entities/user.entity';
 import { UserManagementQuery } from '../domain/vos/user-management-view.vo';
+import { UserStatus } from '../domain/constants/user-constant';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -17,14 +18,17 @@ export class UserRepository extends Repository<User> {
     offset,
     size,
     joinedIn,
+    userStatus,
     search = '',
   }: UserManagementQuery) {
     const qb = this.createQueryBuilder('users')
       .select([
         'users.id',
         'users.username',
+        'users.fullName',
         'users.email',
         'users.createdAt',
+        'users.joinedAt',
         'users.deletedAt',
       ])
       .skip(offset)
@@ -47,20 +51,18 @@ export class UserRepository extends Repository<User> {
       });
     }
 
-    return qb.getManyAndCount();
-  }
+    if (userStatus) {
+      if (userStatus.includes(UserStatus.DEBTOR)) {
+        qb.andWhere(
+          `operationFee.paidMonths < EXTRACT(MONTH FROM age(CURRENT_DATE, users.joinedAt))`,
+        );
+      }
 
-  insertIgnoreDuplicated(users: User[]) {
-    return (
-      this.createQueryBuilder()
-        .insert()
-        .values(users)
-        .orUpdate({
-          conflict_target: ['email'],
-          overwrite: ['username'],
-        })
-        // .orIgnore()
-        .execute()
-    );
+      if (userStatus.includes(UserStatus.INACTIVE)) {
+        qb.andWhere(`users.deletedAt IS NOT NULL`);
+      }
+    }
+
+    return qb.getManyAndCount();
   }
 }

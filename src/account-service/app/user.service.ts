@@ -1,14 +1,8 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { Page, PageRequest } from 'src/system/query-shape/dto';
 import { omit } from 'lodash';
-import { In, IsNull } from 'typeorm';
+import { In, InsertResult, IsNull } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { PasswordManager } from './password-manager';
 import {
@@ -16,10 +10,8 @@ import {
   MonthlyMoneyOperationServiceToken,
 } from '../../monthly-money';
 import {
-  FieldMappingsRequest,
   FileCreateUsersDto,
   FileRow,
-  PublicUserFields,
 } from '../domain/dtos/file-create-users.dto';
 import { read, utils } from 'xlsx';
 import {
@@ -59,12 +51,93 @@ export class UserServiceImpl implements UserService {
     private readonly roleService: RoleService,
   ) {}
 
-  upgradeToMembers(
-    upgradeUserMemberInput: UpgradeUserMemberInput,
-  ): Promise<void> {
-    return this.moneyOperationService.createOperationFee({
-      userIds: upgradeUserMemberInput.ids,
-      monthlyConfigId: upgradeUserMemberInput.monthlyConfigId,
+  async searchOverviewUsers(
+    query: UserManagementQueryDto,
+  ): Promise<Page<UserManagementView>> {
+    const { search, joinedIn, userStatus } = query;
+    const { offset, size } = PageRequest.of(query);
+
+    const [data, totalRecords] =
+      await this.userRepository.findUsersForManagement({
+        search,
+        joinedIn,
+        userStatus: userStatus,
+        offset,
+        size,
+      } as UserManagementQuery);
+
+    const items = data.map<UserManagementView>((user) => {
+      const {
+        username,
+        id,
+        email,
+        fullName,
+        createdAt,
+        deletedAt,
+        roles,
+        joinedAt,
+        operationFee,
+      } = user;
+
+      // Subtract today with created date to get estimated paid months using date-fns
+      const estimatedPaidMonths = operationFee
+        ? Math.min(
+            differenceInMonths(new Date(), joinedAt),
+            operationFee.monthlyConfig.monthRange,
+          )
+        : 0;
+      const paidMonths = operationFee?.paidMonths ?? 0;
+      const debtMonths = estimatedPaidMonths - paidMonths;
+
+      return {
+        username,
+        fullName,
+        id,
+        email,
+        createdAt,
+        deletedAt,
+        joinedAt,
+        roles,
+        remainMonths: operationFee?.remainMonths ?? 0,
+        paidMonths: operationFee?.paidMonths ?? 0,
+        estimatedPaidMonths,
+        isProbation: !operationFee,
+        debtMonths,
+      };
+    });
+
+    return Page.of({
+      query,
+      totalRecords,
+      items,
+    });
+  }
+
+  find(query: UserQuery | string[]): Promise<User[]> {
+    if (Array.isArray(query)) {
+      return this.userRepository.findBy({
+        id: In(query),
+      });
+    }
+
+    const {
+      withDeleted,
+      withRoles = false,
+      withRights = false,
+      ...userFields
+    } = query;
+
+    const relations = [];
+
+    withRoles && relations.push('roles');
+    withRights && relations.push('roles', 'roles.permissions');
+
+    return this.userRepository.find({
+      where: {
+        ...userFields,
+      },
+      relations: uniq(relations),
+      withDeleted,
     });
   }
 
@@ -136,6 +209,16 @@ export class UserServiceImpl implements UserService {
     return omit(user, 'password');
   }
 
+  async findOne(query: UserQuery): Promise<User> {
+    const records = await this.find(query);
+
+    if (!records.length) {
+      return {} as User;
+    }
+
+    return records[0];
+  }
+
   async toggleUserIsActive(id: string): Promise<void> {
     const user = await this.userRepository.findOne({
       withDeleted: true,
@@ -165,7 +248,7 @@ export class UserServiceImpl implements UserService {
     await this.userRepository.restore(id);
   }
 
-  async createUserUseCase(payload: CreateUserPayload): Promise<void> {
+  async createUser(payload: CreateUserPayload): Promise<void> {
     const isEmailDuplicated = await this.userRepository.exist({
       where: {
         email: payload.email,
@@ -193,21 +276,16 @@ export class UserServiceImpl implements UserService {
 
   @Transactional()
   async createUsersByFile(dto: FileCreateUsersDto) {
-    const workbook = read(dto.file.buffer, { type: 'buffer' });
+    const workbook = read(dto.file.buffer, { type: 'buffer', cellDates: true });
 
     await Promise.all(
       workbook.SheetNames.map(async (name) => {
         const sheet = workbook.Sheets[name];
 
         const rows = utils.sheet_to_json<FileRow>(sheet);
-        const users = await this.createEntitiesByFieldRequest(
+        const insertResult = await this.createUsersBySheetRow(
           rows,
-          dto.fieldMappings,
           dto.periodId,
-        );
-
-        const insertResult = await this.userRepository.insertIgnoreDuplicated(
-          users,
         );
 
         if (dto.monthlyConfigId) {
@@ -220,55 +298,26 @@ export class UserServiceImpl implements UserService {
     );
   }
 
-  private getMappingsRequest(input: string): FieldMappingsRequest {
-    try {
-      return JSON.parse(input) as FieldMappingsRequest;
-    } catch {
-      throw new BadRequestException('Invalid field mappings format');
-    }
-  }
-
-  private getDirectMapping(
-    fieldMappingRaw: string,
-  ): Record<string, keyof User> {
-    const mappings = this.getMappingsRequest(fieldMappingRaw);
-    const mappingPublicToEntity: Record<PublicUserFields, keyof User> = {
-      email: 'email',
-      birthday: 'birthday',
-      fullName: 'fullName',
-      username: 'username',
-    };
-
-    return Object.keys(mappings).reduce((acc, key) => {
-      acc[key] = mappingPublicToEntity[mappings[key]] as keyof User;
-      return acc;
-    }, {} as Record<string, keyof User>);
-  }
-
-  private async createEntitiesByFieldRequest(
+  private async createUsersBySheetRow(
     rows: FileRow[],
-    rawMapping: string,
     periodId: number,
-  ): Promise<User[]> {
-    const directMappingToEntity: Record<string, keyof User> =
-      this.getDirectMapping(rawMapping);
-
+  ): Promise<InsertResult> {
     const defaultPwd = await this.passwordManager.getDefaultPassword();
 
-    return rows.map((row) => {
+    const entities = rows.map((row) => {
       const user = new User();
 
-      Object.keys(row).forEach((key) => {
-        const entityField = directMappingToEntity[key];
-
-        user[entityField as any] = row[key];
-        user.periodId = periodId;
-      });
-
+      user.username = row['Username'];
+      user.email = row['Email'];
+      user.fullName = row['Họ và Tên:'];
+      user.joinedAt = row['Join At'] ? new Date(row['Join At']) : new Date();
+      user.periodId = periodId;
       user.password = defaultPwd;
 
       return user;
     });
+
+    return this.userRepository.insert(entities);
   }
 
   async updateUserRoles(
@@ -293,90 +342,13 @@ export class UserServiceImpl implements UserService {
     await this.userRepository.save(user);
   }
 
-  async searchOverviewUsers(
-    query: UserManagementQueryDto,
-  ): Promise<Page<UserManagementView>> {
-    const { search, joinedIn, memberType } = query;
-    const { offset, size } = PageRequest.of(query);
-
-    const [data, totalRecords] =
-      await this.userRepository.findUsersForManagement({
-        search,
-        joinedIn,
-        memberType,
-        offset,
-        size,
-      } as UserManagementQuery);
-
-    const items = data.map<UserManagementView>((user) => {
-      const { username, id, email, createdAt, deletedAt, roles, operationFee } =
-        user;
-
-      // Subtract today with created date to get estimated paid months using date-fns
-      const estimatedPaidMonths = operationFee
-        ? Math.min(
-            differenceInMonths(new Date(), createdAt),
-            operationFee.monthlyConfig.monthRange,
-          )
-        : 0;
-
-      return {
-        username,
-        id,
-        email,
-        createdAt,
-        deletedAt,
-        roles,
-        remainMonths: operationFee?.remainMonths ?? 0,
-        paidMonths: operationFee?.paidMonths ?? 0,
-        estimatedPaidMonths,
-        isProbation: !operationFee,
-      };
+  upgradeToMembers(
+    upgradeUserMemberInput: UpgradeUserMemberInput,
+  ): Promise<void> {
+    return this.moneyOperationService.createOperationFee({
+      userIds: upgradeUserMemberInput.ids,
+      monthlyConfigId: upgradeUserMemberInput.monthlyConfigId,
     });
-
-    return Page.of({
-      query,
-      totalRecords,
-      items,
-    });
-  }
-
-  find(query: UserQuery | string[]): Promise<User[]> {
-    if (Array.isArray(query)) {
-      return this.userRepository.findBy({
-        id: In(query),
-      });
-    }
-
-    const {
-      withDeleted,
-      withRoles = false,
-      withRights = false,
-      ...userFields
-    } = query;
-
-    const relations = [];
-
-    withRoles && relations.push('roles');
-    withRights && relations.push('roles', 'roles.permissions');
-
-    return this.userRepository.find({
-      where: {
-        ...userFields,
-      },
-      relations: uniq(relations),
-      withDeleted,
-    });
-  }
-
-  async findOne(query: UserQuery): Promise<User> {
-    const records = await this.find(query);
-
-    if (!records.length) {
-      return {} as User;
-    }
-
-    return records[0];
   }
 
   isIdExist(id: string): Promise<boolean> {

@@ -105,7 +105,7 @@ export class UserController {
   @Post('/')
   @ApiCreatedResponse()
   async createUsers(@Body() createUsersDto: CreateUsersDto) {
-    await this.domainUser.createUserUseCase(createUsersDto);
+    await this.domainUser.createUser(createUsersDto);
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)

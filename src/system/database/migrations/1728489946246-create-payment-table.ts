@@ -2,7 +2,6 @@ import {
   MigrationInterface,
   QueryRunner,
   Table,
-  TableColumn,
   TableForeignKey,
 } from 'typeorm';
 
@@ -58,19 +57,6 @@ export class CreatePaymentTable1728489946246 implements MigrationInterface {
         columnNames: ['user_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
-      }),
-    ]);
-
-    await queryRunner.addColumns('operation_fees', [
-      new TableColumn({
-        name: 'paid_months',
-        type: 'int',
-        default: 0,
-      }),
-      new TableColumn({
-        name: 'remain_months',
-        type: 'int',
-        default: 0,
       }),
     ]);
   }
