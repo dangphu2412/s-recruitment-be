@@ -5,8 +5,10 @@ export type UserManagementView = {
   id: string;
   username: string;
   email: string;
+  fullName: string;
   createdAt: Date;
   deletedAt: Date;
+  joinedAt: Date;
   roles: {
     id: string;
     name: string;
@@ -14,6 +16,7 @@ export type UserManagementView = {
   paidMonths: number;
   remainMonths: number;
   estimatedPaidMonths: number;
+  debtMonths: number;
   isProbation: boolean;
 };
 

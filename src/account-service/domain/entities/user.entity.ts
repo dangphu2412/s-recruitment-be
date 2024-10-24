@@ -84,6 +84,12 @@ export class User {
   })
   createdAt: Date;
 
+  @Column({
+    name: 'joined_at',
+    default: 'now()',
+  })
+  joinedAt: Date;
+
   @UpdateDateColumn({
     name: 'updated_at',
   })

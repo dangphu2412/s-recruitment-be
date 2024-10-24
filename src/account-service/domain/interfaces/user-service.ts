@@ -33,7 +33,7 @@ export interface UserService {
   /**
    * @throws {InsertUserFailedException}
    */
-  createUserUseCase(dto: CreateUsersDto): Promise<void>;
+  createUser(dto: CreateUsersDto): Promise<void>;
   createUsersByFile(dto: FileCreateUsersDto): Promise<void>;
 
   updateUserRoles(id: string, payload: UpdateUserRolesDto): Promise<void>;

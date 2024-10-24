@@ -34,10 +34,14 @@ export class OperationFee {
   remainMonths: number;
 
   @Column({
-    name: 'joined_at',
-    default: 'now()',
+    name: 'temporary_leave_start',
   })
-  joinedAt: Date;
+  temporaryLeaveStart: Date;
+
+  @Column({
+    name: 'estimated_return_date',
+  })
+  estimatedReturnDate: Date;
 
   @Column({
     name: 'user_id',

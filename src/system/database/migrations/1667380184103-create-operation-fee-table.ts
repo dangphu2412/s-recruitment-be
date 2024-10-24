@@ -26,9 +26,24 @@ export class CreateOperationFeeTable1667380184103
             isNullable: false,
           },
           {
-            name: 'joined_at',
+            name: 'remain_months',
+            type: 'int',
+            default: 0,
+          },
+          {
+            name: 'paid_months',
+            type: 'int',
+            default: 0,
+          },
+          {
+            name: 'temporary_leave_start',
             type: 'timestamp',
-            default: 'now()',
+            isNullable: true,
+          },
+          {
+            name: 'estimated_return_date',
+            type: 'timestamp',
+            isNullable: true,
           },
           {
             name: 'monthly_config_id',
