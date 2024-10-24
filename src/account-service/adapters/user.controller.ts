@@ -112,7 +112,6 @@ export class UserController {
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
-  @ApiNoContentResponse()
   createUsersByFile(
     @Body() dto: FileCreateUsersDto,
     @UploadedFile()

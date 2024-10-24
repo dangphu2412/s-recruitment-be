@@ -1,7 +1,7 @@
 import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { Page, PageRequest } from 'src/system/query-shape/dto';
-import { omit } from 'lodash';
+import { omit, xor } from 'lodash';
 import { In, InsertResult, IsNull } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { PasswordManager } from './password-manager';
@@ -39,6 +39,7 @@ import { UserProbationOutput } from '../domain/output/user-probation.output';
 import { UserProbationQueryInput } from '../domain/inputs/user-probation-query.input';
 import { UpgradeUserMemberInput } from '../domain/inputs/upgrade-user-member.input';
 import { SystemRoles } from '../domain/constants/role-def.enum';
+import { BadRequestFileCreationFormatException } from '../domain/exceptions/bad-request-file-creation-format.exception';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -275,20 +276,39 @@ export class UserServiceImpl implements UserService {
   }
 
   @Transactional()
-  async createUsersByFile(dto: FileCreateUsersDto) {
+  createUsersByFile(dto: FileCreateUsersDto) {
     const workbook = read(dto.file.buffer, { type: 'buffer', cellDates: true });
 
-    await Promise.all(
+    return Promise.all(
       workbook.SheetNames.map(async (name) => {
         const sheet = workbook.Sheets[name];
 
         const rows = utils.sheet_to_json<FileRow>(sheet);
+        // Validate file columns
+        const requiredColumns = ['Họ và Tên:', 'Email', 'Username', 'Join At'];
+        const columns = Object.keys(rows[0]);
+
+        if (xor(requiredColumns, columns).length) {
+          throw new BadRequestFileCreationFormatException();
+        }
+        const usernames = rows.map((row) => row['Username']);
+        const existedUsers = await this.userRepository.find({
+          where: {
+            username: In(usernames),
+          },
+        });
+        if (existedUsers.length) {
+          return {
+            duplicatedEmails: existedUsers.map((user) => user.email),
+          };
+        }
+
         const insertResult = await this.createUsersBySheetRow(
           rows,
           dto.periodId,
         );
 
-        if (dto.monthlyConfigId) {
+        if (dto.monthlyConfigId !== undefined) {
           await this.moneyOperationService.createOperationFee({
             userIds: insertResult.identifiers.map((item) => item.id),
             monthlyConfigId: dto.monthlyConfigId,

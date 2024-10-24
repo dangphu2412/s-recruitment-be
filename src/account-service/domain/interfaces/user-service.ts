@@ -34,7 +34,9 @@ export interface UserService {
    * @throws {InsertUserFailedException}
    */
   createUser(dto: CreateUsersDto): Promise<void>;
-  createUsersByFile(dto: FileCreateUsersDto): Promise<void>;
+  createUsersByFile(
+    dto: FileCreateUsersDto,
+  ): Promise<{ duplicatedEmails: string[] }[]>;
 
   updateUserRoles(id: string, payload: UpdateUserRolesDto): Promise<void>;
   upgradeToMembers(
