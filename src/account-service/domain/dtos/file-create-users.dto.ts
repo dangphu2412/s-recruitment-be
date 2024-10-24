@@ -1,14 +1,5 @@
 import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
-export type PublicUserFields =
-  | 'email'
-  | 'fullName'
-  | 'birthday'
-  | 'username'
-  | 'joinedAt';
-
-export type FieldMappingsRequest = Record<string, PublicUserFields>;
-
 export type FileRow = {
   'Họ và Tên:': string;
   Email: string;
