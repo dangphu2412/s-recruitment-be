@@ -33,7 +33,7 @@ export class AddMasterDataMenu1728101199639 implements MigrationInterface {
       description: 'Manage master data',
     });
     const PARENT_MENU_CODE = 'MASTER_DATA';
-    const DOMAIN_MENU_CODE = 'DOMAIN';
+    const DEPARTMENT_MENU_CODE = 'DEPARTMENT';
     const PERIOD_MENU_CODE = 'PERIOD';
 
     await menuFactory.create([
@@ -43,9 +43,9 @@ export class AddMasterDataMenu1728101199639 implements MigrationInterface {
         code: PARENT_MENU_CODE,
         subMenus: [
           {
-            name: 'Domain',
-            accessLink: '/master-data/domains',
-            code: DOMAIN_MENU_CODE,
+            name: 'Department',
+            accessLink: '/master-data/departments',
+            code: DEPARTMENT_MENU_CODE,
           },
           {
             name: 'Period',
@@ -58,7 +58,7 @@ export class AddMasterDataMenu1728101199639 implements MigrationInterface {
 
     await permissionMenuSettingsConnector.process({
       permissionCode: AccessRights.MANAGE_MASTER_DATA,
-      menuCodes: [PARENT_MENU_CODE, DOMAIN_MENU_CODE, PERIOD_MENU_CODE],
+      menuCodes: [PARENT_MENU_CODE, DEPARTMENT_MENU_CODE, PERIOD_MENU_CODE],
     });
     await rolePermissionConnector.process({
       roleName: SystemRoles.SUPER_ADMIN,
@@ -84,14 +84,14 @@ export class AddMasterDataMenu1728101199639 implements MigrationInterface {
     ]);
     await masterDataCommonRepository.insert([
       {
-        name: 'Khoá Lập Trình 2020',
+        name: 'Khoá Lập Trình 2022',
         code: 'SG0002',
-        description: 'Khoá Lập Trình 2020',
+        description: 'Khoá Lập Trình 2022',
       },
       {
-        name: 'Khoá Lập Trình 2021',
+        name: 'Khoá Lập Trình 2023',
         code: 'SG0002',
-        description: 'Khoá Lập Trình 2021',
+        description: 'Khoá Lập Trình 2023',
       },
     ]);
   }

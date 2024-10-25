@@ -1,5 +1,6 @@
 export enum SystemRoles {
   SUPER_ADMIN = 'Super Admin',
+  HR = 'Human Resource',
   LEADER = 'Leader',
   TRAINER = 'Trainer',
   MEMBER = 'Member',
@@ -13,4 +14,8 @@ export enum AccessRights {
   MANAGE_RECRUITMENT = 'Manage recruitments',
   MANAGE_POSTS = 'Manage posts',
   MANAGE_MASTER_DATA = 'Manage master data',
+  READ_ASSESSMENTS = 'Read assessments',
+  WRITE_ASSESSMENTS = 'Write assessments',
+  READ_USER_GROUPS = 'Read user groups',
+  WRITE_USER_GROUPS = 'Write user groups',
 }
