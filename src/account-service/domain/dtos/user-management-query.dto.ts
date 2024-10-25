@@ -18,4 +18,12 @@ export class UserManagementQueryDto extends OffsetPagination {
   @IsEnum(UserStatus, { each: true })
   @ToManyString()
   userStatus?: UserStatus[];
+
+  @IsOptional()
+  @ToManyString()
+  departmentIds?: number[];
+
+  @IsOptional()
+  @ToManyString()
+  periodIds?: number[];
 }

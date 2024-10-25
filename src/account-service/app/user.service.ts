@@ -55,7 +55,7 @@ export class UserServiceImpl implements UserService {
   async searchOverviewUsers(
     query: UserManagementQueryDto,
   ): Promise<Page<UserManagementView>> {
-    const { search, joinedIn, userStatus } = query;
+    const { search, joinedIn, userStatus, departmentIds, periodIds } = query;
     const { offset, size } = PageRequest.of(query);
 
     const [data, totalRecords] =
@@ -65,6 +65,8 @@ export class UserServiceImpl implements UserService {
         userStatus: userStatus,
         offset,
         size,
+        departmentIds,
+        periodIds,
       } as UserManagementQuery);
 
     const items = data.map<UserManagementView>((user) => {
@@ -78,6 +80,8 @@ export class UserServiceImpl implements UserService {
         roles,
         joinedAt,
         operationFee,
+        domain,
+        period,
       } = user;
 
       // Subtract today with created date to get estimated paid months using date-fns
@@ -104,6 +108,8 @@ export class UserServiceImpl implements UserService {
         estimatedPaidMonths,
         isProbation: !operationFee,
         debtMonths,
+        domain,
+        period,
       };
     });
 
@@ -182,7 +188,7 @@ export class UserServiceImpl implements UserService {
       where: {
         id,
       },
-      relations: ['domain', 'period', 'roles', 'operationFee'],
+      relations: ['department', 'period', 'roles', 'operationFee'],
     });
 
     return {
