@@ -20,6 +20,7 @@ import { Role } from './role.entity';
 import { Post } from '../../../posts-service/domain/entities/posts.entity';
 import { MasterDataCommon } from '../../../master-data/entities/master-data.entity';
 import { Payment } from '../../../monthly-money/client/entities/payment.entity';
+import { UserGroup } from './user-group.entity';
 
 @Entity({
   name: 'users',
@@ -113,6 +114,20 @@ export class User {
     },
   })
   roles?: Role[];
+
+  @ManyToMany(() => UserGroup, (userGroups) => userGroups.users)
+  @JoinTable({
+    name: 'users_user_groups',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'group_id',
+      referencedColumnName: 'id',
+    },
+  })
+  userGroups?: UserGroup[];
 
   @ManyToMany(() => RecruitmentEvent, (event) => event.examiners)
   @JoinTable({

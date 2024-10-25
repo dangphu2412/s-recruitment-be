@@ -11,6 +11,7 @@ import { Post } from '../../../posts-service/domain/entities/posts.entity';
 import { Category } from '../../../posts-service/domain/entities/category.entity';
 import { MasterDataCommon } from '../../../master-data/entities/master-data.entity';
 import { Payment } from '../../../monthly-money/client/entities/payment.entity';
+import { UserGroup } from '../../../account-service/domain/entities/user-group.entity';
 
 export const APP_ENTITIES = [
   User,
@@ -26,6 +27,7 @@ export const APP_ENTITIES = [
   Category,
   MasterDataCommon,
   Payment,
+  UserGroup,
 ];
 
 export const MIGRATION_CONFIGS = {

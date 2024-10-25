@@ -21,6 +21,10 @@ import { User } from '../domain/entities/user.entity';
 import { Role } from '../domain/entities/role.entity';
 import { RoleServiceToken } from '../domain/interfaces/role.service';
 import { UserServiceToken } from '../domain/interfaces/user-service';
+import { UserGroupsController } from '../adapters/user-groups.controller';
+import { UserGroupsServiceToken } from '../domain/interfaces/user-groups.service';
+import { UserGroupsServiceImpl } from '../app/user-groups.service';
+import { UserGroup } from '../domain/entities/user-group.entity';
 
 @Module({
   imports: [
@@ -30,9 +34,14 @@ import { UserServiceToken } from '../domain/interfaces/user-service';
         environmentKeyFactory.getJwtConfig(),
       inject: [EnvironmentKeyFactory],
     }),
-    TypeOrmModule.forFeature([User, Role, Permission]),
+    TypeOrmModule.forFeature([User, Role, Permission, UserGroup]),
   ],
-  controllers: [AuthController, RoleController, UserController],
+  controllers: [
+    AuthController,
+    RoleController,
+    UserController,
+    UserGroupsController,
+  ],
   providers: [
     JwtStrategy,
     PasswordManager,
@@ -54,6 +63,10 @@ import { UserServiceToken } from '../domain/interfaces/user-service';
     {
       provide: UserServiceToken,
       useClass: UserServiceImpl,
+    },
+    {
+      provide: UserGroupsServiceToken,
+      useClass: UserGroupsServiceImpl,
     },
   ],
   exports: [PasswordManager, UserServiceToken, RoleServiceToken],

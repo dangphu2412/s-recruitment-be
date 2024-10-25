@@ -1,5 +1,5 @@
-import { In, MigrationInterface, QueryRunner } from 'typeorm';
-import { omit, keyBy } from 'lodash';
+import { MigrationInterface, QueryRunner } from 'typeorm';
+import { keyBy, omit } from 'lodash';
 import { Menu } from '../../menu';
 
 type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
@@ -24,6 +24,16 @@ export class SeedingMenus1659108460003 implements MigrationInterface {
             name: 'Accessibility',
             accessLink: '/users/access-control',
             code: 'ACCESS_CONTROL',
+          },
+          {
+            name: 'User Groups',
+            accessLink: '/users/groups',
+            code: 'USER_GROUPS',
+          },
+          {
+            name: 'User Assessment',
+            accessLink: '/users/assessment',
+            code: 'USER_ASSESSMENT',
           },
         ],
       },
@@ -61,11 +71,8 @@ export class SeedingMenus1659108460003 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
-    const menuRepository = queryRunner.manager.getTreeRepository(Menu);
-    await menuRepository.delete({
-      code: In(['USER_MANAGEMENT', 'ADMIN', 'ACCESS_CONTROL']),
-    });
+  public async down(): Promise<void> {
+    return;
   }
 
   private static excludeSubMenus(

@@ -19,6 +19,10 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         isEditable: false,
       },
       {
+        name: SystemRoles.HR,
+        description: 'User who charge of manage resource of organization',
+      },
+      {
         name: SystemRoles.LEADER,
         description: 'User who is the leader of a domain or group',
       },
@@ -49,6 +53,22 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         name: AccessRights.EDIT_ACCESS_RIGHTS,
         description: 'Edit roles of system',
       },
+      {
+        name: AccessRights.READ_ASSESSMENTS,
+        description: 'Read assessments',
+      },
+      {
+        name: AccessRights.WRITE_ASSESSMENTS,
+        description: 'Write assessments',
+      },
+      {
+        name: AccessRights.READ_USER_GROUPS,
+        description: 'Read user groups',
+      },
+      {
+        name: AccessRights.WRITE_USER_GROUPS,
+        description: 'Write user groups',
+      },
     ]);
     const nameMapToRoles = keyBy(savedRoles, 'name');
     const nameMapToPermissions = keyBy(savedPermissions, 'name');
@@ -59,6 +79,10 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         AccessRights.EDIT_MEMBER_USER,
         AccessRights.EDIT_ACCESS_RIGHTS,
         AccessRights.VIEW_ACCESS_RIGHTS,
+        AccessRights.READ_ASSESSMENTS,
+        AccessRights.WRITE_ASSESSMENTS,
+        AccessRights.READ_USER_GROUPS,
+        AccessRights.WRITE_USER_GROUPS,
       ],
       [SystemRoles.LEADER]: [
         AccessRights.VIEW_USERS,

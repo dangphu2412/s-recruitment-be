@@ -31,6 +31,10 @@ export class SeedMenuSettings1676171233978 implements MigrationInterface {
             AccessRights.EDIT_MEMBER_USER,
             AccessRights.VIEW_USERS,
             AccessRights.EDIT_ACCESS_RIGHTS,
+            AccessRights.WRITE_USER_GROUPS,
+            AccessRights.READ_USER_GROUPS,
+            AccessRights.WRITE_ASSESSMENTS,
+            AccessRights.READ_ASSESSMENTS,
           ]),
         },
       }),
@@ -44,6 +48,10 @@ export class SeedMenuSettings1676171233978 implements MigrationInterface {
       [AccessRights.EDIT_MEMBER_USER]: ['ADMIN'],
       [AccessRights.VIEW_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
       [AccessRights.EDIT_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
+      [AccessRights.WRITE_USER_GROUPS]: ['USER_GROUPS'],
+      [AccessRights.READ_USER_GROUPS]: ['USER_GROUPS'],
+      [AccessRights.WRITE_ASSESSMENTS]: ['USER_ASSESSMENT'],
+      [AccessRights.READ_ASSESSMENTS]: ['USER_ASSESSMENT'],
     };
 
     const linkedEntities = Object.keys(permissionDefineMenus).map(
