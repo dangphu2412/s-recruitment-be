@@ -20,6 +20,8 @@ export class UserRepository extends Repository<User> {
     joinedIn,
     userStatus,
     search = '',
+    departmentIds,
+    periodIds,
   }: UserManagementQuery) {
     const qb = this.createQueryBuilder('users')
       .select([
@@ -35,6 +37,8 @@ export class UserRepository extends Repository<User> {
       .take(size)
       .withDeleted()
       .leftJoinAndSelect('users.roles', 'roles')
+      .leftJoinAndSelect('users.domain', 'domain')
+      .leftJoinAndSelect('users.period', 'period')
       .leftJoinAndSelect('users.operationFee', 'operationFee')
       .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig');
 
@@ -61,6 +65,18 @@ export class UserRepository extends Repository<User> {
       if (userStatus.includes(UserStatus.INACTIVE)) {
         qb.andWhere(`users.deletedAt IS NOT NULL`);
       }
+    }
+
+    if (departmentIds?.length) {
+      qb.andWhere('domain.id IN (:...departmentIds)', {
+        departmentIds,
+      });
+    }
+
+    if (periodIds?.length) {
+      qb.andWhere('period.id IN (:...periodIds)', {
+        periodIds,
+      });
     }
 
     return qb.getManyAndCount();

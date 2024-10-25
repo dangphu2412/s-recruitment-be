@@ -51,6 +51,7 @@ export class UserGroupsServiceImpl implements UserGroupsService {
             },
           }
         : {}),
+      relations: ['users'],
     });
 
     return Page.of({

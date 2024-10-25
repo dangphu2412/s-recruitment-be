@@ -18,6 +18,14 @@ export type UserManagementView = {
   estimatedPaidMonths: number;
   debtMonths: number;
   isProbation: boolean;
+  domain: {
+    id: number;
+    name: string;
+  };
+  period: {
+    id: number;
+    name: string;
+  };
 };
 
 export type UserManagementQuery = Required<UserManagementQueryDto> &
