@@ -89,6 +89,9 @@ importers:
       multer:
         specifier: ^1.4.5-lts.1
         version: 1.4.5-lts.1
+      object-path:
+        specifier: ^0.11.8
+        version: 0.11.8
       passport:
         specifier: ^0.6.0
         version: 0.6.0
@@ -174,6 +177,9 @@ importers:
       '@types/passport-jwt':
         specifier: ^3.0.6
         version: 3.0.13
+      '@types/qs':
+        specifier: ^6.9.16
+        version: 6.9.16
       '@types/supertest':
         specifier: ^2.0.11
         version: 2.0.16
@@ -3100,6 +3106,10 @@ packages:
   object-inspect@1.13.2:
     resolution: {integrity: sha512-IRZSRuzJiynemAXPYtPe5BoI/RESNYR7TYm50MC5Mqbd3Jmw5y790sErYw3V6SryFJD64b74qQQs9wn5Bg/k3g==}
     engines: {node: '>= 0.4'}
+
+  object-path@0.11.8:
+    resolution: {integrity: sha512-YJjNZrlXJFM42wTBn6zgOJVar9KFJvzx6sTWDte8sWZF//cnjl0BxHNpfZx+ZffXX63A9q0b1zsFiBX4g4X5KA==}
+    engines: {node: '>= 10.12.0'}
 
   obliterator@2.0.4:
     resolution: {integrity: sha512-lgHwxlxV1qIg1Eap7LgIeoBWIMFibOjbrYPIPJZcI1mmGAI2m3lNYpK12Y+GBdPQ0U1hRwSord7GIaawz962qQ==}
@@ -7686,6 +7696,8 @@ snapshots:
   object-assign@4.1.1: {}
 
   object-inspect@1.13.2: {}
+
+  object-path@0.11.8: {}
 
   obliterator@2.0.4: {}
 

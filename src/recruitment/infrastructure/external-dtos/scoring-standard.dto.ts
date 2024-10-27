@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumberString } from 'class-validator';
 
 export class ScoringStandardDto {
   @IsNotEmpty()
   standard: string;
 
-  @IsNumber()
+  @IsNumberString()
   point: number;
 }

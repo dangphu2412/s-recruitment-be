@@ -23,6 +23,11 @@ export class RecruitmentEmployee {
   })
   data: object;
 
+  @Column({
+    name: 'event_id',
+  })
+  eventId: number;
+
   @ManyToOne(() => RecruitmentEvent)
   @JoinColumn({
     name: 'event_id',

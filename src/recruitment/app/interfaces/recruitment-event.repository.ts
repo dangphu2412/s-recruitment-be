@@ -1,8 +1,9 @@
 import { createInterfaceToken } from 'src/system/utils';
 import { RecruitmentEvent } from '../../domain/entities/recruitment-event.entity';
-import { InsertResult } from 'typeorm';
+import { InsertResult, Repository } from 'typeorm';
 
-export interface RecruitmentEventRepository {
+export interface RecruitmentEventRepository
+  extends Repository<RecruitmentEvent> {
   isNameExisted(name: string): Promise<boolean>;
   insert(entity: RecruitmentEvent): Promise<InsertResult>;
   findAllEventsWithAuthorAndExaminers(): Promise<RecruitmentEvent[]>;

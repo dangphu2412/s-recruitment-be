@@ -15,16 +15,13 @@ import {
 } from 'src/account-service/adapters/decorators';
 import { FileInterceptor } from 'src/system/file';
 import { Page } from 'src/system/query-shape/dto';
-import {
-  MarkEmployeeDto,
-  ImportEmployeesDto,
-  CreateRecruitmentEventDto,
-} from '../external-dtos';
+import { CreateRecruitmentEventDto, MarkEmployeeDto } from '../external-dtos';
 import {
   RecruitmentEventUseCase,
   RecruitmentEventUseCaseToken,
 } from 'src/recruitment/app/interfaces/recruitment-event.usecase';
 import { JwtPayload } from '../../../account-service/domain/dtos/jwt-payload';
+import { CreateEventDtoParserInterceptor } from '../create-event-dto-parser.interceptor';
 
 @Identified
 @Controller('recruitments/events')
@@ -34,29 +31,18 @@ export class RecruitmentEventController {
     private readonly recruitmentEventUseCase: RecruitmentEventUseCase,
   ) {}
 
-  @Post()
+  @UseInterceptors(FileInterceptor('file'), CreateEventDtoParserInterceptor)
+  @ApiConsumes('multipart/form-data')
+  @ApiNoContentResponse()
+  @Post('')
   create(
     @Body() createRecruitmentDto: CreateRecruitmentEventDto,
     @CurrentUser() user: JwtPayload,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     return this.recruitmentEventUseCase.create({
       ...createRecruitmentDto,
       authorId: user.sub,
-    });
-  }
-
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiConsumes('multipart/form-data')
-  @ApiNoContentResponse()
-  @Post('employees')
-  importRecruitmentEventEmployees(
-    @Body()
-    importEmployeesDto: ImportEmployeesDto,
-    @UploadedFile()
-    file: Express.Multer.File,
-  ) {
-    return this.recruitmentEventUseCase.importEmployees({
-      ...importEmployeesDto,
       file,
     });
   }
