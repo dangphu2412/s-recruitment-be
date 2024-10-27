@@ -10,6 +10,7 @@ export type CreateRecruitmentCommand = {
     point: number;
   }>;
   authorId: string;
+  file: Express.Multer.File;
 };
 
 export type MarkEmployeePointCommand = {
@@ -21,6 +22,6 @@ export type MarkEmployeePointCommand = {
 };
 
 export type ImportEmployeesCommand = {
-  eventId: string;
+  eventId: number;
   file: Express.Multer.File;
 };

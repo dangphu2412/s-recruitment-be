@@ -188,12 +188,16 @@ export class UserServiceImpl implements UserService {
       where: {
         id,
       },
-      relations: ['department', 'period', 'roles', 'operationFee'],
+      relations: ['domain', 'period', 'roles', 'operationFee'],
     });
 
     return {
       id: user.id,
       username: user.username,
+      email: user.email,
+      fullName: user.fullName,
+      birthday: user.birthday,
+      phoneNumber: user.phoneNumber,
       domain: user.domain,
       period: user.period,
       roles: user.roles,

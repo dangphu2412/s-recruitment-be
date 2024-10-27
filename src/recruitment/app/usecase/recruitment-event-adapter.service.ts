@@ -25,6 +25,7 @@ import {
   UserService,
   UserServiceToken,
 } from '../../../account-service/domain/interfaces/user-service';
+import { Transactional } from 'typeorm-transactional';
 
 @Injectable()
 export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
@@ -39,6 +40,7 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
     private readonly userService: UserService,
   ) {}
 
+  @Transactional()
   async create(command: CreateRecruitmentCommand): Promise<void> {
     const examiners = await this.userService.find(command.examinerIds);
 
@@ -60,7 +62,14 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
     newRecruitmentEvent.authorId = command.authorId;
     newRecruitmentEvent.scoringStandards = command.scoringStandards;
 
-    await this.recruitmentEventRepository.insert(newRecruitmentEvent);
+    const { id } = await this.recruitmentEventRepository.save(
+      newRecruitmentEvent,
+    );
+
+    await this.importEmployees({
+      eventId: id as number,
+      file: command.file,
+    });
   }
 
   findAll() {
@@ -105,8 +114,12 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
     };
   }
 
-  async importEmployees(command: ImportEmployeesCommand): Promise<void> {
-    const workbook = read(command.file.buffer, { type: 'buffer' });
+  private async importEmployees(
+    command: ImportEmployeesCommand,
+  ): Promise<void> {
+    const workbook = read(command.file.buffer, {
+      type: 'buffer',
+    });
 
     const sheetName = workbook.SheetNames[0];
 
@@ -118,18 +131,10 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
 
     const data = utils.sheet_to_json<object>(sheet);
 
-    const event = await this.recruitmentEventRepository.findOneById(
-      parseInt(command.eventId),
-    );
-
-    if (!event) {
-      throw new NotFoundEventException();
-    }
-
     const entities = data.map((item) => {
       const employee = new RecruitmentEmployee();
 
-      employee.organizedBy = event;
+      employee.eventId = command.eventId;
       employee.data = item;
 
       return employee;

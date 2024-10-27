@@ -130,17 +130,6 @@ export class User {
   userGroups?: UserGroup[];
 
   @ManyToMany(() => RecruitmentEvent, (event) => event.examiners)
-  @JoinTable({
-    name: 'recruitment_events_examiners',
-    joinColumn: {
-      name: 'examiner_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'recruitment_event_id',
-      referencedColumnName: 'id',
-    },
-  })
   joinedRecruitEvents?: RecruitmentEvent[];
 
   @OneToOne(() => OperationFee, (operationFee) => operationFee.user)
