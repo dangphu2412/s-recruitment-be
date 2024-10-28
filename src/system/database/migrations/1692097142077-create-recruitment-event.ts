@@ -31,6 +31,11 @@ export class CreateRecruitmentEvent1692097142077 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'pass_point',
+            type: 'int',
+            isNullable: false,
+          },
+          {
             name: 'start_date',
             type: 'timestamp',
             isNullable: false,

@@ -61,6 +61,7 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
     newRecruitmentEvent.examiners = examiners;
     newRecruitmentEvent.authorId = command.authorId;
     newRecruitmentEvent.scoringStandards = command.scoringStandards;
+    newRecruitmentEvent.passPoint = command.passPoint;
 
     const { id } = await this.recruitmentEventRepository.save(
       newRecruitmentEvent,
@@ -119,6 +120,7 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventUseCase {
   ): Promise<void> {
     const workbook = read(command.file.buffer, {
       type: 'buffer',
+      cellDates: true,
     });
 
     const sheetName = workbook.SheetNames[0];

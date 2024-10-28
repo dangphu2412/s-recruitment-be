@@ -23,6 +23,9 @@ export class RecruitmentEventRepositoryAdapter
   findAllEventsWithAuthorAndExaminers(): Promise<RecruitmentEvent[]> {
     return this.find({
       relations: ['createdBy', 'examiners'],
+      order: {
+        startDate: 'DESC',
+      },
     });
   }
 

@@ -35,6 +35,13 @@ export class RecruitmentEvent {
   location: string;
 
   @Column({
+    name: 'pass_point',
+    type: 'int',
+    nullable: false,
+  })
+  passPoint: number;
+
+  @Column({
     name: 'start_date',
     type: 'date',
     nullable: false,
