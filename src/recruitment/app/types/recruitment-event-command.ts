@@ -3,6 +3,7 @@ import { DateRange } from 'src/system/query-shape/dto/date-range.query';
 export type CreateRecruitmentCommand = {
   name: string;
   location: string;
+  passPoint: number;
   recruitmentRange: DateRange;
   examinerIds: string[];
   scoringStandards: Array<{

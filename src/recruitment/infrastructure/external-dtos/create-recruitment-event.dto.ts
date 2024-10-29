@@ -16,6 +16,9 @@ export class CreateRecruitmentEventDto {
   location: string;
 
   @IsNotEmpty()
+  passPoint: number;
+
+  @IsNotEmpty()
   @Type(() => DateRange)
   @ValidateNested()
   recruitmentRange: DateRange;
