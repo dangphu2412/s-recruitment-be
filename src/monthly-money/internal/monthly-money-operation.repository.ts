@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
-import { OperationFee } from '../client';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
+import { OperationFee } from '../domain/data-access/entities/operation-fee.entity';
 
 @Injectable()
 export class MonthlyMoneyOperationRepository extends Repository<OperationFee> {

@@ -1,138 +1,122 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
-
-## Features
-[![Awesome NestJS](https://img.shields.io/badge/Awesome-NestJS-blue.svg?longCache=true&style=flat-square)](https://github.com/dangphu2412/nestjs-templates)
-
-[Nest](https://github.com/nestjs/nest) monolithic repository
+# Member management Backend Project
 
 ## Installation
 
 ```bash
-$ yarn
+$ pnpm
 ```
 
 ## Running the app
 
 ```bash
 # development
-$ yarn start
+$ pnpm start
 
 # watch mode
-$ yarn start:dev
+$ pnpm start:dev
 
 # production mode
-$ yarn start:prod
+$ pnpm start:prod
 ```
 
 ## Test
 
 ```bash
 # unit tests
-$ yarn test
+$ pnpm test
 
 # e2e tests
-$ yarn test:e2e
+$ pnpm test:e2e
 
 # test coverage
-$ yarn test:cov
+$ pnpm test:cov
 ```
 
-## Feature description
+## Architecture Decision
+N-Tier Architecture
+Domain Driven Design
 
-<dl>
-  <dt>Modularization</dt>
-  <dd>Separate feature into module. Each module has the same architecture</dd>
-
-  <dt><b>JWT Authentication</b></dt>
-  <dd>Installed and configured JWT authentication.</dd>
-
-  <dt><b>Environment Configuration</b></dt>
-  <dd>development, staging and production environment configurations</dd>
-
-  <dt><b>Swagger Api Documentation</b></dt>
-  <dd>Already integrated API documentation. To see all available endpoints visit http://localhost:3000/docs</dd>
-
-  <dt><b>Linter</b></dt>  
-  <dd>eslint + prettier = ❤️</dd>
-
-  <dt></dt>
-  <dd></dd>
-</dl>
-
-### Naming convention
-- [English language](https://github.com/dangphu2412/nestjs-templates/tree/main/base-project/backend-nestjs#english-language)
-- [Functions](https://github.com/dangphu2412/nestjs-templates/tree/main/base-project/backend-nestjs#functions)
-- [Classes](https://github.com/dangphu2412/nestjs-templates/tree/main/base-project/backend-nestjs#classes)
-- [Variables](https://github.com/dangphu2412/nestjs-templates/tree/main/base-project/backend-nestjs#variables)
-
-#### English language
+Naming Terminology
+- Entity: Database Model
 ```typescript
-/* Bad */
-const primerNombre = 'Gustavo'
-const amigos = ['Kate', 'John']
+// Just name it as it is
+// bad
+class UserEntity {}
 
-/* Good */
-const firstName = 'Gustavo'
-const friends = ['Kate', 'John']
+// Good
+class User {}
 ```
->Like it or not, English is the dominant language in programming: the syntax of all programming languages is written in English, as well as countless documentations and educational materials. By writing your code in English you dramatically increase its cohesiveness.
-
-#### Functions
-- A/HC/LC Pattern
-
-```
-prefix? + action (A) + high context (HC) + low context? (LC)
-```
-
-| Name                 | Prefix | Action (A) | High context (HC) | Low context (LC) |
-|----------------------|--------|------------|-------------------|------------------|
-| getUser              |        | get        | User              |                  |
-| getUserMessages      |        | get        | User              | Messages         |
-| shouldDisplayMessage | should | Display    | Message           |                  |
-| getUser              |        | get        | User              |                  |
-
-- Actions
-
-The verb part of your function name. The most important part responsible for describing what the function does.
-
-Please focus on intention of name which is the most important thing when writing function.
-
-Getting easy when naming function when you function only do one thing at a time (it is well known as SINGLETON principle)
+- DTO: Data Transfer Object
+Which is known as an object transfer across the layers
+Pattern: [name]DTO
 ```typescript
-function getUserFullName() {
-  return this.firstName + ' ' + this.lastName;
-}
+// Postfix with DTO
+// bad
+class User {}
 
+// Good
+class UserDTO {}
 ```
-
-- Parameters
-
-There are some rules when trying to define functions or method of a class. Sometimes, we may meet a function with no argument or even up to 4 or 5 or more.
-
-Well let take a look at example:
-
+- Incoming request - response communication via network
+Pattern: [name]Request, [name]Response
 ```typescript
-function getStockPrice(region: Region, day: Date, stockCode: StockCode): StockPrice {}
-// Compare to
-function getStockPrice(stockArea: StockArea): StockPrice {}
+// Postfix with Request, Response
+// bad
+class User {}
+
+// Good
+class UserRequest {}
+class UserResponse {}
 ```
 
-Both would get the stock price, but take a look at the meaning of the function when comparing both of them.
+When the business give us the small complexity, we can use the following pattern:
+N-Tier Architecture
+- Controller: Presentation layer
+- Service: Business logic
+- Repository: Data access layer
+Share the same DTO between layers
 
-The first one is quite ambigious due to triac parameters and not really focus on the target in which they are getting the information. Are we getting based on region, day or stockCode? May one of this param is  used for validation only? ...
+When the business give us the medium complexity, we can use the following pattern:
+Domain Driven Design
+- Entity: Database Model
+- Repository: Data access layer
+- Service: Business logic
+- Controller: Presentation layer
+- DTO: Data Transfer Object
+- Mapper: Convert between Entity and DTO
 
-The second way is more clear about the intention: we are getting stock price based on stock area - That is it!
+When the business give us the large complexity, we can use the following pattern:
+Domain Driven Design
+- Entity: Database Model
+- Repository: Data access layer
+- Service: Business logic
+- Controller: Presentation layer
+- DTO: Data Transfer Object
+- Mapper: Convert between Entity and DTO
+- Domain: Business domain
+- Specification: Business rule
+- Aggregate: Business transaction
+- Event: Business event
+- Saga: Business process
+- Factory: Business creation
+- Value Object: Business value
+- Policy: Business policy
+- Strategy: Business strategy
+- Context: Business context
+- Module: Business module
+- Layer: Business layer
+- Application: Business application
+- Infrastructure: Business infrastructure
+- Shared Kernel: Business shared kernel
+- Anti-corruption Layer: Business anti-corruption layer
+- Bounded Context: Business bounded context
 
-Avoid putting too much parameter on function or method - when it is happened, pls try to refactor, extract method, ...
-
-Read more:
-- Clean Code: Chapter 3 - Functions - Robert C. Martin
-Too Many Parameters - Wiki C2
-- Single Responsibility Principle - Wikipedia
-- Extract Method - Refactoring Guru
-- Parameter Object - Refactoring Guru
-
-#### Classes
-#### Variables
+## For CRUD operation, keep the same terminology for consistency development experience
+- Create
+Prefix: create
+- Read
+Prefix: find
+- Update
+Prefix: update
+- Delete
+Prefix: delete

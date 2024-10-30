@@ -1,4 +1,4 @@
-import { Permission } from '../../../account-service/domain/entities/permission.entity';
+import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
 import { In, Repository } from 'typeorm';
 import { Menu } from '../../menu';
 

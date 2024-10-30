@@ -2,7 +2,7 @@ import { Controller, Get, Inject } from '@nestjs/common';
 import {
   MonthlyMoneyConfigService,
   MonthlyMoneyConfigServiceToken,
-} from '../client';
+} from '../domain/core/services/monthly-money-config.service';
 
 @Controller({
   version: '1',
@@ -15,7 +15,7 @@ export class MonthlyMoneyController {
   ) {}
 
   @Get()
-  findConfigs() {
-    return this.monthlyConfigService.find();
+  findAllConfigs() {
+    return this.monthlyConfigService.findAll();
   }
 }

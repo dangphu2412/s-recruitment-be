@@ -6,10 +6,6 @@ import { In, InsertResult, IsNull } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { PasswordManager } from './password-manager';
 import {
-  MonthlyMoneyOperationService,
-  MonthlyMoneyOperationServiceToken,
-} from '../../monthly-money';
-import {
   FileCreateUsersDto,
   FileRow,
 } from '../domain/dtos/file-create-users.dto';
@@ -17,29 +13,34 @@ import { read, utils } from 'xlsx';
 import {
   RoleService,
   RoleServiceToken,
-} from '../domain/interfaces/role.service';
-import { UserService } from '../domain/interfaces/user-service';
+} from '../domain/core/services/role.service';
+import { UserService } from '../domain/core/services/user-service';
 import { MyProfile, UserDetail } from '../domain/dtos/my-profile';
 import {
   EmailExistedException,
   InsertUserFailedException,
   NotFoundUserException,
-} from '../domain/exceptions';
-import { CreateUserPayload, UserQuery } from '../domain/vos/user-service.vo';
-import { User } from '../domain/entities/user.entity';
+} from '../domain/core/exceptions';
+import { GetUserDTO } from '../domain/core/dto/get-users.dto';
+import { User } from '../domain/data-access/entities/user.entity';
 import { UserManagementQueryDto } from '../domain/dtos/user-management-query.dto';
 import {
   UserManagementQuery,
-  UserManagementView,
-} from '../domain/vos/user-management-view.vo';
+  UserManagementViewDTO,
+} from '../domain/core/dto/users.dto';
 import { Transactional } from 'typeorm-transactional';
 import { UpdateUserRolesDto } from '../domain/dtos/update-user-roles.dto';
 import { addMonths, differenceInMonths } from 'date-fns';
-import { UserProbationOutput } from '../domain/output/user-probation.output';
-import { UserProbationQueryInput } from '../domain/inputs/user-probation-query.input';
-import { UpgradeUserMemberInput } from '../domain/inputs/upgrade-user-member.input';
+import { PaginatedUserProbationDTO } from '../domain/core/dto/user-probation.dto';
+import { UserProbationQueryDTO } from '../domain/core/dto/user-probation-query.dto';
 import { SystemRoles } from '../domain/constants/role-def.enum';
-import { BadRequestFileCreationFormatException } from '../domain/exceptions/bad-request-file-creation-format.exception';
+import { BadRequestFileCreationFormatException } from '../domain/core/exceptions/bad-request-file-creation-format.exception';
+import {
+  MonthlyMoneyOperationService,
+  MonthlyMoneyOperationServiceToken,
+} from '../../monthly-money/domain/core/services/monthly-money-operation.service';
+import { UpgradeUserMemberDTO } from '../domain/core/dto/upgrade-user-member.dto';
+import { CreateUserDTO } from '../domain/core/dto/create-user.dto';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -54,7 +55,7 @@ export class UserServiceImpl implements UserService {
 
   async searchOverviewUsers(
     query: UserManagementQueryDto,
-  ): Promise<Page<UserManagementView>> {
+  ): Promise<Page<UserManagementViewDTO>> {
     const { search, joinedIn, userStatus, departmentIds, periodIds } = query;
     const { offset, size } = PageRequest.of(query);
 
@@ -69,7 +70,7 @@ export class UserServiceImpl implements UserService {
         periodIds,
       } as UserManagementQuery);
 
-    const items = data.map<UserManagementView>((user) => {
+    const items = data.map<UserManagementViewDTO>((user) => {
       const {
         username,
         id,
@@ -120,7 +121,7 @@ export class UserServiceImpl implements UserService {
     });
   }
 
-  find(query: UserQuery | string[]): Promise<User[]> {
+  find(query: GetUserDTO | string[]): Promise<User[]> {
     if (Array.isArray(query)) {
       return this.userRepository.findBy({
         id: In(query),
@@ -149,10 +150,10 @@ export class UserServiceImpl implements UserService {
   }
 
   async findProbationUsers(
-    userProbationQueryInput: UserProbationQueryInput,
-  ): Promise<UserProbationOutput> {
-    const { domainId, periodId } = userProbationQueryInput;
-    const { offset, size } = PageRequest.of(userProbationQueryInput);
+    dto: UserProbationQueryDTO,
+  ): Promise<PaginatedUserProbationDTO> {
+    const { domainId, periodId } = dto;
+    const { offset, size } = PageRequest.of(dto);
 
     const [users, totalRecords] = await this.userRepository.findAndCount({
       where: {
@@ -179,7 +180,7 @@ export class UserServiceImpl implements UserService {
     return Page.of({
       items,
       totalRecords,
-      query: userProbationQueryInput,
+      query: dto,
     });
   }
 
@@ -220,7 +221,7 @@ export class UserServiceImpl implements UserService {
     return omit(user, 'password');
   }
 
-  async findOne(query: UserQuery): Promise<User> {
+  async findOne(query: GetUserDTO): Promise<User> {
     const records = await this.find(query);
 
     if (!records.length) {
@@ -259,7 +260,7 @@ export class UserServiceImpl implements UserService {
     await this.userRepository.restore(id);
   }
 
-  async createUser(payload: CreateUserPayload): Promise<void> {
+  async createUser(payload: CreateUserDTO): Promise<void> {
     const isEmailDuplicated = await this.userRepository.exist({
       where: {
         email: payload.email,
@@ -372,12 +373,10 @@ export class UserServiceImpl implements UserService {
     await this.userRepository.save(user);
   }
 
-  upgradeToMembers(
-    upgradeUserMemberInput: UpgradeUserMemberInput,
-  ): Promise<void> {
+  upgradeToMembers(dto: UpgradeUserMemberDTO): Promise<void> {
     return this.moneyOperationService.createOperationFee({
-      userIds: upgradeUserMemberInput.ids,
-      monthlyConfigId: upgradeUserMemberInput.monthlyConfigId,
+      userIds: dto.ids,
+      monthlyConfigId: dto.monthlyConfigId,
     });
   }
 

@@ -1,5 +1,5 @@
-import { Permission } from 'src/account-service/domain/entities/permission.entity';
-import { Role } from '../entities/role.entity';
+import { Permission } from 'src/account-service/domain/data-access/entities/permission.entity';
+import { Role } from '../data-access/entities/role.entity';
 
 export type Right = Permission & { canAccess: boolean };
 export type AccessControlView = {

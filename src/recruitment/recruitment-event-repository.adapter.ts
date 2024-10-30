@@ -1,0 +1,37 @@
+import { RecruitmentEventRepository } from './domain/data-access/recruitment-event.repository';
+import { DataSource, Repository } from 'typeorm';
+import { RecruitmentEvent } from './domain/data-access/entities/recruitment-event.entity';
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class RecruitmentEventRepositoryAdapter
+  extends Repository<RecruitmentEvent>
+  implements RecruitmentEventRepository
+{
+  constructor(dataSource: DataSource) {
+    super(RecruitmentEvent, dataSource.createEntityManager());
+  }
+
+  findOneWithExaminersAndEmployeeById(id: number): Promise<RecruitmentEvent> {
+    return this.createQueryBuilder('rce')
+      .andWhere('rce.id = :id', { id })
+      .leftJoinAndSelect('rce.examiners', 'examiners')
+      .leftJoinAndSelect('rce.employees', 'employees')
+      .getOne();
+  }
+
+  findAllEventsWithAuthorAndExaminers(): Promise<RecruitmentEvent[]> {
+    return this.find({
+      relations: ['createdBy', 'examiners'],
+      order: {
+        startDate: 'DESC',
+      },
+    });
+  }
+
+  async isNameExisted(name: string): Promise<boolean> {
+    return await this.exist({
+      where: { name },
+    });
+  }
+}

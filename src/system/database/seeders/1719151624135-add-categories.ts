@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { Category } from '../../../posts-service/domain/entities/category.entity';
+import { Category } from '../../../posts-service/domain/data-access/entities/category.entity';
 
 export class AddCategories1719151624135 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

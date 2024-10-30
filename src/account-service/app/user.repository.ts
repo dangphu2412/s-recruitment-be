@@ -1,8 +1,8 @@
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../domain/entities/user.entity';
-import { UserManagementQuery } from '../domain/vos/user-management-view.vo';
+import { User } from '../domain/data-access/entities/user.entity';
+import { UserManagementQuery } from '../domain/core/dto/users.dto';
 import { UserStatus } from '../domain/constants/user-constant';
 
 @Injectable()

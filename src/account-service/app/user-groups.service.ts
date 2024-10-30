@@ -1,18 +1,15 @@
-import {
-  CreateUserGroupInput,
-  GetUserGroupInputDto,
-} from '../domain/inputs/user-group.input';
-import { UserGroupsService } from '../domain/interfaces/user-groups.service';
+import { GetUserGroupRequest } from '../domain/presentation/dto/user-group.request';
+import { UserGroupsService } from '../domain/core/services/user-groups.service';
 import { Inject, Injectable } from '@nestjs/common';
 import { Like, Repository } from 'typeorm';
-import { UserGroup } from '../domain/entities/user-group.entity';
+import { UserGroup } from '../domain/data-access/entities/user-group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   UserService,
   UserServiceToken,
-} from '../domain/interfaces/user-service';
-import { PageRequest } from '../../system/query-shape/dto';
-import { Page } from '../../system/query-shape/dto';
+} from '../domain/core/services/user-service';
+import { Page, PageRequest } from '../../system/query-shape/dto';
+import { CreateUserGroupDTO } from '../domain/core/dto/create-user-group.dto';
 
 @Injectable()
 export class UserGroupsServiceImpl implements UserGroupsService {
@@ -23,21 +20,19 @@ export class UserGroupsServiceImpl implements UserGroupsService {
     private readonly userService: UserService,
   ) {}
 
-  async createUserGroup(
-    createUserGroupInput: CreateUserGroupInput,
-  ): Promise<void> {
-    const users = await this.userService.find(createUserGroupInput.userIds);
+  async createUserGroup(dto: CreateUserGroupDTO): Promise<void> {
+    const users = await this.userService.find(dto.userIds);
 
     // TODO: Check invalid userIds
 
     await this.userGroupRepository.save({
-      ...createUserGroupInput,
+      ...dto,
       users,
     });
   }
 
   async findUserGroups(
-    getUserGroupInputDto: GetUserGroupInputDto,
+    getUserGroupInputDto: GetUserGroupRequest,
   ): Promise<Page<UserGroup>> {
     const { offset, size } = PageRequest.of(getUserGroupInputDto);
 

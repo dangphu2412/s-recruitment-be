@@ -4,7 +4,7 @@ import { UpdateRoleRequestDto } from './dtos/update-role-request.dto';
 import {
   RoleService,
   RoleServiceToken,
-} from '../domain/interfaces/role.service';
+} from '../domain/core/services/role.service';
 import { CanAccessBy } from './decorators/can-access-by.decorator';
 import { AccessRights } from '../domain/constants/role-def.enum';
 
