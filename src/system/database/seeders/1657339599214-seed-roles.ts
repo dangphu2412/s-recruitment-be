@@ -1,11 +1,11 @@
 import { In, MigrationInterface, QueryRunner } from 'typeorm';
 import keyBy from 'lodash/keyBy';
-import { Permission } from 'src/account-service/domain/entities/permission.entity';
+import { Permission } from 'src/account-service/domain/data-access/entities/permission.entity';
 import {
   AccessRights,
   SystemRoles,
 } from 'src/account-service/domain/constants/role-def.enum';
-import { Role } from '../../../account-service/domain/entities/role.entity';
+import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
 
 export class SeedRoles1657339599214 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

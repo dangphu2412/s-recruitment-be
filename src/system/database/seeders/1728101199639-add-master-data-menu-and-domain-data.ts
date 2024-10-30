@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { Menu } from '../../menu';
-import { Permission } from '../../../account-service/domain/entities/permission.entity';
-import { Role } from '../../../account-service/domain/entities/role.entity';
+import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
+import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
 import { MenuFactory } from '../processors/menu.factory';
 import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
 import { RolePermissionConnector } from '../processors/role-permission.connector';

@@ -5,7 +5,7 @@ import keyBy from 'lodash/keyBy';
 import {
   RoleService,
   RoleServiceToken,
-} from '../../../account-service/domain/interfaces/role.service';
+} from '../../../account-service/domain/core/services/role.service';
 
 @Injectable()
 export class MenuServiceImpl implements MenuService {

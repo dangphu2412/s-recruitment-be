@@ -2,8 +2,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentKeyFactory } from '../../services';
 import { PasswordManager } from '../../../account-service/app/password-manager';
-import { User } from '../../../account-service/domain/entities/user.entity';
-import { Role } from '../../../account-service/domain/entities/role.entity';
+import { User } from '../../../account-service/domain/data-access/entities/user.entity';
+import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
 import { SystemRoles } from '../../../account-service/domain/constants/role-def.enum';
 
 export class SeedUsers1657339686264 implements MigrationInterface {

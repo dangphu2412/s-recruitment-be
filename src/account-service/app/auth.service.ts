@@ -9,21 +9,21 @@ import {
   IncorrectUsernamePasswordException,
   InvalidTokenFormatException,
   LogoutRequiredException,
-} from '../domain/exceptions';
+} from '../domain/core/exceptions';
 import {
   AuthService,
   TokenGenerator,
   TokenGeneratorToken,
-} from '../domain/interfaces';
+} from '../domain/core/services';
 import {
   UserService,
   UserServiceToken,
-} from '../domain/interfaces/user-service';
+} from '../domain/core/services/user-service';
 import { JwtPayload } from '../domain/dtos/jwt-payload';
 import {
   RoleService,
   RoleServiceToken,
-} from '../domain/interfaces/role.service';
+} from '../domain/core/services/role.service';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {

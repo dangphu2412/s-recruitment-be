@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { EnvironmentKeyFactory } from 'src/system/services';
-import { TokenGenerator } from '../domain/interfaces';
+import { TokenGenerator } from '../domain/core/services';
 import { TokenDto } from '../domain/dtos/login.credentials';
 import { JwtPayload } from '../domain/dtos/jwt-payload';
 

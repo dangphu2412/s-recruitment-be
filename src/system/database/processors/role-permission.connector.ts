@@ -1,6 +1,6 @@
-import { Permission } from '../../../account-service/domain/entities/permission.entity';
+import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
 import { In, Repository } from 'typeorm';
-import { Role } from '../../../account-service/domain/entities/role.entity';
+import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
 
 type MenuSettings = {
   roleName: string;

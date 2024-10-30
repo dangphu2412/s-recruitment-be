@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { MonthlyMoneyConfig } from '../../../monthly-money';
+import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
 
 export class SeedMonthlyMoneyConfig1667039519002 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

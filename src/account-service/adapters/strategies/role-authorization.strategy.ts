@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AuthorizationStrategy } from 'src/account-service/domain/interfaces/authorization';
+import { AuthorizationStrategy } from 'src/account-service/domain/core/services/authorization';
 import { registerStrategy } from './authorization-strategy.register';
 import { JwtPayload } from '../../domain/dtos/jwt-payload';
 import {
   RoleService,
   RoleServiceToken,
-} from '../../domain/interfaces/role.service';
+} from '../../domain/core/services/role.service';
 
 @Injectable()
 export class RoleAuthorizationStrategy

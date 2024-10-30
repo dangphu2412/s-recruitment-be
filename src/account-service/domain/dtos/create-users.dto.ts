@@ -1,11 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateIf,
-} from 'class-validator';
-import { CreateUserType } from '../constants/user-constant';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class CreateUsersDto {
   @IsString()
@@ -24,9 +17,4 @@ export class CreateUsersDto {
   @IsOptional()
   @IsString()
   birthday: string;
-
-  @ValidateIf((dto) => dto.createUserType === CreateUserType.NEW_MEMBERS)
-  @IsString()
-  @IsNotEmpty()
-  monthlyConfigId: string;
 }

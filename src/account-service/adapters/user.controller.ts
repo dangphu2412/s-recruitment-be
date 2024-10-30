@@ -26,17 +26,17 @@ import { FileInterceptor } from '../../system/file';
 import { FileCreateUsersDto } from '../domain/dtos/file-create-users.dto';
 import { AccessRights } from '../domain/constants/role-def.enum';
 import { UserManagementQueryDto } from '../domain/dtos/user-management-query.dto';
-import { UserManagementView } from '../domain/vos/user-management-view.vo';
+import { UserManagementViewDTO } from '../domain/core/dto/users.dto';
 import {
   UserService,
   UserServiceToken,
-} from '../domain/interfaces/user-service';
+} from '../domain/core/services/user-service';
 import { JwtPayload } from '../domain/dtos/jwt-payload';
 import { CreateUsersDto } from '../domain/dtos/create-users.dto';
 import { PaymentService } from '../../monthly-money/internal/payment.service';
 import { CreatePaymentDto } from '../domain/dtos/create-payment.dto';
-import { UserProbationQueryInputDto } from '../domain/inputs/user-probation-query.input';
-import { UpgradeUserMemberInputDto } from '../domain/inputs/upgrade-user-member.input';
+import { UpgradeUserMemberRequest } from '../domain/presentation/dto/upgrade-user-member.request';
+import { UserProbationRequest } from '../domain/presentation/dto/get-users-probation.request';
 
 @ApiTags('users')
 @Controller({
@@ -70,7 +70,7 @@ export class UserController {
   @ApiOkResponse()
   async searchOverviewUsers(
     @Query() query: UserManagementQueryDto,
-  ): Promise<Page<UserManagementView>> {
+  ): Promise<Page<UserManagementViewDTO>> {
     return this.domainUser.searchOverviewUsers(query);
   }
 
@@ -138,16 +138,14 @@ export class UserController {
 
   @CanAccessBy(AccessRights.VIEW_USERS)
   @Get('/probation')
-  findProbationUsers(
-    @Query() userProbationQueryInputDto: UserProbationQueryInputDto,
-  ) {
-    return this.domainUser.findProbationUsers(userProbationQueryInputDto);
+  findProbationUsers(@Query() userProbationRequest: UserProbationRequest) {
+    return this.domainUser.findProbationUsers(userProbationRequest);
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
   @Patch('/members')
   upgradeToMembers(
-    @Body() upgradeUserMemberInputDto: UpgradeUserMemberInputDto,
+    @Body() upgradeUserMemberInputDto: UpgradeUserMemberRequest,
   ) {
     return this.domainUser.upgradeToMembers(upgradeUserMemberInputDto);
   }

@@ -1,12 +1,12 @@
-import {
-  CreateMoneyFee,
-  MonthlyMoneyConfigService,
-  MonthlyMoneyConfigServiceToken,
-  MonthlyMoneyOperationService,
-  OperationFee,
-} from '../client';
 import { MonthlyMoneyOperationRepository } from './monthly-money-operation.repository';
 import { Inject, Injectable } from '@nestjs/common';
+import {
+  MonthlyMoneyConfigService,
+  MonthlyMoneyConfigServiceToken,
+} from '../domain/core/services/monthly-money-config.service';
+import { MonthlyMoneyOperationService } from '../domain/core/services/monthly-money-operation.service';
+import { CreateMoneyFeeDTO } from '../domain/core/dto/create-money-fee.dto';
+import { OperationFee } from '../domain/data-access/entities/operation-fee.entity';
 
 @Injectable()
 export class MonthlyMoneyOperationServiceImpl
@@ -18,7 +18,7 @@ export class MonthlyMoneyOperationServiceImpl
     private readonly moneyConfigService: MonthlyMoneyConfigService,
   ) {}
 
-  async createOperationFee(createMoneyFee: CreateMoneyFee): Promise<void> {
+  async createOperationFee(createMoneyFee: CreateMoneyFeeDTO): Promise<void> {
     const config = await this.moneyConfigService.findById(
       createMoneyFee.monthlyConfigId,
     );

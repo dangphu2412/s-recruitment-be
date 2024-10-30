@@ -1,4 +1,4 @@
-import { User } from '../entities/user.entity';
+import { User } from '../data-access/entities/user.entity';
 
 export type MyProfile = Pick<User, 'id' | 'username'>;
 

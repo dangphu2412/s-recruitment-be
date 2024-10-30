@@ -12,11 +12,11 @@ import {
 import {
   UserGroupsService,
   UserGroupsServiceToken,
-} from '../domain/interfaces/user-groups.service';
+} from '../domain/core/services/user-groups.service';
 import {
-  CreateUserGroupInputDto,
-  GetUserGroupInputDto,
-} from '../domain/inputs/user-group.input';
+  CreateUserGroupRequest,
+  GetUserGroupRequest,
+} from '../domain/presentation/dto/user-group.request';
 
 @Controller('user-groups')
 export class UserGroupsController {
@@ -26,12 +26,12 @@ export class UserGroupsController {
   ) {}
 
   @Post()
-  createUserGroup(@Body() body: CreateUserGroupInputDto) {
+  createUserGroup(@Body() body: CreateUserGroupRequest) {
     return this.userGroupsService.createUserGroup(body);
   }
 
   @Get()
-  findUserGroups(@Query() query: GetUserGroupInputDto) {
+  findUserGroups(@Query() query: GetUserGroupRequest) {
     return this.userGroupsService.findUserGroups(query);
   }
 

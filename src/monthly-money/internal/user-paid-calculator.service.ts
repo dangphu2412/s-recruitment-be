@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   PAYMENT_CREATED_EVENT,
   PaymentCreatedEvent,
-} from '../client/events/payment-created.event';
+} from '../domain/core/events/payment-created.event';
 import { OnEvent } from '@nestjs/event-emitter';
 import { MonthlyMoneyOperationRepository } from './monthly-money-operation.repository';
 import { PaymentRepository } from './payment.repository';
@@ -15,16 +15,16 @@ export class UserPaidCalculator {
   ) {}
 
   @OnEvent(PAYMENT_CREATED_EVENT)
-  async handleUserPaidEvent(payload: PaymentCreatedEvent) {
+  async handleUserPaidEvent(paymentCreatedEvent: PaymentCreatedEvent) {
     const { monthlyConfig } = await this.operationFeeRepository.findOne({
       where: {
-        userId: payload.userId,
+        userId: paymentCreatedEvent.userId,
       },
       relations: ['monthlyConfig'],
     });
 
     const userPayments = await this.paymentRepository.findUserPaymentsByUserId(
-      payload.userId,
+      paymentCreatedEvent.userId,
     );
 
     const totalPaid = userPayments.reduce(
@@ -36,7 +36,7 @@ export class UserPaidCalculator {
 
     await this.operationFeeRepository.update(
       {
-        userId: payload.userId,
+        userId: paymentCreatedEvent.userId,
       },
       {
         paidMonths: totalMonths,
