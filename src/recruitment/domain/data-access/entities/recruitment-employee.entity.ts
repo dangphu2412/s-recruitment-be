@@ -37,4 +37,32 @@ export class RecruitmentEmployee {
 
   @OneToMany(() => EmployeeEventPoint, (point) => point.employee)
   points: EmployeeEventPoint[];
+
+  @Column({
+    name: 'point',
+    select: false,
+    insert: false,
+  })
+  point: number;
+
+  @Column({
+    name: 'my_voted_point',
+    select: false,
+    insert: false,
+  })
+  myVotedPoint: number;
+
+  @Column({
+    name: 'my_note',
+    select: false,
+    insert: false,
+  })
+  myNote: number;
+
+  @Column({
+    name: 'vote_status',
+    select: false,
+    insert: false,
+  })
+  voteStatus: number;
 }

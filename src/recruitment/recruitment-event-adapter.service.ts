@@ -26,6 +26,7 @@ import {
   UserServiceToken,
 } from '../account-service/domain/core/services/user-service';
 import { Transactional } from 'typeorm-transactional';
+import { GetEventDetailDto } from './domain/core/dto/get-event-detail.dto';
 
 @Injectable()
 export class RecruitmentEventUseCaseAdapter implements RecruitmentEventService {
@@ -77,42 +78,8 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventService {
     return this.recruitmentEventRepository.findAllEventsWithAuthorAndExaminers();
   }
 
-  async findOne(id: number, authorId: string): Promise<any> {
-    const event =
-      await this.recruitmentEventRepository.findOneWithExaminersAndEmployeeById(
-        id,
-      );
-
-    const votedPoints = await this.employeeEventPointRepository.find({
-      where: {
-        eventId: id,
-      },
-    });
-
-    const employeeResponse = event.employees.map((employee) => {
-      const myVotedPoint = votedPoints.find(
-        (point) =>
-          point.employeeId === employee.id && authorId === point.authorId,
-      );
-
-      return {
-        ...employee,
-        point: votedPoints.reduce((result, curr) => {
-          if (curr.eventId === id && curr.employeeId === employee.id) {
-            return result + curr.point;
-          }
-
-          return result;
-        }, 0),
-        myVotedPoint: myVotedPoint?.point ?? 0,
-        myNote: myVotedPoint?.note ?? '',
-      };
-    });
-
-    return {
-      ...event,
-      employees: employeeResponse,
-    };
+  findOne(dto: GetEventDetailDto): Promise<any> {
+    return this.recruitmentEventRepository.findEventDetail(dto);
   }
 
   private async importEmployees(dto: ImportEmployeesDTO): Promise<void> {
