@@ -4,10 +4,11 @@ import {
 } from './dto/recruitment-event.dto';
 import { RecruitmentEvent } from '../data-access/entities/recruitment-event.entity';
 import { createInterfaceToken } from '../../../system/utils';
+import { GetEventDetailDto } from './dto/get-event-detail.dto';
 
 export interface RecruitmentEventService {
   findAll(): Promise<RecruitmentEvent[]>;
-  findOne(id: number, authorId: string): Promise<any>;
+  findOne(dto: GetEventDetailDto): Promise<any>;
   create(createRecruitmentDTO: CreateRecruitmentEventDTO): Promise<void>;
   markPointForEmployee(
     markEmployeePointDTO: MarkEmployeePointDTO,

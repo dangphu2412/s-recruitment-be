@@ -3,8 +3,11 @@ import {
   Controller,
   Get,
   Inject,
+  Logger,
   Param,
+  ParseIntPipe,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -25,6 +28,7 @@ import {
 } from 'src/recruitment/domain/core/recruitment-event.service';
 import { JwtPayload } from '../account-service/domain/dtos/jwt-payload';
 import { FormBodyParserInterceptor } from '../system/form-body/form-body-parser.interceptor';
+import { GetEventDetailRequest } from './domain/presentation/dto/get-event-detail.request';
 
 @Identified
 @Controller('recruitments/events')
@@ -62,8 +66,16 @@ export class RecruitmentEventController {
   }
 
   @Get(':id')
-  getOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.recruitmentEventService.findOne(+id, user.sub);
+  getOne(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: JwtPayload,
+    @Query() query: GetEventDetailRequest,
+  ) {
+    return this.recruitmentEventService.findOne({
+      id: id,
+      authorId: user.sub,
+      ...query,
+    });
   }
 
   @Post('/:eventId/mark')
