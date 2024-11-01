@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { read, utils } from 'xlsx';
+import { read, utils, write } from 'xlsx';
 import { NotFoundExaminersException } from './domain/core/exceptions/not-found-examiners.exception';
 import {
   CreateRecruitmentEventDTO,
@@ -165,5 +165,38 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventService {
     pointEntity.note = note;
 
     await this.employeeEventPointRepository.insert(pointEntity);
+  }
+
+  async downloadEmployeesById(eventId: number): Promise<Buffer> {
+    const event = await this.recruitmentEventRepository.findEventReport(
+      eventId,
+    );
+    const { employees } = event;
+
+    // Build excel file which contains employees data, provide more columns including: average points, vote status.
+    const workbook = utils.book_new();
+    const columns = Object.keys(employees[0].data);
+    const sheet = utils.aoa_to_sheet([
+      [...columns, 'Điểm trung bình', 'Trạng thái'],
+    ]);
+    const data = employees.map((employee) => {
+      const avg = employee.point ?? 0;
+      const status = avg >= event.passPoint ? 'Đậu' : 'Rớt';
+      const results = new Array(columns.length);
+
+      for (let i = 0; i < columns.length; i++) {
+        results[i] = employee.data[columns[i]];
+      }
+
+      results[columns.length] = `${avg} / ${event.passPoint}`;
+      results[columns.length + 1] = status;
+
+      return results;
+    });
+
+    utils.sheet_add_aoa(sheet, data, { origin: -1 });
+    utils.book_append_sheet(workbook, sheet, 'Employees');
+
+    return write(workbook, { bookType: 'xlsx', type: 'buffer' });
   }
 }
