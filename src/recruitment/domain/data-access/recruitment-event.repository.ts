@@ -11,6 +11,7 @@ export interface RecruitmentEventRepository
   findAllEventsWithAuthorAndExaminers(): Promise<RecruitmentEvent[]>;
   findEventDetail(dto: GetEventDetailDTO): Promise<EventDetailAggregate>;
   findOneById(id: number): Promise<RecruitmentEvent>;
+  findEventReport(eventId: number): Promise<EventDetailAggregate>;
 }
 
 export const RecruitmentEventRepositoryToken = createInterfaceToken(

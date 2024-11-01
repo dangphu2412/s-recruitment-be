@@ -86,4 +86,32 @@ export class RecruitmentEventRepositoryAdapter
       where: { name },
     });
   }
+
+  findEventReport(eventId: number): Promise<EventDetailAggregate> {
+    return this.createQueryBuilder('event')
+      .andWhere('event.id = :id', { id: eventId })
+      .leftJoinAndSelect('event.employees', 'employees')
+      .leftJoin(
+        (qb) => {
+          qb.from(RecruitmentEmployee, 'employee')
+            .leftJoin(
+              EmployeeEventPoint,
+              'event_point',
+              'event_point.employee_id = employee.id',
+            )
+            .where('employee.event_id = :id', { id: eventId })
+            .addGroupBy('event_point.employee_id')
+            .addGroupBy('event_point.event_id')
+            .select()
+            .addSelect('AVG(event_point.point)', 'total_points')
+            .addSelect('event_point.employee_id', 'employee_id')
+            .addSelect('event_point.event_id', 'event_id');
+          return qb;
+        },
+        'avg_point',
+        'employees.id = avg_point.employee_id',
+      )
+      .addSelect('avg_point.total_points', 'employees_point')
+      .getOne() as unknown as Promise<EventDetailAggregate>;
+  }
 }

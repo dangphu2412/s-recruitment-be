@@ -13,6 +13,7 @@ export interface RecruitmentEventService {
   markPointForEmployee(
     markEmployeePointDTO: MarkEmployeePointDTO,
   ): Promise<void>;
+  downloadEmployeesById(eventId: number): Promise<Buffer>;
 }
 
 export const RecruitmentEventServiceToken = createInterfaceToken(

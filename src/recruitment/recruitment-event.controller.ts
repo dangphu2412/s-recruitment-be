@@ -3,19 +3,16 @@ import {
   Controller,
   Get,
   Inject,
-  Logger,
   Param,
   ParseIntPipe,
   Post,
   Query,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiConsumes, ApiNoContentResponse } from '@nestjs/swagger';
-import {
-  CurrentUser,
-  Identified,
-} from 'src/account-service/adapters/decorators';
+import { CurrentUser } from 'src/account-service/adapters/decorators';
 import { FileInterceptor } from 'src/system/file';
 import { Page } from 'src/system/query-shape/dto';
 import {
@@ -29,8 +26,11 @@ import {
 import { JwtPayload } from '../account-service/domain/dtos/jwt-payload';
 import { FormBodyParserInterceptor } from '../system/form-body/form-body-parser.interceptor';
 import { GetEventDetailRequest } from './domain/presentation/dto/get-event-detail.request';
+import { CanAccessBy } from '../account-service/adapters/decorators/can-access-by.decorator';
+import { AccessRights } from '../account-service/domain/constants/role-def.enum';
+import { FastifyReply } from 'fastify';
 
-@Identified
+@CanAccessBy(AccessRights.MANAGE_RECRUITMENT)
 @Controller('recruitments/events')
 export class RecruitmentEventController {
   constructor(
@@ -87,5 +87,26 @@ export class RecruitmentEventController {
       ...markEmployeeDto,
       authorId: user.sub,
     });
+  }
+
+  @Get('/:eventId/download')
+  async downloadEmployeesByEventId(
+    @Param('eventId', ParseIntPipe)
+    eventId: number,
+    @Res() response: FastifyReply,
+  ) {
+    const buffer = await this.recruitmentEventService.downloadEmployeesById(
+      eventId,
+    );
+
+    response.header(
+      'Content-Disposition',
+      'attachment; filename=employees.xlsx',
+    );
+    response.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    response.send(buffer);
   }
 }
