@@ -37,6 +37,7 @@ import { PaymentService } from '../../monthly-money/internal/payment.service';
 import { CreatePaymentDto } from '../domain/dtos/create-payment.dto';
 import { UpgradeUserMemberRequest } from '../domain/presentation/dto/upgrade-user-member.request';
 import { UserProbationRequest } from '../domain/presentation/dto/get-users-probation.request';
+import { UpdateUserRequest } from '../domain/presentation/dto/update-user.request';
 
 @ApiTags('users')
 @Controller({
@@ -88,6 +89,19 @@ export class UserController {
     return this.domainUser.findOne({
       id: userId,
       withRoles: true,
+    });
+  }
+
+  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
+  @Patch('/:id')
+  @ApiNoContentResponse()
+  async updateUser(
+    @Param('id') userId: string,
+    @Body() dto: UpdateUserRequest,
+  ) {
+    await this.domainUser.updateUser({
+      ...dto,
+      id: userId,
     });
   }
 

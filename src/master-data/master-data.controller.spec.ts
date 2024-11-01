@@ -13,6 +13,7 @@ describe('MasterDataController', () => {
           provide: MasterDataService,
           useValue: {
             findByCode: jest.fn(),
+            createByCode: jest.fn(),
           },
         },
       ],
