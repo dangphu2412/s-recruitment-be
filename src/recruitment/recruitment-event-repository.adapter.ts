@@ -62,7 +62,9 @@ export class RecruitmentEventRepositoryAdapter
         qb.andWhere('avg_point.total_points >= event.pass_point');
         break;
       case VoteStatus.Failed:
-        qb.andWhere('avg_point.total_points < event.pass_point');
+        qb.andWhere(
+          'avg_point.total_points < event.pass_point AND avg_point.total_points > 0',
+        );
         break;
       case VoteStatus.NotVoted:
         qb.andWhere('avg_point.total_points IS NULL');

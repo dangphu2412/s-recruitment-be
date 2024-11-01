@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { RoleAuthorizationStrategy } from '../strategies/role-authorization.strategy';
 import { Reflector } from '@nestjs/core';
-import { ACCESS_RIGHT_META_DATA_KEY } from 'src/account-service/adapters/decorators/can-access-by.decorator';
-import { StrategiesStorage } from 'src/account-service/adapters/strategies/authorization-strategy.register';
+import { StrategiesStorage } from '../strategies/authorization-strategy.register';
+import { ACCESS_RIGHT_META_DATA_KEY } from '../decorators/can-access-by.decorator';
 
 @Injectable()
 export class AccessRightGuard implements CanActivate {

@@ -41,6 +41,7 @@ import {
 } from '../../monthly-money/domain/core/services/monthly-money-operation.service';
 import { UpgradeUserMemberDTO } from '../domain/core/dto/upgrade-user-member.dto';
 import { CreateUserDTO } from '../domain/core/dto/create-user.dto';
+import { UpdateUserDTO } from '../domain/core/dto/update-user.dto';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -349,6 +350,10 @@ export class UserServiceImpl implements UserService {
     });
 
     return this.userRepository.insert(entities);
+  }
+
+  async updateUser(dto: UpdateUserDTO): Promise<void> {
+    await this.userRepository.update({ id: dto.id }, dto);
   }
 
   async updateUserRoles(

@@ -11,6 +11,7 @@ import { PaginatedUserProbationDTO } from '../dto/user-probation.dto';
 import { UserProbationQueryDTO } from '../dto/user-probation-query.dto';
 import { UpgradeUserMemberDTO } from '../dto/upgrade-user-member.dto';
 import { GetUserDTO, GetUsersDTO } from '../dto/get-users.dto';
+import { UpdateUserDTO } from '../dto/update-user.dto';
 
 export const UserServiceToken = createInterfaceToken('UserServiceToken');
 
@@ -39,6 +40,7 @@ export interface UserService {
   ): Promise<{ duplicatedEmails: string[] }[]>;
 
   updateUserRoles(id: string, payload: UpdateUserRolesDto): Promise<void>;
+  updateUser(dto: UpdateUserDTO): Promise<void>;
   upgradeToMembers(upgradeUserMemberInput: UpgradeUserMemberDTO): Promise<void>;
   toggleUserIsActive(id: string): Promise<void>;
 }
