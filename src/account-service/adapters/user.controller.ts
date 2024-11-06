@@ -25,7 +25,7 @@ import { UpdateUserRolesDto } from '../domain/dtos/update-user-roles.dto';
 import { FileInterceptor } from '../../system/file';
 import { FileCreateUsersDto } from '../domain/dtos/file-create-users.dto';
 import { AccessRights } from '../domain/constants/role-def.enum';
-import { UserManagementQueryDto } from '../domain/dtos/user-management-query.dto';
+import { GetUsersQueryRequest } from '../domain/presentation/dto/get-users-query.request';
 import { UserManagementViewDTO } from '../domain/core/dto/users.dto';
 import {
   UserService,
@@ -34,7 +34,7 @@ import {
 import { JwtPayload } from '../domain/dtos/jwt-payload';
 import { CreateUsersDto } from '../domain/dtos/create-users.dto';
 import { PaymentService } from '../../monthly-money/internal/payment.service';
-import { CreatePaymentDto } from '../domain/dtos/create-payment.dto';
+import { CreatePaymentRequest } from '../domain/presentation/dto/create-payment.request';
 import { UpgradeUserMemberRequest } from '../domain/presentation/dto/upgrade-user-member.request';
 import { UserProbationRequest } from '../domain/presentation/dto/get-users-probation.request';
 import { UpdateUserRequest } from '../domain/presentation/dto/update-user.request';
@@ -70,9 +70,9 @@ export class UserController {
   @Get('/')
   @ApiOkResponse()
   async searchOverviewUsers(
-    @Query() query: UserManagementQueryDto,
+    @Query() query: GetUsersQueryRequest,
   ): Promise<Page<UserManagementViewDTO>> {
-    return this.domainUser.searchOverviewUsers(query);
+    return this.domainUser.findUsers(query);
   }
 
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
@@ -137,10 +137,10 @@ export class UserController {
   @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
   @Post('/:userId/payments')
   async createPayment(
-    @Body() createPaymentDto: CreatePaymentDto,
+    @Body() createPaymentDto: CreatePaymentRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
   ) {
-    await this.domainUser.isIdExist(userId);
+    await this.domainUser.assertIdExist(userId);
     await this.paymentService.createPayment({ ...createPaymentDto, userId });
   }
 

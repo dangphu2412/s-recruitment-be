@@ -1,12 +1,12 @@
 import { Type } from 'class-transformer';
+import { DateRange } from 'src/system/query-shape/dto/date-range.query';
 import {
   ArrayNotEmpty,
   IsNotEmpty,
+  IsNumber,
   IsUUID,
   ValidateNested,
-  IsNumberString,
 } from 'class-validator';
-import { DateRange } from 'src/system/query-shape/dto/date-range.query';
 
 export class CreateRecruitmentEventRequest {
   @IsNotEmpty()
@@ -39,6 +39,7 @@ export class ScoringStandardDto {
   @IsNotEmpty()
   standard: string;
 
-  @IsNumberString()
+  @IsNumber()
+  @Type(() => Number)
   point: number;
 }

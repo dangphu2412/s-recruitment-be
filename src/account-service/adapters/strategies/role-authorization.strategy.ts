@@ -22,7 +22,7 @@ export class RoleAuthorizationStrategy
     { sub }: JwtPayload,
     requiredRights: string[],
   ): Promise<boolean> {
-    const accessRights = await this.roleService.getAccessRightsByUserId(sub);
+    const accessRights = await this.roleService.findAccessRightsByUserId(sub);
 
     return requiredRights.some((role) =>
       accessRights.some((right) => right === role),

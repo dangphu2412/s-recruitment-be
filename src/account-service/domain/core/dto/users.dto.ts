@@ -1,6 +1,3 @@
-import { UserManagementQueryDto } from '../../dtos/user-management-query.dto';
-import { PageRequest } from 'src/system/query-shape/types';
-
 export type UserManagementViewDTO = {
   id: string;
   username: string;
@@ -27,6 +24,3 @@ export type UserManagementViewDTO = {
     name: string;
   };
 };
-
-export type UserManagementQuery = Required<UserManagementQueryDto> &
-  PageRequest;

@@ -2,10 +2,10 @@ import { IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { OffsetPagination } from 'src/system/query-shape/dto/offset-pagination.request';
 import { DateRange } from 'src/system/query-shape/dto/date-range.query';
 import { ToDateRange } from 'src/system/query-shape/decorators/to-date-range.decorator';
-import { UserStatus } from '../constants/user-constant';
-import { ToManyString } from '../../../system/query-shape/decorators/transformer';
+import { UserStatus } from '../../constants/user-constant';
+import { ToManyString } from '../../../../system/query-shape/decorators/transformer';
 
-export class UserManagementQueryDto extends OffsetPagination {
+export class GetUsersQueryRequest extends OffsetPagination {
   @ToDateRange()
   @ValidateNested()
   joinedIn?: DateRange;

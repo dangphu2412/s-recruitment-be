@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class MarkEmployeeRequest {
   @IsNotEmpty()
@@ -10,6 +11,8 @@ export class MarkEmployeeRequest {
   employeeId: number;
 
   @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
   point: number;
 
   @IsOptional()

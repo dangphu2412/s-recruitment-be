@@ -43,6 +43,8 @@ export class ClientExceptionFilter implements ExceptionFilter {
       return response.status(exception.getStatus()).send({
         ...SystemExceptionClientCode.GOT_ISSUE,
         statusCode: exception.getStatus(),
+        code: exception.getStatus().toString(),
+        errorCode: exception.getStatus().toString(),
       });
     }
 

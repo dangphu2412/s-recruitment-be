@@ -1,5 +1,4 @@
 import { createInterfaceToken } from 'src/system/utils';
-import { UserManagementQueryDto } from '../../dtos/user-management-query.dto';
 import { Page } from 'src/system/query-shape/dto';
 import { UserManagementViewDTO } from '../dto/users.dto';
 import { CreateUsersDto } from '../../dtos/create-users.dto';
@@ -12,6 +11,7 @@ import { UserProbationQueryDTO } from '../dto/user-probation-query.dto';
 import { UpgradeUserMemberDTO } from '../dto/upgrade-user-member.dto';
 import { GetUserDTO, GetUsersDTO } from '../dto/get-users.dto';
 import { UpdateUserDTO } from '../dto/update-user.dto';
+import { GetUsersQueryDTO } from '../dto/get-users-query.dto';
 
 export const UserServiceToken = createInterfaceToken('UserServiceToken');
 
@@ -24,12 +24,12 @@ export interface UserService {
   findProbationUsers(
     userProbationQueryInput: UserProbationQueryDTO,
   ): Promise<PaginatedUserProbationDTO>;
+  findUsers(query: GetUsersQueryDTO): Promise<Page<UserManagementViewDTO>>;
 
-  isIdExist(id: string): Promise<boolean>;
-
-  searchOverviewUsers(
-    query: UserManagementQueryDto,
-  ): Promise<Page<UserManagementViewDTO>>;
+  /**
+   * @throws {NotFoundUserException}
+   */
+  assertIdExist(id: string): Promise<void>;
 
   /**
    * @throws {InsertUserFailedException}

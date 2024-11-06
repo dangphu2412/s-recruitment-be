@@ -18,7 +18,7 @@ export class PasswordManager {
   }
 
   async compare(data: string, encrypted: string): Promise<boolean> {
-    return await compare(encrypted, data);
+    return await compare(data, encrypted);
   }
 
   async getDefaultPassword(): Promise<string> {
