@@ -12,8 +12,8 @@ import {
 } from '../domain/core/exceptions';
 import {
   AuthService,
-  TokenGenerator,
-  TokenGeneratorToken,
+  TokenFactory,
+  TokenFactoryToken,
 } from '../domain/core/services';
 import {
   UserService,
@@ -32,8 +32,8 @@ export class AuthServiceImpl implements AuthService {
     private readonly userService: UserService,
     @Inject(RoleServiceToken)
     private readonly roleService: RoleService,
-    @Inject(TokenGeneratorToken)
-    private readonly tokenGenerator: TokenGenerator,
+    @Inject(TokenFactoryToken)
+    private readonly tokenFactory: TokenFactory,
     private readonly jwtService: JwtService,
     private readonly passwordManager: PasswordManager,
   ) {}
@@ -56,16 +56,15 @@ export class AuthServiceImpl implements AuthService {
       withRights: true,
     });
 
-    const cannotLogin =
+    if (
       isEmpty(user) ||
-      (await this.passwordManager.compare(password, user.password));
-
-    if (cannotLogin) {
+      !(await this.passwordManager.compare(password, user.password))
+    ) {
       throw new IncorrectUsernamePasswordException();
     }
 
     const [tokens] = await Promise.all([
-      this.tokenGenerator.generate(user.id),
+      this.tokenFactory.create(user.id),
       this.roleService.save(user.id, user.roles),
     ]);
 
@@ -79,17 +78,9 @@ export class AuthServiceImpl implements AuthService {
       const { sub } = await this.jwtService.verifyAsync<JwtPayload>(
         refreshToken,
       );
-      const user = await this.userService.findOne({
-        id: sub,
-        withRights: true,
-      });
 
-      const [tokens] = await Promise.all([
-        this.tokenGenerator.generate(sub, refreshToken),
-        this.roleService.save(user.id, user.roles),
-      ]);
+      const tokens = await this.tokenFactory.create(sub, refreshToken);
 
-      // TODO: Missing access token in cache when server restart
       return {
         tokens,
       };

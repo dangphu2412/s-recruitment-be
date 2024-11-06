@@ -2,8 +2,10 @@ import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../domain/data-access/entities/user.entity';
-import { UserManagementQuery } from '../domain/core/dto/users.dto';
 import { UserStatus } from '../domain/constants/user-constant';
+import { Page, PageRequest } from '../../system/query-shape/dto';
+import { GetUsersQueryRequest } from '../domain/presentation/dto/get-users-query.request';
+import { UserOverviewAggregate } from '../domain/data-access/aggregates/user-overview.aggregate';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -14,15 +16,18 @@ export class UserRepository extends Repository<User> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  findUsersForManagement({
-    offset,
-    size,
-    joinedIn,
-    userStatus,
-    search = '',
-    departmentIds,
-    periodIds,
-  }: UserManagementQuery) {
+  async findPaginatedOverviewUsers(
+    query: GetUsersQueryRequest,
+  ): Promise<Page<UserOverviewAggregate>> {
+    const {
+      joinedIn,
+      userStatus,
+      search = '',
+      departmentIds,
+      periodIds,
+    } = query;
+    const { offset, size } = PageRequest.of(query);
+
     const qb = this.createQueryBuilder('users')
       .select([
         'users.id',
@@ -79,6 +84,12 @@ export class UserRepository extends Repository<User> {
       });
     }
 
-    return qb.getManyAndCount();
+    const [data, totalRecords] = await qb.getManyAndCount();
+
+    return Page.of({
+      query,
+      items: data as UserOverviewAggregate[],
+      totalRecords,
+    });
   }
 }

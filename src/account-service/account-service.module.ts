@@ -3,7 +3,7 @@ import { AuthController } from './adapters/auth.controller';
 import { AuthServiceImpl } from './app/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './adapters/strategies/jwt.strategy';
-import { TokenGeneratorImpl } from './app/token-generator';
+import { TokenGeneratorImpl } from './app/token-factory';
 import { EnvironmentKeyFactory } from '../system/services';
 import { PasswordManager } from './app/password-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -16,7 +16,7 @@ import { MonthlyMoneyModule } from '../monthly-money/internal/monthly-money.modu
 import { UserController } from './adapters/user.controller';
 import { UserServiceImpl } from './app/user.service';
 import { UserRepository } from './app/user.repository';
-import { AuthServiceToken, TokenGeneratorToken } from './domain/core/services';
+import { AuthServiceToken, TokenFactoryToken } from './domain/core/services';
 import { User } from './domain/data-access/entities/user.entity';
 import { Role } from './domain/data-access/entities/role.entity';
 import { RoleServiceToken } from './domain/core/services/role.service';
@@ -53,7 +53,7 @@ import { UserGroup } from './domain/data-access/entities/user-group.entity';
       useClass: AuthServiceImpl,
     },
     {
-      provide: TokenGeneratorToken,
+      provide: TokenFactoryToken,
       useClass: TokenGeneratorImpl,
     },
     {

@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreatePaymentDto {
+export class CreatePaymentRequest {
   @IsNumber()
   amount: number;
 

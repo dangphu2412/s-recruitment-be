@@ -106,7 +106,7 @@ export class RoleServiceImpl implements RoleService {
     return this.roleRepository.findBy({ id: In(ids) });
   }
 
-  async getAccessRightsByUserId(userId: string): Promise<string[]> {
+  async findAccessRightsByUserId(userId: string): Promise<string[]> {
     const rights: string[] | undefined = await this.cacheManager.get<
       string[] | undefined
     >(RoleServiceImpl.genKey(userId));

@@ -16,7 +16,7 @@ export class MenuServiceImpl implements MenuService {
   ) {}
 
   async findMenusByUserId(userId: string): Promise<Menu[]> {
-    const rights = await this.roleService.getAccessRightsByUserId(userId);
+    const rights = await this.roleService.findAccessRightsByUserId(userId);
 
     if (!rights.length) return [];
 

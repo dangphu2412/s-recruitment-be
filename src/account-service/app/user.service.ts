@@ -23,11 +23,8 @@ import {
 } from '../domain/core/exceptions';
 import { GetUserDTO } from '../domain/core/dto/get-users.dto';
 import { User } from '../domain/data-access/entities/user.entity';
-import { UserManagementQueryDto } from '../domain/dtos/user-management-query.dto';
-import {
-  UserManagementQuery,
-  UserManagementViewDTO,
-} from '../domain/core/dto/users.dto';
+import { GetUsersQueryRequest } from '../domain/presentation/dto/get-users-query.request';
+import { UserManagementViewDTO } from '../domain/core/dto/users.dto';
 import { Transactional } from 'typeorm-transactional';
 import { UpdateUserRolesDto } from '../domain/dtos/update-user-roles.dto';
 import { addMonths, differenceInMonths } from 'date-fns';
@@ -54,22 +51,11 @@ export class UserServiceImpl implements UserService {
     private readonly roleService: RoleService,
   ) {}
 
-  async searchOverviewUsers(
-    query: UserManagementQueryDto,
+  async findUsers(
+    query: GetUsersQueryRequest,
   ): Promise<Page<UserManagementViewDTO>> {
-    const { search, joinedIn, userStatus, departmentIds, periodIds } = query;
-    const { offset, size } = PageRequest.of(query);
-
-    const [data, totalRecords] =
-      await this.userRepository.findUsersForManagement({
-        search,
-        joinedIn,
-        userStatus: userStatus,
-        offset,
-        size,
-        departmentIds,
-        periodIds,
-      } as UserManagementQuery);
+    const { items: data, metadata } =
+      await this.userRepository.findPaginatedOverviewUsers(query);
 
     const items = data.map<UserManagementViewDTO>((user) => {
       const {
@@ -117,7 +103,7 @@ export class UserServiceImpl implements UserService {
 
     return Page.of({
       query,
-      totalRecords,
+      totalRecords: metadata.totalRecords,
       items,
     });
   }
@@ -385,11 +371,15 @@ export class UserServiceImpl implements UserService {
     });
   }
 
-  isIdExist(id: string): Promise<boolean> {
-    return this.userRepository.exist({
-      where: {
-        id,
-      },
-    });
+  async assertIdExist(id: string): Promise<void> {
+    if (
+      !(await this.userRepository.exist({
+        where: {
+          id,
+        },
+      }))
+    ) {
+      throw new NotFoundUserException();
+    }
   }
 }
