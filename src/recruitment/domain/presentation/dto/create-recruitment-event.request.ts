@@ -4,6 +4,7 @@ import {
   ArrayNotEmpty,
   IsNotEmpty,
   IsNumber,
+  IsString,
   IsUUID,
   ValidateNested,
 } from 'class-validator';
@@ -14,6 +15,9 @@ export class CreateRecruitmentEventRequest {
 
   @IsNotEmpty()
   location: string;
+
+  @IsString()
+  remark: string;
 
   @IsNotEmpty()
   passPoint: number;

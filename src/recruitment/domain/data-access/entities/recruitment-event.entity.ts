@@ -35,6 +35,12 @@ export class RecruitmentEvent {
   location: string;
 
   @Column({
+    name: 'remark',
+    type: 'varchar',
+  })
+  remark: string;
+
+  @Column({
     name: 'pass_point',
     type: 'int',
     nullable: false,

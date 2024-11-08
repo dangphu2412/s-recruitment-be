@@ -2,6 +2,7 @@ import { DateRange } from 'src/system/query-shape/dto/date-range.query';
 
 export type CreateRecruitmentEventDTO = {
   name: string;
+  remark: string;
   location: string;
   passPoint: number;
   recruitmentRange: DateRange;

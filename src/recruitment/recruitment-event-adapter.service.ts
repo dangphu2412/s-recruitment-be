@@ -20,7 +20,6 @@ import {
   RecruitmentEventRepositoryToken,
 } from './domain/data-access/recruitment-event.repository';
 import { RecruitmentEvent } from './domain/data-access/entities/recruitment-event.entity';
-import { NotFoundSheetNameException } from './domain/core/exceptions/not-found-sheet-import.exception';
 import {
   UserService,
   UserServiceToken,
@@ -56,6 +55,7 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventService {
     const newRecruitmentEvent = new RecruitmentEvent();
 
     newRecruitmentEvent.name = dto.name;
+    newRecruitmentEvent.remark = dto.remark;
     newRecruitmentEvent.location = dto.location;
     newRecruitmentEvent.startDate = new Date(dto.recruitmentRange.fromDate);
     newRecruitmentEvent.endDate = new Date(dto.recruitmentRange.toDate);
@@ -88,26 +88,24 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventService {
       cellDates: true,
     });
 
-    const sheetName = workbook.SheetNames[0];
+    await Promise.all(
+      workbook.SheetNames.map((sheetName) => {
+        const sheet = workbook.Sheets[sheetName];
 
-    if (!sheetName) {
-      throw new NotFoundSheetNameException();
-    }
+        const data = utils.sheet_to_json<object>(sheet);
 
-    const sheet = workbook.Sheets[sheetName];
+        const entities = data.map((item) => {
+          const employee = new RecruitmentEmployee();
 
-    const data = utils.sheet_to_json<object>(sheet);
+          employee.eventId = dto.eventId;
+          employee.data = item;
 
-    const entities = data.map((item) => {
-      const employee = new RecruitmentEmployee();
+          return employee;
+        });
 
-      employee.eventId = dto.eventId;
-      employee.data = item;
-
-      return employee;
-    });
-
-    await this.recruitmentEmployeeRepository.insert(entities);
+        return this.recruitmentEmployeeRepository.insert(entities);
+      }),
+    );
   }
 
   async markPointForEmployee({
