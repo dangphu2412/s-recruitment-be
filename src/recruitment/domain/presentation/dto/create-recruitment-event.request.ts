@@ -39,6 +39,9 @@ export class ScoringStandardDto {
   @IsNotEmpty()
   standard: string;
 
+  @IsNotEmpty()
+  description: string;
+
   @IsNumber()
   @Type(() => Number)
   point: number;

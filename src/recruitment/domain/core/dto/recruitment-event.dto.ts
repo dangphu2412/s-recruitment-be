@@ -8,6 +8,7 @@ export type CreateRecruitmentEventDTO = {
   examinerIds: string[];
   scoringStandards: Array<{
     standard: string;
+    description: string;
     point: number;
   }>;
   authorId: string;
