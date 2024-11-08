@@ -31,6 +31,10 @@ export class CreateRecruitmentEvent1692097142077 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'remark',
+            type: 'varchar',
+          },
+          {
             name: 'pass_point',
             type: 'int',
             isNullable: false,
