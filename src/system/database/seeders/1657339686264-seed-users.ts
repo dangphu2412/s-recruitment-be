@@ -28,6 +28,8 @@ export class SeedUsers1657339686264 implements MigrationInterface {
     user.username = 'noibosgroup@gmail.com';
     user.password = password;
     user.roles = [adminRole];
+    user.period = null;
+    user.department = null;
     await userRepository.save(user);
   }
 

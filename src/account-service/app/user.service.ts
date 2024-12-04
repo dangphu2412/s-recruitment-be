@@ -68,7 +68,7 @@ export class UserServiceImpl implements UserService {
         roles,
         joinedAt,
         operationFee,
-        domain,
+        department,
         period,
       } = user;
 
@@ -96,7 +96,7 @@ export class UserServiceImpl implements UserService {
         estimatedPaidMonths,
         isProbation: !operationFee,
         debtMonths,
-        domain,
+        department,
         period,
       };
     });
@@ -139,12 +139,12 @@ export class UserServiceImpl implements UserService {
   async findProbationUsers(
     dto: UserProbationQueryDTO,
   ): Promise<PaginatedUserProbationDTO> {
-    const { domainId, periodId } = dto;
+    const { departmentId, periodId } = dto;
     const { offset, size } = PageRequest.of(dto);
 
     const [users, totalRecords] = await this.userRepository.findAndCount({
       where: {
-        ...(domainId ? { domainId } : {}),
+        ...(departmentId ? { departmentId: departmentId } : {}),
         periodId,
         operationFee: {
           id: IsNull(),
@@ -176,7 +176,7 @@ export class UserServiceImpl implements UserService {
       where: {
         id,
       },
-      relations: ['domain', 'period', 'roles', 'operationFee'],
+      relations: ['department', 'period', 'roles', 'operationFee'],
     });
 
     return {
@@ -186,7 +186,7 @@ export class UserServiceImpl implements UserService {
       fullName: user.fullName,
       birthday: user.birthday,
       phoneNumber: user.phoneNumber,
-      domain: user.domain,
+      department: user.department,
       period: user.period,
       roles: user.roles,
       createdAt: user.createdAt,
@@ -248,13 +248,11 @@ export class UserServiceImpl implements UserService {
   }
 
   async createUser(payload: CreateUserDTO): Promise<void> {
-    const isEmailDuplicated = await this.userRepository.exist({
-      where: {
+    if (
+      await this.userRepository.existsBy({
         email: payload.email,
-      },
-    });
-
-    if (isEmailDuplicated) {
+      })
+    ) {
       throw new EmailExistedException();
     }
 
@@ -274,7 +272,7 @@ export class UserServiceImpl implements UserService {
   }
 
   @Transactional()
-  createUsersByFile(dto: FileCreateUsersDto) {
+  async createUsersByFile(dto: FileCreateUsersDto) {
     const workbook = read(dto.file.buffer, { type: 'buffer', cellDates: true });
 
     return Promise.all(
@@ -283,7 +281,13 @@ export class UserServiceImpl implements UserService {
 
         const rows = utils.sheet_to_json<FileRow>(sheet);
         // Validate file columns
-        const requiredColumns = ['Họ và Tên:', 'Email', 'Username', 'Join At'];
+        const requiredColumns = [
+          'Họ và Tên:',
+          'Email',
+          'Username',
+          'Join At',
+          'Department',
+        ];
         const columns = Object.keys(rows[0]);
 
         if (xor(requiredColumns, columns).length) {
@@ -318,7 +322,7 @@ export class UserServiceImpl implements UserService {
 
   private async createUsersBySheetRow(
     rows: FileRow[],
-    periodId: number,
+    periodId: string,
   ): Promise<InsertResult> {
     const defaultPwd = await this.passwordManager.getDefaultPassword();
 
@@ -330,6 +334,7 @@ export class UserServiceImpl implements UserService {
       user.fullName = row['Họ và Tên:'];
       user.joinedAt = row['Join At'] ? new Date(row['Join At']) : new Date();
       user.periodId = periodId;
+      user.departmentId = row['Department'];
       user.password = defaultPwd;
 
       return user;

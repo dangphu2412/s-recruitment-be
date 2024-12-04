@@ -25,6 +25,14 @@ import { UserGroupsController } from './adapters/user-groups.controller';
 import { UserGroupsServiceToken } from './domain/core/services/user-groups.service';
 import { UserGroupsServiceImpl } from './app/user-groups.service';
 import { UserGroup } from './domain/data-access/entities/user-group.entity';
+import { PeriodController } from './adapters/period.controller';
+import { DepartmentsController } from './adapters/departments.controller';
+import { DepartmentServiceToken } from './domain/core/services/department.service';
+import { DepartmentServiceImpl } from './app/department.service';
+import { PeriodServiceToken } from './domain/core/services/period.service';
+import { PeriodServiceImpl } from './app/period.service';
+import { Department } from './domain/data-access/entities/department.entity';
+import { Period } from './domain/data-access/entities/period.entity';
 
 @Module({
   imports: [
@@ -34,13 +42,22 @@ import { UserGroup } from './domain/data-access/entities/user-group.entity';
         environmentKeyFactory.getJwtConfig(),
       inject: [EnvironmentKeyFactory],
     }),
-    TypeOrmModule.forFeature([User, Role, Permission, UserGroup]),
+    TypeOrmModule.forFeature([
+      User,
+      Role,
+      Permission,
+      UserGroup,
+      Department,
+      Period,
+    ]),
   ],
   controllers: [
     AuthController,
     RoleController,
     UserController,
     UserGroupsController,
+    PeriodController,
+    DepartmentsController,
   ],
   providers: [
     JwtStrategy,
@@ -67,6 +84,14 @@ import { UserGroup } from './domain/data-access/entities/user-group.entity';
     {
       provide: UserGroupsServiceToken,
       useClass: UserGroupsServiceImpl,
+    },
+    {
+      provide: DepartmentServiceToken,
+      useClass: DepartmentServiceImpl,
+    },
+    {
+      provide: PeriodServiceToken,
+      useClass: PeriodServiceImpl,
     },
   ],
   exports: [PasswordManager, UserServiceToken, RoleServiceToken],

@@ -3,8 +3,8 @@ import { OffsetPagination } from '../../../../system/query-shape/dto';
 
 export class UserProbationRequest extends OffsetPagination {
   @IsNotEmpty()
-  periodId: number;
+  periodId: string;
 
   @IsOptional()
-  domainId?: number;
+  departmentId?: string;
 }

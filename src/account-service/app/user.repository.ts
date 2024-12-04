@@ -42,7 +42,7 @@ export class UserRepository extends Repository<User> {
       .take(size)
       .withDeleted()
       .leftJoinAndSelect('users.roles', 'roles')
-      .leftJoinAndSelect('users.domain', 'domain')
+      .leftJoinAndSelect('users.department', 'department')
       .leftJoinAndSelect('users.period', 'period')
       .leftJoinAndSelect('users.operationFee', 'operationFee')
       .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig');
@@ -73,7 +73,7 @@ export class UserRepository extends Repository<User> {
     }
 
     if (departmentIds?.length) {
-      qb.andWhere('domain.id IN (:...departmentIds)', {
+      qb.andWhere('department.id IN (:...departmentIds)', {
         departmentIds,
       });
     }

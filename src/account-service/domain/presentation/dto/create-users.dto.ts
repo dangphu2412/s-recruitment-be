@@ -9,7 +9,7 @@ export class CreateUsersDto {
   fullName: string;
 
   @IsString()
-  domainId: string;
+  departmentId: string;
 
   @IsString()
   periodId: string;

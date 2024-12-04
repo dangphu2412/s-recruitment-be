@@ -17,10 +17,11 @@ import { RecruitmentEvent } from '../../../../recruitment/domain/data-access/ent
 import { EmployeeEventPoint } from '../../../../recruitment/domain/data-access/entities/employee-event-point.entity';
 import { Role } from './role.entity';
 import { Post } from '../../../../posts-service/domain/data-access/entities/posts.entity';
-import { MasterDataCommon } from '../../../../master-data/entities/master-data.entity';
 import { Payment } from '../../../../monthly-money/domain/data-access/entities/payment.entity';
 import { UserGroup } from './user-group.entity';
 import { OperationFee } from '../../../../monthly-money/domain/data-access/entities/operation-fee.entity';
+import { Department } from './department.entity';
+import { Period } from './period.entity';
 
 @Entity({
   name: 'users',
@@ -71,14 +72,19 @@ export class User {
   phoneNumber: string;
 
   @Column({
-    name: 'domain_id',
+    name: 'department_id',
   })
-  domainId: number;
+  departmentId: string;
 
   @Column({
     name: 'period_id',
   })
-  periodId: number;
+  periodId: string;
+
+  @Column({
+    name: 'tracking_id',
+  })
+  trackingId: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -144,11 +150,11 @@ export class User {
   @OneToMany(() => Post, (post) => post.author)
   posts?: Post[];
 
-  @ManyToOne(() => MasterDataCommon, (common) => common.domainUser)
-  @JoinColumn({ name: 'domain_id' })
-  domain: MasterDataCommon;
+  @ManyToOne(() => Department, (department) => department.users)
+  @JoinColumn({ name: 'department_id' })
+  department: Department;
 
-  @ManyToOne(() => MasterDataCommon, (common) => common.periodUser)
+  @ManyToOne(() => Period, (period) => period.users)
   @JoinColumn({ name: 'period_id' })
-  period: MasterDataCommon;
+  period: Period;
 }

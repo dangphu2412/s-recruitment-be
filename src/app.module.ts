@@ -7,7 +7,6 @@ import { MonthlyMoneyModule } from './monthly-money/internal/monthly-money.modul
 import { RecruitmentEventModule } from './recruitment/recruitment-event.module';
 import { PostsServiceModule } from './posts-service/posts-service.module';
 import { FileServiceModule } from './file-service/file-service.module';
-import { MasterDataModule } from './master-data/master-data.module';
 
 @Module({
   imports: [
@@ -19,7 +18,6 @@ import { MasterDataModule } from './master-data/master-data.module';
     RecruitmentEventModule,
     PostsServiceModule,
     FileServiceModule,
-    MasterDataModule,
   ],
 })
 export class AppModule {}

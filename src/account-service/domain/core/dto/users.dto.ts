@@ -15,12 +15,12 @@ export type UserManagementViewDTO = {
   estimatedPaidMonths: number;
   debtMonths: number;
   isProbation: boolean;
-  domain: {
-    id: number;
+  department: {
+    id: string;
     name: string;
   };
   period: {
-    id: number;
+    id: string;
     name: string;
   };
 };

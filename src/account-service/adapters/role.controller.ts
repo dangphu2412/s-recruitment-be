@@ -6,7 +6,7 @@ import {
   RoleServiceToken,
 } from '../domain/core/services/role.service';
 import { CanAccessBy } from './decorators/can-access-by.decorator';
-import { AccessRights } from '../domain/constants/role-def.enum';
+import { Permissions } from '../domain/constants/role-def.enum';
 
 @ApiTags('roles')
 @Controller({
@@ -19,13 +19,13 @@ export class RoleController {
     private readonly roleService: RoleService,
   ) {}
 
-  @CanAccessBy(AccessRights.VIEW_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.VIEW_ACCESS_RIGHTS)
   @Get()
   getRoles() {
     return this.roleService.findAccessControlView();
   }
 
-  @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.EDIT_ACCESS_RIGHTS)
   @Put('/:id')
   @ApiNoContentResponse()
   async updateRole(

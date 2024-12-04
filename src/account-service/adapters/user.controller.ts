@@ -24,7 +24,7 @@ import { Page } from '../../system/query-shape/types';
 import { UpdateUserRolesDto } from '../domain/dtos/update-user-roles.dto';
 import { FileInterceptor } from '../../system/file';
 import { FileCreateUsersDto } from '../domain/dtos/file-create-users.dto';
-import { AccessRights } from '../domain/constants/role-def.enum';
+import { Permissions } from '../domain/constants/role-def.enum';
 import { GetUsersQueryRequest } from '../domain/presentation/dto/get-users-query.request';
 import { UserManagementViewDTO } from '../domain/core/dto/users.dto';
 import {
@@ -32,7 +32,7 @@ import {
   UserServiceToken,
 } from '../domain/core/services/user-service';
 import { JwtPayload } from '../domain/dtos/jwt-payload';
-import { CreateUsersDto } from '../domain/dtos/create-users.dto';
+import { CreateUsersDto } from '../domain/presentation/dto/create-users.dto';
 import { PaymentService } from '../../monthly-money/internal/payment.service';
 import { CreatePaymentRequest } from '../domain/presentation/dto/create-payment.request';
 import { UpgradeUserMemberRequest } from '../domain/presentation/dto/upgrade-user-member.request';
@@ -58,7 +58,7 @@ export class UserController {
     return this.domainUser.findMyProfile(user.sub);
   }
 
-  @CanAccessBy(AccessRights.VIEW_USERS, AccessRights.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.VIEW_USERS, Permissions.EDIT_MEMBER_USER)
   @Get('/:id')
   findUserDetail(
     @Param('id', new ParseUUIDPipe({ version: '4' })) userId: string,
@@ -66,7 +66,7 @@ export class UserController {
     return this.domainUser.findUserDetail(userId);
   }
 
-  @CanAccessBy(AccessRights.VIEW_USERS, AccessRights.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.VIEW_USERS, Permissions.EDIT_MEMBER_USER)
   @Get('/')
   @ApiOkResponse()
   async searchOverviewUsers(
@@ -75,14 +75,14 @@ export class UserController {
     return this.domainUser.findUsers(query);
   }
 
-  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
   @Patch('/:id/active')
   @ApiNoContentResponse()
   async toggleIsActive(@Param('id') id: string) {
     await this.domainUser.toggleUserIsActive(id);
   }
 
-  @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.EDIT_ACCESS_RIGHTS)
   @Get('/:id/roles')
   @ApiOkResponse()
   findUserWithRoles(@Param('id') userId: string) {
@@ -92,7 +92,7 @@ export class UserController {
     });
   }
 
-  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
   @Patch('/:id')
   @ApiNoContentResponse()
   async updateUser(
@@ -105,7 +105,7 @@ export class UserController {
     });
   }
 
-  @CanAccessBy(AccessRights.EDIT_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.EDIT_ACCESS_RIGHTS)
   @Patch('/:id/roles')
   @ApiNoContentResponse()
   async updateUserRoles(
@@ -115,14 +115,14 @@ export class UserController {
     await this.domainUser.updateUserRoles(userId, dto);
   }
 
-  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
   @Post('/')
   @ApiCreatedResponse()
   async createUsers(@Body() createUsersDto: CreateUsersDto) {
     await this.domainUser.createUser(createUsersDto);
   }
 
-  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
@@ -134,7 +134,7 @@ export class UserController {
     return this.domainUser.createUsersByFile({ ...dto, file });
   }
 
-  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
   @Post('/:userId/payments')
   async createPayment(
     @Body() createPaymentDto: CreatePaymentRequest,
@@ -144,19 +144,19 @@ export class UserController {
     await this.paymentService.createPayment({ ...createPaymentDto, userId });
   }
 
-  @CanAccessBy(AccessRights.VIEW_USERS)
+  @CanAccessBy(Permissions.VIEW_USERS)
   @Get('/:userId/payments')
   async findUserPayments(@Param('userId') userId: string) {
     return this.paymentService.findUserPaymentsByUserId(userId);
   }
 
-  @CanAccessBy(AccessRights.VIEW_USERS)
+  @CanAccessBy(Permissions.VIEW_USERS)
   @Get('/probation')
   findProbationUsers(@Query() userProbationRequest: UserProbationRequest) {
     return this.domainUser.findProbationUsers(userProbationRequest);
   }
 
-  @CanAccessBy(AccessRights.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
   @Patch('/members')
   upgradeToMembers(
     @Body() upgradeUserMemberInputDto: UpgradeUserMemberRequest,

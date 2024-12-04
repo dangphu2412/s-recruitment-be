@@ -16,7 +16,7 @@ import {
 } from '../domain/core/services/post.service';
 import { CreatePostRequest } from '../domain/presentation/dto/create-post.request';
 import { CanAccessBy } from '../../account-service/adapters/decorators/can-access-by.decorator';
-import { AccessRights } from '../../account-service/domain/constants/role-def.enum';
+import { Permissions } from '../../account-service/domain/constants/role-def.enum';
 import { CurrentUser } from '../../account-service/adapters/decorators';
 import { JwtPayload } from '../../account-service/domain/dtos/jwt-payload';
 import { OffsetPagination } from '../../system/query-shape/dto';
@@ -33,13 +33,13 @@ export class PostController {
     private readonly postService: PostService,
   ) {}
 
-  @CanAccessBy(AccessRights.MANAGE_POSTS)
+  @CanAccessBy(Permissions.MANAGE_POSTS)
   @Post()
   createPost(@Body() dto: CreatePostRequest, @CurrentUser() user: JwtPayload) {
     return this.postService.createOne({ ...dto, authorId: user.sub });
   }
 
-  @CanAccessBy(AccessRights.MANAGE_POSTS)
+  @CanAccessBy(Permissions.MANAGE_POSTS)
   @Patch('/:id')
   editPost(
     @Param('id', ParseIntPipe) id: number,

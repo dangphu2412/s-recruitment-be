@@ -1,18 +1,23 @@
 import { In, MigrationInterface, QueryRunner } from 'typeorm';
-import keyBy from 'lodash/keyBy';
 import { Permission } from 'src/account-service/domain/data-access/entities/permission.entity';
 import {
-  AccessRights,
+  Permissions,
   SystemRoles,
 } from 'src/account-service/domain/constants/role-def.enum';
 import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
+import { RolePermissionConnector } from '../processors/role-permission.connector';
 
 export class SeedRoles1657339599214 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const roleRepository = queryRunner.manager.getRepository(Role);
     const permissionRepository = queryRunner.manager.getRepository(Permission);
 
-    const savedRoles = await roleRepository.save([
+    const rolePermissionConnector = new RolePermissionConnector(
+      roleRepository,
+      permissionRepository,
+    );
+
+    await roleRepository.insert([
       {
         name: SystemRoles.SUPER_ADMIN,
         description: 'The highest role in the system',
@@ -27,6 +32,10 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         description: 'User who is the leader of a domain or group',
       },
       {
+        name: SystemRoles.MEDIA,
+        description: 'User who is in media team',
+      },
+      {
         name: SystemRoles.TRAINER,
         description:
           'User who is the trainer of a domain or group, can view and edit users',
@@ -36,75 +45,91 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         description: 'Member in the system',
       },
     ]);
-    const savedPermissions = await permissionRepository.save([
+    await permissionRepository.insert([
       {
-        name: AccessRights.VIEW_ACCESS_RIGHTS,
+        name: Permissions.VIEW_ACCESS_RIGHTS,
         description: 'View access rights of system',
       },
       {
-        name: AccessRights.EDIT_MEMBER_USER,
+        name: Permissions.EDIT_MEMBER_USER,
         description: 'Modify member user',
       },
       {
-        name: AccessRights.VIEW_USERS,
+        name: Permissions.VIEW_USERS,
         description: 'View users of system',
       },
       {
-        name: AccessRights.EDIT_ACCESS_RIGHTS,
+        name: Permissions.EDIT_ACCESS_RIGHTS,
         description: 'Edit roles of system',
       },
       {
-        name: AccessRights.READ_ASSESSMENTS,
+        name: Permissions.READ_ASSESSMENTS,
         description: 'Read assessments',
       },
       {
-        name: AccessRights.WRITE_ASSESSMENTS,
+        name: Permissions.WRITE_ASSESSMENTS,
         description: 'Write assessments',
       },
       {
-        name: AccessRights.READ_USER_GROUPS,
+        name: Permissions.READ_USER_GROUPS,
         description: 'Read user groups',
       },
       {
-        name: AccessRights.WRITE_USER_GROUPS,
+        name: Permissions.WRITE_USER_GROUPS,
         description: 'Write user groups',
       },
+      {
+        name: Permissions.MANAGE_RECRUITMENT,
+        description: 'Manage recruitment',
+      },
+      {
+        name: Permissions.MANAGE_POSTS,
+        description: 'Manage public posts of S-Group',
+      },
+      {
+        name: Permissions.MANAGE_MASTER_DATA,
+        description: 'Manage master data',
+      },
     ]);
-    const nameMapToRoles = keyBy(savedRoles, 'name');
-    const nameMapToPermissions = keyBy(savedPermissions, 'name');
 
     const roleNameMapToPermissionNames = {
       [SystemRoles.SUPER_ADMIN]: [
-        AccessRights.VIEW_USERS,
-        AccessRights.EDIT_MEMBER_USER,
-        AccessRights.EDIT_ACCESS_RIGHTS,
-        AccessRights.VIEW_ACCESS_RIGHTS,
-        AccessRights.READ_ASSESSMENTS,
-        AccessRights.WRITE_ASSESSMENTS,
-        AccessRights.READ_USER_GROUPS,
-        AccessRights.WRITE_USER_GROUPS,
+        Permissions.VIEW_USERS,
+        Permissions.EDIT_MEMBER_USER,
+        Permissions.EDIT_ACCESS_RIGHTS,
+        Permissions.VIEW_ACCESS_RIGHTS,
+        Permissions.READ_ASSESSMENTS,
+        Permissions.WRITE_ASSESSMENTS,
+        Permissions.READ_USER_GROUPS,
+        Permissions.WRITE_USER_GROUPS,
+        Permissions.MANAGE_RECRUITMENT,
+        Permissions.MANAGE_MASTER_DATA,
+        Permissions.WRITE_WORKING,
+        Permissions.READ_WORKING,
+        Permissions.MANAGE_POSTS,
       ],
       [SystemRoles.LEADER]: [
-        AccessRights.VIEW_USERS,
-        AccessRights.EDIT_MEMBER_USER,
+        Permissions.VIEW_USERS,
+        Permissions.EDIT_MEMBER_USER,
       ],
       [SystemRoles.TRAINER]: [
-        AccessRights.VIEW_USERS,
-        AccessRights.EDIT_MEMBER_USER,
+        Permissions.VIEW_USERS,
+        Permissions.EDIT_MEMBER_USER,
       ],
+      [SystemRoles.MEDIA]: [
+        Permissions.VIEW_USERS,
+        Permissions.EDIT_MEMBER_USER,
+      ],
+      [SystemRoles.HR]: [Permissions.VIEW_USERS, Permissions.EDIT_MEMBER_USER],
       [SystemRoles.MEMBER]: [],
     };
 
-    await roleRepository.save(
+    await Promise.all(
       Object.keys(roleNameMapToPermissionNames).map((roleName) => {
-        const role = nameMapToRoles[roleName];
-
-        role.permissions = roleNameMapToPermissionNames[roleName].map(
-          (permissionName: string | number) =>
-            nameMapToPermissions[permissionName],
-        );
-
-        return role;
+        rolePermissionConnector.process({
+          roleName: roleName,
+          permissionCodes: roleNameMapToPermissionNames[roleName],
+        });
       }),
     );
   }

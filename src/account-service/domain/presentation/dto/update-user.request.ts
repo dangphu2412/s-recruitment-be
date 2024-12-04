@@ -1,7 +1,7 @@
 export class UpdateUserRequest {
   fullName: string;
-  domainId?: number;
-  periodId?: number;
+  departmentId?: string;
+  periodId?: string;
   birthday?: string;
   phoneNumber?: string;
 }

@@ -27,10 +27,10 @@ import { JwtPayload } from '../account-service/domain/dtos/jwt-payload';
 import { FormBodyParserInterceptor } from '../system/form-body/form-body-parser.interceptor';
 import { GetEventDetailRequest } from './domain/presentation/dto/get-event-detail.request';
 import { CanAccessBy } from '../account-service/adapters/decorators/can-access-by.decorator';
-import { AccessRights } from '../account-service/domain/constants/role-def.enum';
+import { Permissions } from '../account-service/domain/constants/role-def.enum';
 import { FastifyReply } from 'fastify';
 
-@CanAccessBy(AccessRights.MANAGE_RECRUITMENT)
+@CanAccessBy(Permissions.MANAGE_RECRUITMENT)
 @Controller('recruitments/events')
 export class RecruitmentEventController {
   constructor(

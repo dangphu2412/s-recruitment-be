@@ -2,11 +2,12 @@ export enum SystemRoles {
   SUPER_ADMIN = 'Super Admin',
   HR = 'Human Resource',
   LEADER = 'Leader',
+  MEDIA = 'Media',
   TRAINER = 'Trainer',
   MEMBER = 'Member',
 }
 
-export enum AccessRights {
+export enum Permissions {
   VIEW_USERS = 'View users',
   EDIT_MEMBER_USER = 'Edit member user',
   VIEW_ACCESS_RIGHTS = 'View access rights',
@@ -18,4 +19,6 @@ export enum AccessRights {
   WRITE_ASSESSMENTS = 'Write assessments',
   READ_USER_GROUPS = 'Read user groups',
   WRITE_USER_GROUPS = 'Write user groups',
+  READ_WORKING = 'Read user groups',
+  WRITE_WORKING = 'Write working',
 }

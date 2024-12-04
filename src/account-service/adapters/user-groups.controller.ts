@@ -18,7 +18,7 @@ import {
   GetUserGroupRequest,
 } from '../domain/presentation/dto/user-group.request';
 import { CanAccessBy } from './decorators/can-access-by.decorator';
-import { AccessRights } from '../domain/constants/role-def.enum';
+import { Permissions } from '../domain/constants/role-def.enum';
 
 @Controller('user-groups')
 export class UserGroupsController {
@@ -27,19 +27,19 @@ export class UserGroupsController {
     private readonly userGroupsService: UserGroupsService,
   ) {}
 
-  @CanAccessBy(AccessRights.WRITE_USER_GROUPS)
+  @CanAccessBy(Permissions.WRITE_USER_GROUPS)
   @Post()
   createUserGroup(@Body() body: CreateUserGroupRequest) {
     return this.userGroupsService.createUserGroup(body);
   }
 
-  @CanAccessBy(AccessRights.READ_USER_GROUPS)
+  @CanAccessBy(Permissions.READ_USER_GROUPS)
   @Get()
   findUserGroups(@Query() query: GetUserGroupRequest) {
     return this.userGroupsService.findUserGroups(query);
   }
 
-  @CanAccessBy(AccessRights.WRITE_USER_GROUPS)
+  @CanAccessBy(Permissions.WRITE_USER_GROUPS)
   @Delete('/:id')
   deleteUserGroup(@Param('id', ParseIntPipe) id: number) {
     return this.userGroupsService.deleteUserGroup(id);
