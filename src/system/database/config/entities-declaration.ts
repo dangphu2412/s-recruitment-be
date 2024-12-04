@@ -8,11 +8,12 @@ import { Role } from '../../../account-service/domain/data-access/entities/role.
 import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
 import { Post } from '../../../posts-service/domain/data-access/entities/posts.entity';
 import { Category } from '../../../posts-service/domain/data-access/entities/category.entity';
-import { MasterDataCommon } from '../../../master-data/entities/master-data.entity';
 import { Payment } from '../../../monthly-money/domain/data-access/entities/payment.entity';
 import { UserGroup } from '../../../account-service/domain/data-access/entities/user-group.entity';
 import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
 import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
+import { Period } from '../../../account-service/domain/data-access/entities/period.entity';
+import { Department } from '../../../account-service/domain/data-access/entities/department.entity';
 
 export const APP_ENTITIES = [
   User,
@@ -26,9 +27,10 @@ export const APP_ENTITIES = [
   EmployeeEventPoint,
   Post,
   Category,
-  MasterDataCommon,
   Payment,
   UserGroup,
+  Period,
+  Department,
 ];
 
 export const MIGRATION_CONFIGS = {

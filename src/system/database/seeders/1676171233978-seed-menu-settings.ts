@@ -1,78 +1,40 @@
-import { In, MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 import { Menu } from '../../menu';
-import keyBy from 'lodash/keyBy';
 import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
-import { AccessRights } from '../../../account-service/domain/constants/role-def.enum';
+import { Permissions } from '../../../account-service/domain/constants/role-def.enum';
+import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
 
 export class SeedMenuSettings1676171233978 implements MigrationInterface {
-  private keyMenuByCode(menus: Menu[]): Record<string, Menu> {
-    return menus.reduce<Record<string, Menu>>((result, currentMenu) => {
-      result[currentMenu.code] = currentMenu;
-
-      if (currentMenu.subMenus?.length) {
-        return {
-          ...result,
-          ...this.keyMenuByCode(currentMenu.subMenus),
-        };
-      }
-      return result;
-    }, {});
-  }
-
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const permissionRepo = queryRunner.manager.getRepository(Permission);
+    const permissionRepository = queryRunner.manager.getRepository(Permission);
     const menuRepository = queryRunner.manager.getTreeRepository(Menu);
 
-    const [permissions, menus] = await Promise.all([
-      permissionRepo.find({
-        where: {
-          name: In([
-            AccessRights.VIEW_ACCESS_RIGHTS,
-            AccessRights.EDIT_MEMBER_USER,
-            AccessRights.VIEW_USERS,
-            AccessRights.EDIT_ACCESS_RIGHTS,
-            AccessRights.WRITE_USER_GROUPS,
-            AccessRights.READ_USER_GROUPS,
-            AccessRights.WRITE_ASSESSMENTS,
-            AccessRights.READ_ASSESSMENTS,
-          ]),
-        },
-      }),
-      menuRepository.findTrees(),
-    ]);
-    const permissionNameMapToPermission = keyBy(permissions, 'name');
-    const menuCodeMapToMenu = this.keyMenuByCode(menus);
-
-    const permissionDefineMenus: Record<string, Array<string>> = {
-      [AccessRights.VIEW_USERS]: ['USER_MANAGEMENT', 'ADMIN'],
-      [AccessRights.EDIT_MEMBER_USER]: ['ADMIN'],
-      [AccessRights.VIEW_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
-      [AccessRights.EDIT_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
-      [AccessRights.WRITE_USER_GROUPS]: ['USER_GROUPS'],
-      [AccessRights.READ_USER_GROUPS]: ['USER_GROUPS'],
-      [AccessRights.WRITE_ASSESSMENTS]: ['USER_ASSESSMENT'],
-      [AccessRights.READ_ASSESSMENTS]: ['USER_ASSESSMENT'],
-    };
-
-    const linkedEntities = Object.keys(permissionDefineMenus).map(
-      (permissionName) => {
-        const permission = permissionNameMapToPermission[permissionName];
-
-        if (!permission) {
-          throw new Error('Missing permission');
-        }
-
-        permission.menuSettings = permissionDefineMenus[permissionName].map(
-          (menuCode) => {
-            return menuCodeMapToMenu[menuCode];
-          },
-        );
-
-        return permission;
-      },
+    const menuSettingsProcessor = new PermissionMenuSettingsConnector(
+      permissionRepository,
+      menuRepository,
     );
 
-    await permissionRepo.save(linkedEntities);
+    const permissionDefineMenus: Record<string, Array<string>> = {
+      [Permissions.VIEW_USERS]: ['USER_MANAGEMENT', 'ADMIN'],
+      [Permissions.EDIT_MEMBER_USER]: ['ADMIN'],
+      [Permissions.VIEW_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
+      [Permissions.EDIT_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
+      [Permissions.WRITE_USER_GROUPS]: ['USER_GROUPS'],
+      [Permissions.READ_USER_GROUPS]: ['USER_GROUPS'],
+      [Permissions.WRITE_ASSESSMENTS]: ['USER_ASSESSMENT'],
+      [Permissions.READ_ASSESSMENTS]: ['USER_ASSESSMENT'],
+      [Permissions.MANAGE_RECRUITMENT]: ['RECRUITMENT', 'RECRUITMENT_OVERVIEW'],
+      [Permissions.MANAGE_POSTS]: ['POSTS_OVERVIEW', 'POST'],
+    };
+
+    await Promise.all(
+      Object.keys(permissionDefineMenus).map((permission) => {
+        return menuSettingsProcessor.process({
+          permissionCode: permission,
+          menuCodes: permissionDefineMenus[permission],
+        });
+      }),
+    );
   }
 
   public async down(): Promise<void> {

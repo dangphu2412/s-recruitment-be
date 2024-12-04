@@ -1,7 +1,7 @@
 import { createInterfaceToken } from 'src/system/utils';
 import { Page } from 'src/system/query-shape/dto';
 import { UserManagementViewDTO } from '../dto/users.dto';
-import { CreateUsersDto } from '../../dtos/create-users.dto';
+import { CreateUsersDto } from '../../presentation/dto/create-users.dto';
 import { FileCreateUsersDto } from '../../dtos/file-create-users.dto';
 import { User } from '../../data-access/entities/user.entity';
 import { MyProfile, UserDetail } from '../../dtos/my-profile';

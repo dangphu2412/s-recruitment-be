@@ -1,96 +1,39 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { Menu } from '../../menu';
-import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
-import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
-import { MenuFactory } from '../processors/menu.factory';
-import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
-import { RolePermissionConnector } from '../processors/role-permission.connector';
-import {
-  AccessRights,
-  SystemRoles,
-} from '../../../account-service/domain/constants/role-def.enum';
-import { MasterDataCommon } from '../../../master-data/entities/master-data.entity';
+import { Department } from '../../../account-service/domain/data-access/entities/department.entity';
+import { Period } from '../../../account-service/domain/data-access/entities/period.entity';
 
 export class AddMasterDataMenu1728101199639 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const menuRepository = queryRunner.manager.getTreeRepository(Menu);
-    const permissionRepository = queryRunner.manager.getRepository(Permission);
-    const roleRepository = queryRunner.manager.getRepository(Role);
-    const masterDataCommonRepository =
-      queryRunner.manager.getRepository(MasterDataCommon);
-    const menuFactory = new MenuFactory(menuRepository);
-    const permissionMenuSettingsConnector = new PermissionMenuSettingsConnector(
-      permissionRepository,
-      menuRepository,
-    );
-    const rolePermissionConnector = new RolePermissionConnector(
-      roleRepository,
-      permissionRepository,
-    );
+    const departmentRepository = queryRunner.manager.getRepository(Department);
+    const periodRepository = queryRunner.manager.getRepository(Period);
 
-    await permissionRepository.save({
-      name: AccessRights.MANAGE_MASTER_DATA,
-      description: 'Manage master data',
-    });
-    const PARENT_MENU_CODE = 'MASTER_DATA';
-    const DEPARTMENT_MENU_CODE = 'DEPARTMENT';
-    const PERIOD_MENU_CODE = 'PERIOD';
-
-    await menuFactory.create([
+    await departmentRepository.insert([
       {
-        name: 'Master data',
-        iconCode: 'MASTER_ICON',
-        code: PARENT_MENU_CODE,
-        subMenus: [
-          {
-            name: 'Department',
-            accessLink: '/master-data/departments',
-            code: DEPARTMENT_MENU_CODE,
-          },
-          {
-            name: 'Period',
-            accessLink: '/master-data/period',
-            code: PERIOD_MENU_CODE,
-          },
-        ],
-      },
-    ]);
-
-    await permissionMenuSettingsConnector.process({
-      permissionCode: AccessRights.MANAGE_MASTER_DATA,
-      menuCodes: [PARENT_MENU_CODE, DEPARTMENT_MENU_CODE, PERIOD_MENU_CODE],
-    });
-    await rolePermissionConnector.process({
-      roleName: SystemRoles.SUPER_ADMIN,
-      permissionCodes: [AccessRights.MANAGE_MASTER_DATA],
-    });
-
-    await masterDataCommonRepository.insert([
-      {
+        id: 'IT',
         name: 'IT',
-        code: 'SG0001',
         description: 'Information Technology',
       },
       {
+        id: 'DS',
         name: 'Design',
-        code: 'SG0001',
         description: 'Design',
       },
       {
+        id: 'MO',
         name: 'Marketing Online',
-        code: 'SG0001',
         description: 'Marketing Online',
       },
     ]);
-    await masterDataCommonRepository.insert([
+
+    await periodRepository.insert([
       {
+        id: 'LT2022',
         name: 'Khoá Lập Trình 2022',
-        code: 'SG0002',
         description: 'Khoá Lập Trình 2022',
       },
       {
+        id: 'LT2023',
         name: 'Khoá Lập Trình 2023',
-        code: 'SG0002',
         description: 'Khoá Lập Trình 2023',
       },
     ]);

@@ -1,15 +1,15 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import { User } from '../../account-service/domain/data-access/entities/user.entity';
+import { User } from './user.entity';
 
 @Entity({
-  name: 'mdm_common',
+  name: 'mdm_periods',
 })
-export class MasterDataCommon {
+export class Period {
   @PrimaryColumn({
     name: 'id',
     type: 'varchar',
   })
-  id: number;
+  id: string;
 
   @Column({
     name: 'name',
@@ -19,23 +19,12 @@ export class MasterDataCommon {
   name: string;
 
   @Column({
-    name: 'code',
-    nullable: false,
-    type: 'varchar',
-    unique: true,
-  })
-  code: string;
-
-  @Column({
     name: 'description',
     nullable: true,
     type: 'varchar',
   })
   description: string;
 
-  @OneToMany(() => User, (user) => user.domain)
-  domainUser: User;
-
   @OneToMany(() => User, (user) => user.period)
-  periodUser: User;
+  users: User[];
 }

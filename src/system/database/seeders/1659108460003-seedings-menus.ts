@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { keyBy, omit } from 'lodash';
 import { Menu } from '../../menu';
+import { MenuFactory } from '../processors/menu.factory';
 
 type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
   subMenus?: InsertMenu[];
@@ -9,6 +9,8 @@ type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
 export class SeedingMenus1659108460003 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const menuRepository = queryRunner.manager.getTreeRepository(Menu);
+    const menuProcessor = new MenuFactory(menuRepository);
+
     const menus: InsertMenu[] = [
       {
         name: 'User Management',
@@ -21,9 +23,9 @@ export class SeedingMenus1659108460003 implements MigrationInterface {
             code: 'ADMIN',
           },
           {
-            name: 'Accessibility',
-            accessLink: '/users/access-control',
-            code: 'ACCESS_CONTROL',
+            name: 'IAM',
+            accessLink: '/users/iam',
+            code: 'IDENTITY_ACCESS_MANAGEMENT',
           },
           {
             name: 'User Groups',
@@ -37,47 +39,36 @@ export class SeedingMenus1659108460003 implements MigrationInterface {
           },
         ],
       },
+      {
+        name: 'Posts',
+        iconCode: 'POST_ICON',
+        code: 'POST',
+        subMenus: [
+          {
+            name: 'Post management',
+            accessLink: '/posts/overview',
+            code: 'POSTS_OVERVIEW',
+          },
+        ],
+      },
+      {
+        name: 'Recruitment',
+        iconCode: 'RECRUITMENT_ICON',
+        code: 'RECRUITMENT',
+        subMenus: [
+          {
+            name: 'Recruitment Overview',
+            accessLink: '/recruitments/overview',
+            code: 'RECRUITMENT_OVERVIEW',
+          },
+        ],
+      },
     ];
 
-    const createdParent = await menuRepository.save(
-      menus
-        .map(SeedingMenus1659108460003.excludeSubMenus)
-        .map((menu) => menuRepository.create(menu)),
-    );
-
-    const childMenu = await menuRepository.save(
-      menus
-        .map((menu) => {
-          return menu.subMenus
-            ? menu.subMenus.map((subMenu) => menuRepository.create(subMenu))
-            : [];
-        })
-        .flat(),
-    );
-
-    const parentKeyByCode = keyBy(createdParent, 'code');
-    const childMenuKeyByCode = keyBy(childMenu, 'code');
-
-    await menuRepository.save(
-      menus.map((menu) => {
-        const menuEntity = parentKeyByCode[menu.code];
-        if (menu.subMenus) {
-          menuEntity.subMenus = menu.subMenus.map((subMenu) => {
-            return childMenuKeyByCode[subMenu.code];
-          });
-        }
-        return menuEntity;
-      }),
-    );
+    await menuProcessor.create(menus);
   }
 
   public async down(): Promise<void> {
     return;
-  }
-
-  private static excludeSubMenus(
-    menu: InsertMenu,
-  ): Omit<InsertMenu, 'subMenus'> {
-    return menu.subMenus ? omit(menu, 'subMenus') : { ...menu };
   }
 }

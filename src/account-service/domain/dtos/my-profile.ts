@@ -9,12 +9,12 @@ export type UserDetail = {
   fullName: string;
   birthday: Date;
   phoneNumber: string;
-  domain?: {
-    id: number;
+  department?: {
+    id: string;
     name: string;
   };
   period?: {
-    id: number;
+    id: string;
     name: string;
   };
   roles: {

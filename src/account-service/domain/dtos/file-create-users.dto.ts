@@ -9,7 +9,7 @@ export type FileRow = {
 
 export class FileCreateUsersDto {
   @IsNotEmpty()
-  periodId: number;
+  periodId: string;
 
   @IsOptional()
   @IsNumber()
