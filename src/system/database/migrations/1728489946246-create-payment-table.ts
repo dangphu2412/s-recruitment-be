@@ -34,11 +34,6 @@ export class CreatePaymentTable1728489946246 implements MigrationInterface {
             default: "''",
           },
           {
-            name: 'monthly_config_id',
-            type: 'int',
-            isNullable: false,
-          },
-          {
             name: 'user_id',
             type: 'uuid',
             isNullable: false,
@@ -48,11 +43,6 @@ export class CreatePaymentTable1728489946246 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKeys('payments', [
-      new TableForeignKey({
-        columnNames: ['monthly_config_id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'monthly_money_configs',
-      }),
       new TableForeignKey({
         columnNames: ['user_id'],
         referencedColumnNames: ['id'],

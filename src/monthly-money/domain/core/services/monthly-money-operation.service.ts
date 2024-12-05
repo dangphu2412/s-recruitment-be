@@ -1,5 +1,8 @@
 import { createInterfaceToken } from '../../../../system/utils';
-import { CreateMoneyFeeDTO } from '../dto/create-money-fee.dto';
+import {
+  CreateMoneyFeeDTO,
+  CreateMoneyFeeResultsDTO,
+} from '../dto/create-money-fee.dto';
 import { OperationFee } from '../../data-access/entities/operation-fee.entity';
 
 export const MonthlyMoneyOperationServiceToken = createInterfaceToken(
@@ -7,6 +10,8 @@ export const MonthlyMoneyOperationServiceToken = createInterfaceToken(
 );
 
 export interface MonthlyMoneyOperationService {
-  createOperationFee(createMoneyFee: CreateMoneyFeeDTO): Promise<void>;
-  findOperationByUserId(userId: string): Promise<OperationFee>;
+  createOperationFee(
+    createMoneyFeeDTO: CreateMoneyFeeDTO,
+  ): Promise<CreateMoneyFeeResultsDTO>;
+  findOperationFeeWithMoneyConfigById(id: number): Promise<OperationFee>;
 }

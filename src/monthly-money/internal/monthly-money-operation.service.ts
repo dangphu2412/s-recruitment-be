@@ -5,8 +5,11 @@ import {
   MonthlyMoneyConfigServiceToken,
 } from '../domain/core/services/monthly-money-config.service';
 import { MonthlyMoneyOperationService } from '../domain/core/services/monthly-money-operation.service';
-import { CreateMoneyFeeDTO } from '../domain/core/dto/create-money-fee.dto';
 import { OperationFee } from '../domain/data-access/entities/operation-fee.entity';
+import {
+  CreateMoneyFeeDTO,
+  CreateMoneyFeeResultsDTO,
+} from '../domain/core/dto/create-money-fee.dto';
 
 @Injectable()
 export class MonthlyMoneyOperationServiceImpl
@@ -18,28 +21,40 @@ export class MonthlyMoneyOperationServiceImpl
     private readonly moneyConfigService: MonthlyMoneyConfigService,
   ) {}
 
-  async createOperationFee(createMoneyFee: CreateMoneyFeeDTO): Promise<void> {
-    const config = await this.moneyConfigService.findById(
-      createMoneyFee.monthlyConfigId,
-    );
-    const newOperationFees = createMoneyFee.userIds.map((userId) => {
-      return {
-        monthlyConfigId: createMoneyFee.monthlyConfigId,
-        userId: userId,
-        remainMonths: config.monthRange,
-        paidMoney: 0,
-        paidMonths: 0,
-      };
+  findOperationFeeWithMoneyConfigById(id: number): Promise<OperationFee> {
+    return this.operationFeeRepository.findOne({
+      where: { id },
+      relations: ['monthlyConfig'],
     });
-
-    await this.operationFeeRepository.insert(newOperationFees);
   }
 
-  findOperationByUserId(userId: string): Promise<OperationFee> {
-    return this.operationFeeRepository.findOne({
-      where: {
-        userId,
-      },
-    });
+  async createOperationFee(
+    dto: CreateMoneyFeeDTO,
+  ): Promise<CreateMoneyFeeResultsDTO> {
+    const { monthlyConfigId, userIds } = dto;
+    const config = await this.moneyConfigService.findById(monthlyConfigId);
+
+    const items = await Promise.all(
+      userIds.map(async (userId) => {
+        const entity = new OperationFee();
+        entity.monthlyConfigId = monthlyConfigId;
+        entity.remainMonths = config.monthRange;
+        entity.paidMoney = 0;
+        entity.paidMonths = 0;
+
+        const { identifiers } = await this.operationFeeRepository.insert(
+          entity,
+        );
+
+        return {
+          userId,
+          operationFeeId: identifiers[0].id,
+        };
+      }),
+    );
+
+    return {
+      items,
+    };
   }
 }

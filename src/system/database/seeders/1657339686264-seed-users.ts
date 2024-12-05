@@ -30,6 +30,7 @@ export class SeedUsers1657339686264 implements MigrationInterface {
     user.roles = [adminRole];
     user.period = null;
     user.department = null;
+    user.operationFee = null;
     await userRepository.save(user);
   }
 

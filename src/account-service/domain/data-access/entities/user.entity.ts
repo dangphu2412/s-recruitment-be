@@ -82,6 +82,11 @@ export class User {
   periodId: string;
 
   @Column({
+    name: 'operation_fee_id',
+  })
+  operationFeeId: number;
+
+  @Column({
     name: 'tracking_id',
   })
   trackingId: string;
@@ -139,10 +144,14 @@ export class User {
   joinedRecruitEvents?: RecruitmentEvent[];
 
   @OneToOne(() => OperationFee, (operationFee) => operationFee.user)
+  @JoinColumn({
+    name: 'operation_fee_id',
+    referencedColumnName: 'id',
+  })
   operationFee?: OperationFee;
 
-  @OneToOne(() => Payment, (payment) => payment.user)
-  payments?: Payment;
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments?: Payment[];
 
   @OneToMany(() => EmployeeEventPoint, (point) => point.author)
   markedEventPoints: EmployeeEventPoint[];

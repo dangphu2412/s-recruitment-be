@@ -44,12 +44,6 @@ export class OperationFee {
   estimatedReturnDate: Date;
 
   @Column({
-    name: 'user_id',
-    nullable: false,
-  })
-  userId: string;
-
-  @Column({
     name: 'monthly_config_id',
     nullable: false,
   })
@@ -63,9 +57,5 @@ export class OperationFee {
   monthlyConfig: MonthlyMoneyConfig;
 
   @OneToOne(() => User, (user) => user.operationFee)
-  @JoinColumn({
-    name: 'user_id',
-    referencedColumnName: 'id',
-  })
   user: User;
 }

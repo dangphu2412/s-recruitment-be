@@ -16,13 +16,6 @@ export class UserPaidCalculator {
 
   @OnEvent(PAYMENT_CREATED_EVENT)
   async handleUserPaidEvent(paymentCreatedEvent: PaymentCreatedEvent) {
-    const { monthlyConfig } = await this.operationFeeRepository.findOne({
-      where: {
-        userId: paymentCreatedEvent.userId,
-      },
-      relations: ['monthlyConfig'],
-    });
-
     const userPayments = await this.paymentRepository.findUserPaymentsByUserId(
       paymentCreatedEvent.userId,
     );
@@ -31,12 +24,13 @@ export class UserPaidCalculator {
       (acc, payment) => acc + payment.amount,
       0,
     );
+    const { monthlyConfig } = paymentCreatedEvent;
     const totalMonths = Math.floor(totalPaid / monthlyConfig.amount);
     const remainMonths = monthlyConfig.monthRange - totalMonths;
 
     await this.operationFeeRepository.update(
       {
-        userId: paymentCreatedEvent.userId,
+        id: paymentCreatedEvent.operationFeeId,
       },
       {
         paidMonths: totalMonths,
