@@ -19,4 +19,4 @@ COPY --from=builder /app/dist /app/dist
 COPY --from=builder /app/package.json /app/package.json
 
 EXPOSE 3000
-CMD [ "npm", "start:prod" ]
+CMD [ "npm", "run", "start:prod" ]
