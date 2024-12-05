@@ -90,6 +90,14 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         name: Permissions.MANAGE_MASTER_DATA,
         description: 'Manage master data',
       },
+      {
+        name: Permissions.READ_WORKING,
+        description: 'Read working',
+      },
+      {
+        name: Permissions.WRITE_WORKING,
+        description: 'Write working',
+      },
     ]);
 
     const roleNameMapToPermissionNames = {

@@ -18,7 +18,7 @@ jobs:
 
   lint-check:
     needs: [setups]
-    uses: ./.github/workflows/unit-test-job.yml
+    uses: ./.github/workflows/lint-job.yml
 
   build:
     needs: [setups]
