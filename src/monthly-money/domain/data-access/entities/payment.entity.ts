@@ -3,10 +3,8 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { MonthlyMoneyConfig } from './monthly-money-config.entity';
 import { User } from '../../../../account-service/domain/data-access/entities/user.entity';
 
 @Entity({
@@ -43,20 +41,7 @@ export class Payment {
   })
   userId: string;
 
-  @Column({
-    name: 'monthly_config_id',
-    nullable: false,
-  })
-  monthlyConfigId: number;
-
-  @ManyToOne(() => MonthlyMoneyConfig)
-  @JoinColumn({
-    name: 'monthly_config_id',
-    referencedColumnName: 'id',
-  })
-  monthlyConfig: MonthlyMoneyConfig;
-
-  @OneToOne(() => User, (user) => user.operationFee)
+  @ManyToOne(() => User, (user) => user.payments)
   @JoinColumn({
     name: 'user_id',
     referencedColumnName: 'id',

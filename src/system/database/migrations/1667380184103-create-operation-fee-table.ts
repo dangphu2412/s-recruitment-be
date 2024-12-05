@@ -2,6 +2,7 @@ import {
   MigrationInterface,
   QueryRunner,
   Table,
+  TableColumn,
   TableForeignKey,
 } from 'typeorm';
 
@@ -50,14 +51,17 @@ export class CreateOperationFeeTable1667380184103
             type: 'int',
             isNullable: false,
           },
-          {
-            name: 'user_id',
-            type: 'uuid',
-            isNullable: false,
-          },
         ],
       }),
     );
+
+    await queryRunner.addColumns('users', [
+      new TableColumn({
+        name: 'operation_fee_id',
+        type: 'int',
+        isNullable: true,
+      }),
+    ]);
 
     await queryRunner.createForeignKeys('operation_fees', [
       new TableForeignKey({
@@ -65,10 +69,13 @@ export class CreateOperationFeeTable1667380184103
         referencedColumnNames: ['id'],
         referencedTableName: 'monthly_money_configs',
       }),
+    ]);
+
+    await queryRunner.createForeignKeys('users', [
       new TableForeignKey({
-        columnNames: ['user_id'],
+        columnNames: ['operation_fee_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'users',
+        referencedTableName: 'operation_fees',
       }),
     ]);
   }

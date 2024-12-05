@@ -7,7 +7,10 @@ import {
 import { CreatePaymentDTO } from '../domain/core/dto/create-payment.dto';
 import { Payment } from '../domain/data-access/entities/payment.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { PAYMENT_CREATED_EVENT } from '../domain/core/events/payment-created.event';
+import {
+  PAYMENT_CREATED_EVENT,
+  PaymentCreatedEvent,
+} from '../domain/core/events/payment-created.event';
 
 @Injectable()
 export class PaymentService {
@@ -19,20 +22,30 @@ export class PaymentService {
   ) {}
 
   async createPayment(dto: CreatePaymentDTO) {
-    const operation = await this.operationFeeService.findOperationByUserId(
-      dto.userId,
-    );
-
+    const operationFee =
+      await this.operationFeeService.findOperationFeeWithMoneyConfigById(
+        dto.operationFeeId,
+      );
     const entity = new Payment();
+
     entity.amount = dto.amount;
-    entity.monthlyConfigId = operation.monthlyConfigId;
     entity.userId = dto.userId;
     entity.note = dto.note;
     entity.paidAt = new Date(dto.paidAt);
 
     await this.paymentRepository.insert(entity);
 
-    this.eventEmitter.emit(PAYMENT_CREATED_EVENT, entity);
+    const paymentCreatedEvent: PaymentCreatedEvent = {
+      id: entity.id,
+      amount: entity.amount,
+      monthlyConfig: operationFee.monthlyConfig,
+      note: entity.note,
+      paidAt: entity.paidAt.toISOString(),
+      userId: entity.userId,
+      operationFeeId: operationFee.id,
+    };
+
+    this.eventEmitter.emit(PAYMENT_CREATED_EVENT, paymentCreatedEvent);
   }
 
   findUserPaymentsByUserId(userId: string) {

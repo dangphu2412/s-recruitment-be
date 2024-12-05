@@ -12,6 +12,7 @@ import { UpgradeUserMemberDTO } from '../dto/upgrade-user-member.dto';
 import { GetUserDTO, GetUsersDTO } from '../dto/get-users.dto';
 import { UpdateUserDTO } from '../dto/update-user.dto';
 import { GetUsersQueryDTO } from '../dto/get-users-query.dto';
+import { CreatePaymentRequest } from '../../presentation/dto/create-payment.request';
 
 export const UserServiceToken = createInterfaceToken('UserServiceToken');
 
@@ -38,6 +39,7 @@ export interface UserService {
   createUsersByFile(
     dto: FileCreateUsersDto,
   ): Promise<{ duplicatedEmails: string[] }[]>;
+  createUserPayment(id: string, dto: CreatePaymentRequest): Promise<void>;
 
   updateUserRoles(id: string, payload: UpdateUserRolesDto): Promise<void>;
   updateUser(dto: UpdateUserDTO): Promise<void>;

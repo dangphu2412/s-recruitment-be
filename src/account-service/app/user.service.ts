@@ -39,6 +39,8 @@ import {
 import { UpgradeUserMemberDTO } from '../domain/core/dto/upgrade-user-member.dto';
 import { CreateUserDTO } from '../domain/core/dto/create-user.dto';
 import { UpdateUserDTO } from '../domain/core/dto/update-user.dto';
+import { CreatePaymentRequest } from '../domain/presentation/dto/create-payment.request';
+import { PaymentService } from '../../monthly-money/internal/payment.service';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -49,6 +51,7 @@ export class UserServiceImpl implements UserService {
     private readonly moneyOperationService: MonthlyMoneyOperationService,
     @Inject(RoleServiceToken)
     private readonly roleService: RoleService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   async findUsers(
@@ -343,6 +346,21 @@ export class UserServiceImpl implements UserService {
     return this.userRepository.insert(entities);
   }
 
+  async createUserPayment(
+    id: string,
+    dto: CreatePaymentRequest,
+  ): Promise<void> {
+    const user = await this.userRepository.findOneBy({
+      id,
+    });
+
+    await this.paymentService.createPayment({
+      ...dto,
+      operationFeeId: user.operationFeeId,
+      userId: id,
+    });
+  }
+
   async updateUser(dto: UpdateUserDTO): Promise<void> {
     await this.userRepository.update({ id: dto.id }, dto);
   }
@@ -369,16 +387,34 @@ export class UserServiceImpl implements UserService {
     await this.userRepository.save(user);
   }
 
-  upgradeToMembers(dto: UpgradeUserMemberDTO): Promise<void> {
-    return this.moneyOperationService.createOperationFee({
-      userIds: dto.ids,
+  @Transactional()
+  async upgradeToMembers(dto: UpgradeUserMemberDTO): Promise<void> {
+    const users = await this.userRepository.findBy({
+      id: In(dto.ids),
+    });
+
+    if (users.length !== dto.ids.length) {
+      throw new NotFoundUserException();
+    }
+
+    const { items } = await this.moneyOperationService.createOperationFee({
       monthlyConfigId: dto.monthlyConfigId,
+      userIds: dto.ids,
+    });
+
+    items.forEach((item) => {
+      const user = users.find((u) => u.id === item.userId);
+      user.operationFeeId = item.operationFeeId;
+    });
+
+    await this.userRepository.save(users, {
+      chunk: 10,
     });
   }
 
   async assertIdExist(id: string): Promise<void> {
     if (
-      !(await this.userRepository.exist({
+      !(await this.userRepository.exists({
         where: {
           id,
         },

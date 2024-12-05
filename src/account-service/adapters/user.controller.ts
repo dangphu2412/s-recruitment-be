@@ -136,12 +136,11 @@ export class UserController {
 
   @CanAccessBy(Permissions.EDIT_MEMBER_USER)
   @Post('/:userId/payments')
-  async createPayment(
+  async createUserPayment(
     @Body() createPaymentDto: CreatePaymentRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
   ) {
-    await this.domainUser.assertIdExist(userId);
-    await this.paymentService.createPayment({ ...createPaymentDto, userId });
+    await this.domainUser.createUserPayment(userId, createPaymentDto);
   }
 
   @CanAccessBy(Permissions.VIEW_USERS)
