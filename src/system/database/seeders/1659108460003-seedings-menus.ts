@@ -52,6 +52,18 @@ export class SeedingMenus1659108460003 implements MigrationInterface {
         ],
       },
       {
+        name: 'Workings',
+        iconCode: 'WORKING_MANAGEMENT_ICON',
+        code: 'WORKING_MANAGEMENT',
+        subMenus: [
+          {
+            name: 'Requests',
+            accessLink: '/workings/requests',
+            code: 'WORKING_REQUESTS',
+          },
+        ],
+      },
+      {
         name: 'Recruitment',
         iconCode: 'RECRUITMENT_ICON',
         code: 'RECRUITMENT',

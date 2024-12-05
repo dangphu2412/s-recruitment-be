@@ -25,6 +25,8 @@ export class SeedMenuSettings1676171233978 implements MigrationInterface {
       [Permissions.READ_ASSESSMENTS]: ['USER_ASSESSMENT'],
       [Permissions.MANAGE_RECRUITMENT]: ['RECRUITMENT', 'RECRUITMENT_OVERVIEW'],
       [Permissions.MANAGE_POSTS]: ['POSTS_OVERVIEW', 'POST'],
+      [Permissions.READ_WORKING]: ['WORKING_MANAGEMENT', 'WORKING_REQUESTS'],
+      [Permissions.WRITE_WORKING]: ['WORKING_MANAGEMENT', 'WORKING_REQUESTS'],
     };
 
     await Promise.all(
