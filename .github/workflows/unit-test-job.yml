@@ -1,11 +1,11 @@
-name: Build job
+name: Unit test job
 
 on:
   workflow_call:
 
 jobs:
   setups:
-    name: builder
+    name: unit-test
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -29,6 +29,6 @@ jobs:
           restore-keys: |
             - cache-node-modules-
 
-      - name: Build dist
+      - name: Run unit tests
         run: |
-          pnpm build
+          pnpm test

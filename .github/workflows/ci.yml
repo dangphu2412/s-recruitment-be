@@ -4,40 +4,22 @@ on:
   pull_request:
     branches: [main, develop, release/*]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   setups:
-    name: Setup packages
     uses: ./.github/workflows/setup-packages-job.yml
 
-  unit-test:
-    name: Run Unit Test
+  unit-test-check:
     needs: [setups]
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      matrix:
-        node: [20.x]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-          cache: 'pnpm'
+    uses: ./.github/workflows/unit-test-job.yml
 
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/node_modules/
-          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            - cache-node-modules-
-
-      - name: Run unit tests
-        run: |
-          pnpm test
+  lint-check:
+    needs: [setups]
+    uses: ./.github/workflows/unit-test-job.yml
 
   build:
-    name: Build dist
     needs: [setups]
     uses: ./.github/workflows/builder-job.yml
