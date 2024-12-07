@@ -52,14 +52,19 @@ export class SeedingMenus1659108460003 implements MigrationInterface {
         ],
       },
       {
-        name: 'Workings',
-        iconCode: 'WORKING_MANAGEMENT_ICON',
-        code: 'WORKING_MANAGEMENT',
+        name: 'Activities',
+        iconCode: 'ACTIVITY_MANAGEMENT_ICON',
+        code: 'ACTIVITY_MANAGEMENT',
         subMenus: [
           {
             name: 'Requests',
-            accessLink: '/workings/requests',
-            code: 'WORKING_REQUESTS',
+            accessLink: '/activities/requests',
+            code: 'ACTIVITY_REQUESTS',
+          },
+          {
+            name: 'My requests',
+            accessLink: '/activities/requests/my',
+            code: 'MY_ACTIVITY_REQUESTS',
           },
         ],
       },
