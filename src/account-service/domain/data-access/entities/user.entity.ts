@@ -22,6 +22,7 @@ import { UserGroup } from './user-group.entity';
 import { OperationFee } from '../../../../monthly-money/domain/data-access/entities/operation-fee.entity';
 import { Department } from './department.entity';
 import { Period } from './period.entity';
+import { ActivityRequest } from '../../../../activities/domain/data-access/activity-request.entity';
 
 @Entity({
   name: 'users',
@@ -166,4 +167,7 @@ export class User {
   @ManyToOne(() => Period, (period) => period.users)
   @JoinColumn({ name: 'period_id' })
   period: Period;
+
+  @OneToMany(() => ActivityRequest, (activityRequest) => activityRequest.author)
+  activityRequests?: ActivityRequest[];
 }

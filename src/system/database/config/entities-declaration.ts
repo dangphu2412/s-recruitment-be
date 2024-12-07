@@ -14,6 +14,8 @@ import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/en
 import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
 import { Period } from '../../../account-service/domain/data-access/entities/period.entity';
 import { Department } from '../../../account-service/domain/data-access/entities/department.entity';
+import { ActivityRequest } from '../../../activities/domain/data-access/activity-request.entity';
+import { Activity } from '../../../activities/domain/data-access/activity.entity';
 
 export const APP_ENTITIES = [
   User,
@@ -31,6 +33,8 @@ export const APP_ENTITIES = [
   UserGroup,
   Period,
   Department,
+  ActivityRequest,
+  Activity,
 ];
 
 export const MIGRATION_CONFIGS = {

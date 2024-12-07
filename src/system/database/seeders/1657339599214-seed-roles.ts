@@ -91,11 +91,11 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         description: 'Manage master data',
       },
       {
-        name: Permissions.READ_WORKING,
+        name: Permissions.READ_ACTIVITIES,
         description: 'Read working',
       },
       {
-        name: Permissions.WRITE_WORKING,
+        name: Permissions.WRITE_ACTIVITIES,
         description: 'Write working',
       },
     ]);
@@ -112,8 +112,8 @@ export class SeedRoles1657339599214 implements MigrationInterface {
         Permissions.WRITE_USER_GROUPS,
         Permissions.MANAGE_RECRUITMENT,
         Permissions.MANAGE_MASTER_DATA,
-        Permissions.WRITE_WORKING,
-        Permissions.READ_WORKING,
+        Permissions.WRITE_ACTIVITIES,
+        Permissions.READ_ACTIVITIES,
         Permissions.MANAGE_POSTS,
       ],
       [SystemRoles.LEADER]: [
