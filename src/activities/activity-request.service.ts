@@ -17,6 +17,8 @@ import {
   ActivityService,
   ActivityServiceToken,
 } from './domain/core/services/activity.service';
+import { FindRequestedMyActivityResponseDTO } from './domain/core/dtos/find-requested-my-acitivity.dto';
+import { UpdateMyActivityRequestDTO } from './domain/core/dtos/update-my-activity-request.dto';
 
 @Injectable()
 export class ActivityRequestServiceImpl implements ActivityRequestService {
@@ -63,6 +65,19 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     });
   }
 
+  findMyRequestedActivity(
+    id: number,
+    userId: string,
+  ): Promise<FindRequestedMyActivityResponseDTO> {
+    return this.activityRequestRepository.findOne({
+      where: {
+        id,
+        authorId: userId,
+      },
+      relations: ['author'],
+    });
+  }
+
   async createRequestActivity(dto: CreateActivityRequestDTO): Promise<any> {
     await this.activityRequestRepository.insert({
       ...dto,
@@ -74,7 +89,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   async updateApprovalRequestActivity(
     dto: UpdateApprovalActivityRequestDTO,
   ): Promise<void> {
-    const { id, action } = dto;
+    const { id, action, rejectReason, reviseNote } = dto;
 
     const activity = await this.activityRequestRepository.findOneBy({ id });
 
@@ -89,6 +104,8 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
 
     await this.activityRequestRepository.update(id, {
       approvalStatus: nextState,
+      ...(rejectReason ? { rejectReason } : {}),
+      ...(reviseNote ? { reviseNote } : {}),
     });
 
     if (ApprovalRequestAction.APPROVE === command) {
@@ -114,15 +131,13 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
         [ApprovalRequestAction.REJECT]: {
           nextState: RequestActivityStatus.REJECTED,
         },
-      },
-      [RequestActivityStatus.APPROVED]: {
         [ApprovalRequestAction.REVISE]: {
-          nextState: RequestActivityStatus.PENDING,
+          nextState: RequestActivityStatus.REVISE,
         },
       },
       [RequestActivityStatus.REJECTED]: {
         [ApprovalRequestAction.REVISE]: {
-          nextState: RequestActivityStatus.PENDING,
+          nextState: RequestActivityStatus.REVISE,
         },
       },
     };
@@ -130,9 +145,31 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     const transition = transitions[currentStatus];
 
     if (!transition) {
-      throw new Error('Invalid transition');
+      throw new Error('Invalid state transition');
     }
 
     return transition[action];
+  }
+
+  async updateMyRequestActivity(dto: UpdateMyActivityRequestDTO) {
+    const request = await this.activityRequestRepository.findOne({
+      where: {
+        id: dto.id,
+        authorId: dto.authorId,
+      },
+    });
+
+    if (!request) {
+      throw new Error('Request not found');
+    }
+
+    if (RequestActivityStatus.REVISE !== request.approvalStatus) {
+      throw new Error('Request is not in revise status');
+    }
+
+    await this.activityRequestRepository.update(dto.id, {
+      ...dto,
+      approvalStatus: RequestActivityStatus.PENDING,
+    });
   }
 }

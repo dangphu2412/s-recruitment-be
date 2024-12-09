@@ -1,6 +1,4 @@
-import { Page } from '../../../../system/query-shape/types';
-
-export type FindRequestedMyActivitiesResponseDTO = Page<{
+export type FindRequestedMyActivityResponseDTO = {
   id: number;
   requestType: string;
   timeOfDay: string;
@@ -9,4 +7,4 @@ export type FindRequestedMyActivitiesResponseDTO = Page<{
     id: string;
     fullName: string;
   };
-}>;
+};

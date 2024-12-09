@@ -1,7 +1,8 @@
-import { IsEnum } from 'class-validator';
-import { ApprovalRequestAction } from '../../core/constants/request-activity-status.enum';
+import { IsNotEmpty } from 'class-validator';
 
-export class UpdateApprovalActivityRequestRequest {
-  @IsEnum(ApprovalRequestAction)
-  action: ApprovalRequestAction;
+export class UpdateMyActivityRequestRequest {
+  @IsNotEmpty()
+  timeOfDay: string;
+  @IsNotEmpty()
+  dayOfWeek: string;
 }

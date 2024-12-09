@@ -21,6 +21,7 @@ import {
 } from '../account-service/adapters/decorators';
 import { JwtPayload } from '../account-service/domain/dtos/jwt-payload';
 import { UpdateApprovalActivityRequestRequest } from './domain/presentation/dtos/update-approval-activity-request.request';
+import { UpdateMyActivityRequestRequest } from './domain/presentation/dtos/update-my-activity.request';
 
 @Controller('activities')
 export class ActivityController {
@@ -41,6 +42,15 @@ export class ActivityController {
     return this.activityRequestService.findMyRequestedActivities(user.sub);
   }
 
+  @Identified
+  @Get('my-requests/:id')
+  findMyRequestedActivity(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.activityRequestService.findMyRequestedActivity(id, user.sub);
+  }
+
   @CanAccessBy(Permissions.WRITE_ACTIVITIES)
   @Post('requests')
   createRequestedActivity(
@@ -48,6 +58,20 @@ export class ActivityController {
     @CurrentUser() user: JwtPayload,
   ) {
     return this.activityRequestService.createRequestActivity({
+      ...dto,
+      authorId: user.sub,
+    });
+  }
+
+  @Identified
+  @Patch('my-requests/:id')
+  updateRequestedActivity(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateMyActivityRequestRequest,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.activityRequestService.updateMyRequestActivity({
+      id,
       ...dto,
       authorId: user.sub,
     });

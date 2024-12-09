@@ -4,4 +4,6 @@ export type UpdateApprovalActivityRequestDTO = {
   id: number;
   authorId: string;
   action: ApprovalRequestAction;
+  rejectReason?: string;
+  reviseNote?: string;
 };
