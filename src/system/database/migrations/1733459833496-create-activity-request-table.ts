@@ -26,6 +26,16 @@ export class CreateActivityRequestTable1733459833496
             isNullable: false,
           },
           {
+            name: 'reject_reason',
+            type: 'varchar',
+            isNullable: true,
+          },
+          {
+            name: 'revise_note',
+            type: 'varchar',
+            isNullable: true,
+          },
+          {
             name: 'time_of_day',
             type: 'varchar',
           },

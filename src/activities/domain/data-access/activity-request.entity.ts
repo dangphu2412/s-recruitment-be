@@ -23,6 +23,18 @@ export class ActivityRequest {
   })
   requestType: string;
 
+  @Column({
+    name: 'reject_reason',
+    type: 'varchar',
+  })
+  rejectReason: string;
+
+  @Column({
+    name: 'revise_note',
+    type: 'varchar',
+  })
+  reviseNote: string;
+
   // Occurrence
   @Column({
     name: 'time_of_day',

@@ -1,6 +1,10 @@
+import { IsNotEmpty } from 'class-validator';
+
 export class CreateActivityRequestRequest {
-  authorId: string;
+  @IsNotEmpty()
   requestType: string;
+  @IsNotEmpty()
   timeOfDay: string;
+  @IsNotEmpty()
   dayOfWeek: string;
 }

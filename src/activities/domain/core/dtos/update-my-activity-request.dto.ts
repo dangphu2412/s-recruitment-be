@@ -1,9 +1,6 @@
-import { ApprovalRequestAction } from '../constants/request-activity-status.enum';
-
-export type UpdateApprovalActivityRequestDTO = {
+export type UpdateMyActivityRequestDTO = {
   id: number;
   authorId: string;
-  action: ApprovalRequestAction;
-  rejectReason?: string;
-  reviseNote?: string;
+  timeOfDay: string;
+  dayOfWeek: string;
 };

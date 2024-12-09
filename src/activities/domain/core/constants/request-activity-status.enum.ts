@@ -1,7 +1,8 @@
 export enum RequestActivityStatus {
-  PENDING = 'P',
-  APPROVED = 'A',
-  REJECTED = 'R',
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  REVISE = 'REVISE',
 }
 
 export enum ApprovalRequestAction {
