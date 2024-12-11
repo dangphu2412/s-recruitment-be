@@ -1,8 +1,14 @@
 export type FindRequestedMyActivityResponseDTO = {
   id: number;
   requestType: string;
-  timeOfDay: string;
-  dayOfWeek: string;
+  timeOfDay: {
+    id: string;
+    name: string;
+  };
+  dayOfWeek: {
+    id: string;
+    name: string;
+  };
   author: {
     id: string;
     fullName: string;

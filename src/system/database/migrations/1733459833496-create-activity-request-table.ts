@@ -11,6 +11,42 @@ export class CreateActivityRequestTable1733459833496
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
+        name: 'mdm_time_of_days',
+        columns: [
+          {
+            name: 'id',
+            type: 'varchar',
+            isPrimary: true,
+          },
+          {
+            name: 'name',
+            type: 'varchar',
+            isNullable: false,
+          },
+        ],
+      }),
+    );
+
+    await queryRunner.createTable(
+      new Table({
+        name: 'mdm_day_of_weeks',
+        columns: [
+          {
+            name: 'id',
+            type: 'varchar',
+            isPrimary: true,
+          },
+          {
+            name: 'name',
+            type: 'varchar',
+            isNullable: false,
+          },
+        ],
+      }),
+    );
+
+    await queryRunner.createTable(
+      new Table({
         name: 'activity_requests',
         columns: [
           {
@@ -36,11 +72,11 @@ export class CreateActivityRequestTable1733459833496
             isNullable: true,
           },
           {
-            name: 'time_of_day',
+            name: 'time_of_day_id',
             type: 'varchar',
           },
           {
-            name: 'day_of_week',
+            name: 'day_of_week_id',
             type: 'varchar',
           },
           {
@@ -71,6 +107,16 @@ export class CreateActivityRequestTable1733459833496
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
       }),
+      new TableForeignKey({
+        columnNames: ['time_of_day_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'mdm_time_of_days',
+      }),
+      new TableForeignKey({
+        columnNames: ['day_of_week_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'mdm_day_of_weeks',
+      }),
     ]);
 
     await queryRunner.createTable(
@@ -90,11 +136,11 @@ export class CreateActivityRequestTable1733459833496
             isNullable: false,
           },
           {
-            name: 'time_of_day',
+            name: 'time_of_day_id',
             type: 'varchar',
           },
           {
-            name: 'day_of_week',
+            name: 'day_of_week_id',
             type: 'varchar',
           },
           {
@@ -120,6 +166,16 @@ export class CreateActivityRequestTable1733459833496
         columnNames: ['author_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
+      }),
+      new TableForeignKey({
+        columnNames: ['time_of_day_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'mdm_time_of_days',
+      }),
+      new TableForeignKey({
+        columnNames: ['day_of_week_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'mdm_day_of_weeks',
       }),
     ]);
   }

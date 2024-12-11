@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { User } from '../../../account-service/domain/data-access/entities/user.entity';
 import { RequestActivityStatus } from '../core/constants/request-activity-status.enum';
+import { TimeOfDay } from './time-of-day.entity';
+import { DayOfWeek } from './day-of-week';
 
 @Entity({
   name: 'activity_requests',
@@ -37,17 +39,16 @@ export class ActivityRequest {
 
   // Occurrence
   @Column({
-    name: 'time_of_day',
+    name: 'time_of_day_id',
     type: 'varchar',
   })
-  timeOfDay: string;
+  timeOfDayId: string;
 
-  // Occurrence
   @Column({
-    name: 'day_of_week',
+    name: 'day_of_week_id',
     type: 'varchar',
   })
-  dayOfWeek: string;
+  dayOfWeekId: string;
 
   @Column({
     name: 'approval_status',
@@ -77,4 +78,18 @@ export class ActivityRequest {
     referencedColumnName: 'id',
   })
   author: User;
+
+  @ManyToOne(() => TimeOfDay, (timeOfDay) => timeOfDay.activityRequests)
+  @JoinColumn({
+    name: 'time_of_day_id',
+    referencedColumnName: 'id',
+  })
+  timeOfDay: TimeOfDay;
+
+  @ManyToOne(() => DayOfWeek, (timeOfDay) => timeOfDay.activityRequests)
+  @JoinColumn({
+    name: 'day_of_week_id',
+    referencedColumnName: 'id',
+  })
+  dayOfWeek: DayOfWeek;
 }

@@ -16,6 +16,8 @@ import { Period } from '../../../account-service/domain/data-access/entities/per
 import { Department } from '../../../account-service/domain/data-access/entities/department.entity';
 import { ActivityRequest } from '../../../activities/domain/data-access/activity-request.entity';
 import { Activity } from '../../../activities/domain/data-access/activity.entity';
+import { DayOfWeek } from '../../../activities/domain/data-access/day-of-week';
+import { TimeOfDay } from '../../../activities/domain/data-access/time-of-day.entity';
 
 export const APP_ENTITIES = [
   User,
@@ -35,6 +37,8 @@ export const APP_ENTITIES = [
   Department,
   ActivityRequest,
   Activity,
+  DayOfWeek,
+  TimeOfDay,
 ];
 
 export const MIGRATION_CONFIGS = {

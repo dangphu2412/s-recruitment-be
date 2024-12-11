@@ -8,6 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../../account-service/domain/data-access/entities/user.entity';
+import { TimeOfDay } from './time-of-day.entity';
+import { DayOfWeek } from './day-of-week';
 
 @Entity({
   name: 'activities',
@@ -24,17 +26,17 @@ export class Activity {
 
   // Occurrence
   @Column({
-    name: 'time_of_day',
+    name: 'time_of_day_id',
     type: 'varchar',
   })
-  timeOfDay: string;
+  timeOfDayId: string;
 
   // Occurrence
   @Column({
-    name: 'day_of_week',
+    name: 'day_of_week_id',
     type: 'varchar',
   })
-  dayOfWeek: string;
+  dayOfWeekId: string;
 
   @Column({
     name: 'author_id',
@@ -58,4 +60,18 @@ export class Activity {
     referencedColumnName: 'id',
   })
   author: User;
+
+  @ManyToOne(() => TimeOfDay, (timeOfDay) => timeOfDay.activities)
+  @JoinColumn({
+    name: 'time_of_day_id',
+    referencedColumnName: 'id',
+  })
+  timeOfDay: TimeOfDay;
+
+  @ManyToOne(() => DayOfWeek, (timeOfDay) => timeOfDay.activities)
+  @JoinColumn({
+    name: 'day_of_week_id',
+    referencedColumnName: 'id',
+  })
+  dayOfWeek: DayOfWeek;
 }
