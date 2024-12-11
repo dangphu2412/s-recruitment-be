@@ -14,4 +14,6 @@ export declare global {
     index: number,
     array: T[],
   ) => value is S;
+
+  type ClassConstructor<T> = new (...args: any[]) => T;
 }

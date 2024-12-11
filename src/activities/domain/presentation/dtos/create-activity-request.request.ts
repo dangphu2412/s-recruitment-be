@@ -4,7 +4,7 @@ export class CreateActivityRequestRequest {
   @IsNotEmpty()
   requestType: string;
   @IsNotEmpty()
-  timeOfDay: string;
+  timeOfDayId: string;
   @IsNotEmpty()
-  dayOfWeek: string;
+  dayOfWeekId: string;
 }

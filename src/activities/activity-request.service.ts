@@ -34,7 +34,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   ): Promise<FindRequestedMyActivitiesResponseDTO> {
     const items = await this.activityRequestRepository.find({
       where: { authorId: userId },
-      relations: ['author'],
+      relations: ['author', 'dayOfWeek', 'timeOfDay'],
     });
 
     return Page.of({
@@ -49,7 +49,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
 
   async findRequestedActivities(): Promise<FindRequestedActivitiesResponseDTO> {
     const items = await this.activityRequestRepository.find({
-      relations: ['author'],
+      relations: ['author', 'dayOfWeek', 'timeOfDay'],
       order: {
         updatedAt: 'DESC',
       },
@@ -74,7 +74,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
         id,
         authorId: userId,
       },
-      relations: ['author'],
+      relations: ['author', 'dayOfWeek', 'timeOfDay'],
     });
   }
 
@@ -112,8 +112,8 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       await this.activityService.createActivity({
         authorId: activity.authorId,
         requestType: activity.requestType,
-        timeOfDay: activity.timeOfDay,
-        dayOfWeek: activity.dayOfWeek,
+        timeOfDayId: activity.timeOfDayId,
+        dayOfWeekId: activity.dayOfWeekId,
       });
     }
   }

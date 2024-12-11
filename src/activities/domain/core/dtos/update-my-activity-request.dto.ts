@@ -1,6 +1,6 @@
 export type UpdateMyActivityRequestDTO = {
   id: number;
   authorId: string;
-  timeOfDay: string;
-  dayOfWeek: string;
+  timeOfDayId: string;
+  dayOfWeekId: string;
 };

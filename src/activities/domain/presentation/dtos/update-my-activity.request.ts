@@ -2,7 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 
 export class UpdateMyActivityRequestRequest {
   @IsNotEmpty()
-  timeOfDay: string;
+  timeOfDayId: string;
   @IsNotEmpty()
-  dayOfWeek: string;
+  dayOfWeekId: string;
 }
