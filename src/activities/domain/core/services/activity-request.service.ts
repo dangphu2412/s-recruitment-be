@@ -1,7 +1,10 @@
 import { createInterfaceToken } from '../../../../system/utils';
 import { CreateActivityRequestDTO } from '../dtos/create-activity-request.dto';
 import { FindRequestedMyActivitiesResponseDTO } from '../dtos/find-requested-my-acitivities.dto';
-import { FindRequestedActivitiesResponseDTO } from '../dtos/find-requested-acitivities.dto';
+import {
+  FindRequestedActivitiesResponseDTO,
+  FindRequestedActivityQueryDTO,
+} from '../dtos/find-requested-acitivities.dto';
 import { FindRequestedMyActivityResponseDTO } from '../dtos/find-requested-my-acitivity.dto';
 import { UpdateMyActivityRequestDTO } from '../dtos/update-my-activity-request.dto';
 import { UpdateApprovalActivityRequestDTO } from '../dtos/update-approval-activity-request.dto';
@@ -11,7 +14,9 @@ export const ActivityRequestServiceToken = createInterfaceToken(
 );
 
 export interface ActivityRequestService {
-  findRequestedActivities(): Promise<FindRequestedActivitiesResponseDTO>;
+  findRequestedActivities(
+    findRequestedActivityQueryDTO: FindRequestedActivityQueryDTO,
+  ): Promise<FindRequestedActivitiesResponseDTO>;
   findMyRequestedActivities(
     userId: string,
   ): Promise<FindRequestedMyActivitiesResponseDTO>;

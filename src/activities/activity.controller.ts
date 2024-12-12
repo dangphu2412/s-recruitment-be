@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ActivityRequestService,
@@ -22,6 +23,7 @@ import {
 import { JwtPayload } from '../account-service/domain/dtos/jwt-payload';
 import { UpdateApprovalActivityRequestRequest } from './domain/presentation/dtos/update-approval-activity-request.request';
 import { UpdateMyActivityRequestRequest } from './domain/presentation/dtos/update-my-activity.request';
+import { FindRequestedActivityRequestDTO } from './domain/presentation/dtos/find-requested-activity-request.dto';
 
 @Controller('activities')
 export class ActivityController {
@@ -32,8 +34,8 @@ export class ActivityController {
 
   @CanAccessBy(Permissions.READ_ACTIVITIES)
   @Get('requests')
-  findRequestedActivities() {
-    return this.activityRequestService.findRequestedActivities();
+  findRequestedActivities(@Query() query: FindRequestedActivityRequestDTO) {
+    return this.activityRequestService.findRequestedActivities(query);
   }
 
   @Identified
