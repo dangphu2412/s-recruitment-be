@@ -1,4 +1,9 @@
 import { Page } from '../../../../system/query-shape/types';
+import { OffsetPagination } from '../../../../system/query-shape/dto';
+
+export type FindRequestedActivityQueryDTO = OffsetPagination & {
+  query: string;
+};
 
 export type FindRequestedActivitiesResponseDTO = Page<{
   id: number;
