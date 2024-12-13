@@ -1,4 +1,4 @@
-name: Setup packages
+name: Setup packages jobs
 
 on:
   workflow_call:
@@ -11,14 +11,12 @@ jobs:
 
     strategy:
       matrix:
-        node: [18.x]
+        node: [20.x]
 
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
-      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'

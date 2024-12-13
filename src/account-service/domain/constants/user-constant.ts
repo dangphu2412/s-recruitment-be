@@ -4,8 +4,9 @@ export enum CreateUserType {
   EXCEL = 'Excel',
 }
 
-export enum MemberType {
+export enum UserStatus {
   DEBTOR = 'DEBTOR',
-  NON_MEMBER = 'NON_MEMBER',
-  ALL = 'ALL',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  TEMPORARY_STOP = 'TEMPORARY_STOP',
 }

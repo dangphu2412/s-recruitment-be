@@ -1,22 +1,19 @@
-import { Equals, IsOptional, IsString } from 'class-validator';
-import { CreateUserType } from '../constants/user-constant';
+import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
-export type PublicUserFields = 'email' | 'fullName' | 'birthday' | 'username';
-
-export type FieldMappingsRequest = Record<string, PublicUserFields>;
-
-export type FileRow = Record<string, string>;
+export type FileRow = {
+  'Họ và Tên:': string;
+  Email: string;
+  Username: string;
+  'Join At': string;
+};
 
 export class FileCreateUsersDto {
-  @Equals(CreateUserType.EXCEL)
-  createUserType: CreateUserType;
+  @IsNotEmpty()
+  periodId: string;
 
   @IsOptional()
-  @IsString()
-  monthlyConfigId?: string;
+  @IsNumber()
+  monthlyConfigId?: number;
 
   file: Express.Multer.File;
-
-  @IsString()
-  fieldMappings: string;
 }

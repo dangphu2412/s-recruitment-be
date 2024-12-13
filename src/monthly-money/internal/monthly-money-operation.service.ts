@@ -1,14 +1,15 @@
-import {
-  CreateMoneyFee,
-  DebtOperationFeeQuery,
-  ExceedLimitOperationUpdateException,
-  MonthlyMoneyOperationService,
-  OperationFee,
-  UpdatePaid,
-} from '../client';
 import { MonthlyMoneyOperationRepository } from './monthly-money-operation.repository';
-import { Injectable } from '@nestjs/common';
-import { NoOperationFeeFound } from '../client/exceptions/no-operation-fee-found.exception';
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  MonthlyMoneyConfigService,
+  MonthlyMoneyConfigServiceToken,
+} from '../domain/core/services/monthly-money-config.service';
+import { MonthlyMoneyOperationService } from '../domain/core/services/monthly-money-operation.service';
+import { OperationFee } from '../domain/data-access/entities/operation-fee.entity';
+import {
+  CreateMoneyFeeDTO,
+  CreateMoneyFeeResultsDTO,
+} from '../domain/core/dto/create-money-fee.dto';
 
 @Injectable()
 export class MonthlyMoneyOperationServiceImpl
@@ -16,75 +17,44 @@ export class MonthlyMoneyOperationServiceImpl
 {
   constructor(
     private readonly operationFeeRepository: MonthlyMoneyOperationRepository,
+    @Inject(MonthlyMoneyConfigServiceToken)
+    private readonly moneyConfigService: MonthlyMoneyConfigService,
   ) {}
 
-  async createOperationFee(createMoneyFee: CreateMoneyFee): Promise<void> {
-    const newOperationFees = createMoneyFee.userIds.map((userId) => {
-      return {
-        monthlyConfigId: createMoneyFee.monthlyConfigId,
-        userId: userId,
-        paidMoney: 0,
-      };
-    });
-
-    await this.operationFeeRepository.insert(newOperationFees);
-  }
-
-  async updateNewPaid(updatePaid: UpdatePaid): Promise<void> {
-    const { userId, newPaid } = updatePaid;
-
-    await this.validateUpdateUserOperationFee(updatePaid);
-
-    await this.operationFeeRepository.update(
-      {
-        userId,
-      },
-      {
-        paidMoney: newPaid,
-      },
-    );
-  }
-
-  private async validateUpdateUserOperationFee({
-    operationFeeId,
-    userId,
-    newPaid,
-  }: UpdatePaid): Promise<void> {
-    const operationFee = await this.operationFeeRepository.findOne({
-      where: {
-        id: operationFeeId,
-        userId,
-      },
+  findOperationFeeWithMoneyConfigById(id: number): Promise<OperationFee> {
+    return this.operationFeeRepository.findOne({
+      where: { id },
       relations: ['monthlyConfig'],
     });
-
-    if (!operationFee) {
-      throw new NoOperationFeeFound();
-    }
-
-    const maxPaidMoney =
-      operationFee.monthlyConfig.amount * operationFee.monthlyConfig.monthRange;
-
-    if (maxPaidMoney < newPaid) {
-      throw new ExceedLimitOperationUpdateException(
-        'Exceed the max limit when update user monthly money',
-      );
-    }
-
-    if (newPaid < 0) {
-      throw new ExceedLimitOperationUpdateException(
-        'Exceed the min limit when update user monthly money',
-      );
-    }
   }
 
-  async findDebtOperationFee({
-    offset,
-    size,
-  }: DebtOperationFeeQuery): Promise<OperationFee[]> {
-    return this.operationFeeRepository.findDebtOperationFee({
-      skip: offset,
-      take: size,
-    });
+  async createOperationFee(
+    dto: CreateMoneyFeeDTO,
+  ): Promise<CreateMoneyFeeResultsDTO> {
+    const { monthlyConfigId, userIds } = dto;
+    const config = await this.moneyConfigService.findById(monthlyConfigId);
+
+    const items = await Promise.all(
+      userIds.map(async (userId) => {
+        const entity = new OperationFee();
+        entity.monthlyConfigId = monthlyConfigId;
+        entity.remainMonths = config.monthRange;
+        entity.paidMoney = 0;
+        entity.paidMonths = 0;
+
+        const { identifiers } = await this.operationFeeRepository.insert(
+          entity,
+        );
+
+        return {
+          userId,
+          operationFeeId: identifiers[0].id,
+        };
+      }),
+    );
+
+    return {
+      items,
+    };
   }
 }

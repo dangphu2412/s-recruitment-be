@@ -1,4 +1,4 @@
-name: Build runner app
+name: Build job
 
 on:
   workflow_call:
@@ -11,13 +11,11 @@ jobs:
 
     strategy:
       matrix:
-        node: [18.x]
+        node: [20.x]
 
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
@@ -34,9 +32,3 @@ jobs:
       - name: Build dist
         run: |
           pnpm build
-
-      - name: Upload Dist Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist

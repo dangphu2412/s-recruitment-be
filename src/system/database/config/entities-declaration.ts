@@ -1,14 +1,23 @@
 import { Menu } from '../../menu';
-import { MonthlyMoneyConfig, OperationFee } from '../../../monthly-money';
-import { RecruitmentEvent } from '../../../recruitment/domain/entities/recruitment-event.entity';
-import { RecruitmentEmployee } from '../../../recruitment/domain/entities/recruitment-employee.entity';
-import { EmployeeEventPoint } from '../../../recruitment/domain/entities/employee-event-point.entity';
+import { RecruitmentEvent } from '../../../recruitment/domain/data-access/entities/recruitment-event.entity';
+import { RecruitmentEmployee } from '../../../recruitment/domain/data-access/entities/recruitment-employee.entity';
+import { EmployeeEventPoint } from '../../../recruitment/domain/data-access/entities/employee-event-point.entity';
 import { join } from 'path';
-import { User } from '../../../account-service/domain/entities/user.entity';
-import { Role } from '../../../account-service/domain/entities/role.entity';
-import { Permission } from '../../../account-service/domain/entities/permission.entity';
-import { Post } from '../../../posts-service/domain/entities/posts.entity';
-import { Category } from '../../../posts-service/domain/entities/category.entity';
+import { User } from '../../../account-service/domain/data-access/entities/user.entity';
+import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
+import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
+import { Post } from '../../../posts-service/domain/data-access/entities/posts.entity';
+import { Category } from '../../../posts-service/domain/data-access/entities/category.entity';
+import { Payment } from '../../../monthly-money/domain/data-access/entities/payment.entity';
+import { UserGroup } from '../../../account-service/domain/data-access/entities/user-group.entity';
+import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
+import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
+import { Period } from '../../../account-service/domain/data-access/entities/period.entity';
+import { Department } from '../../../account-service/domain/data-access/entities/department.entity';
+import { ActivityRequest } from '../../../activities/domain/data-access/activity-request.entity';
+import { Activity } from '../../../activities/domain/data-access/activity.entity';
+import { DayOfWeek } from '../../../activities/domain/data-access/day-of-week';
+import { TimeOfDay } from '../../../activities/domain/data-access/time-of-day.entity';
 
 export const APP_ENTITIES = [
   User,
@@ -22,6 +31,14 @@ export const APP_ENTITIES = [
   EmployeeEventPoint,
   Post,
   Category,
+  Payment,
+  UserGroup,
+  Period,
+  Department,
+  ActivityRequest,
+  Activity,
+  DayOfWeek,
+  TimeOfDay,
 ];
 
 export const MIGRATION_CONFIGS = {

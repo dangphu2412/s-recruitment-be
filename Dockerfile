@@ -1,20 +1,22 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS builder
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN npm install pnpm@8.5.1 -g
+
 WORKDIR /app
+
 COPY package.json pnpm-lock.yaml ./
+RUN npm install pnpm -g && pnpm install --frozen-lockfile --ignore-scripts
 
-FROM base AS prod-deps
-RUN pnpm install --prod --frozen-lockfile --ignore-scripts
-
-FROM base AS builder
 COPY . .
-RUN pnpm install --frozen-lockfile
-RUN pnpm run build
+RUN pnpm run build && pnpm prune --prod --ignore-scripts
 
-FROM base
-COPY --from=prod-deps /app/node_modules /app/node_modules
+FROM node:20-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/dist /app/dist
+COPY --from=builder /app/package.json /app/package.json
+
 EXPOSE 3000
-CMD [ "pnpm", "start:prod" ]
+CMD [ "npm", "run", "start:prod" ]

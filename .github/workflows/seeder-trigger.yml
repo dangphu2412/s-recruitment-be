@@ -1,0 +1,55 @@
+name: Seed runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment'
+        required: true
+        default: 'production'
+        options:
+          - 'production'
+          - 'staging'
+          - 'development'
+
+jobs:
+  setups:
+    name: builder
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: ${{ github.event.inputs.environment }}
+
+    strategy:
+      matrix:
+        node: [20.x]
+
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/node_modules/
+          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            - cache-node-modules-
+
+      - name: Dispatch seed runner
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+          echo "DB_PORT=${{ vars.DB_PORT }}" >> .env
+          echo "DB_USERNAME=${{ vars.DB_USERNAME }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_DATABASE=${{ vars.DB_DATABASE }}" >> .env
+          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> .env
+          echo "SALT_ROUNDS=${{ vars.SALT_ROUNDS }}" >> .env
+
+      - name: Run seed runner
+        run: |
+          pnpm install && pnpm run seed:run

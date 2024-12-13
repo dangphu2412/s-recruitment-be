@@ -9,28 +9,31 @@ import {
   IncorrectUsernamePasswordException,
   InvalidTokenFormatException,
   LogoutRequiredException,
-} from '../domain/exceptions';
+} from '../domain/core/exceptions';
 import {
   AuthService,
-  TokenGenerator,
-  TokenGeneratorToken,
-} from '../domain/interfaces';
-import { DomainUser, DomainUserToken } from '../domain/interfaces/domain-user';
+  TokenFactory,
+  TokenFactoryToken,
+} from '../domain/core/services';
 import {
-  AccessRightStorage,
-  AccessRightStorageToken,
-} from '../domain/interfaces/access-right-storage';
+  UserService,
+  UserServiceToken,
+} from '../domain/core/services/user-service';
 import { JwtPayload } from '../domain/dtos/jwt-payload';
+import {
+  RoleService,
+  RoleServiceToken,
+} from '../domain/core/services/role.service';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
   constructor(
-    @Inject(DomainUserToken)
-    private readonly userService: DomainUser,
-    @Inject(AccessRightStorageToken)
-    private readonly accessRightStorage: AccessRightStorage,
-    @Inject(TokenGeneratorToken)
-    private readonly tokenGenerator: TokenGenerator,
+    @Inject(UserServiceToken)
+    private readonly userService: UserService,
+    @Inject(RoleServiceToken)
+    private readonly roleService: RoleService,
+    @Inject(TokenFactoryToken)
+    private readonly tokenFactory: TokenFactory,
     private readonly jwtService: JwtService,
     private readonly passwordManager: PasswordManager,
   ) {}
@@ -41,7 +44,7 @@ export class AuthServiceImpl implements AuthService {
       return;
     }
 
-    return this.accessRightStorage.clean(jwtPayload.sub);
+    return this.roleService.clean(jwtPayload.sub);
   }
 
   async login({
@@ -53,17 +56,16 @@ export class AuthServiceImpl implements AuthService {
       withRights: true,
     });
 
-    const cannotLogin =
+    if (
       isEmpty(user) ||
-      (await this.passwordManager.compare(password, user.password));
-
-    if (cannotLogin) {
+      !(await this.passwordManager.compare(password, user.password))
+    ) {
       throw new IncorrectUsernamePasswordException();
     }
 
     const [tokens] = await Promise.all([
-      this.tokenGenerator.generate(user.id),
-      this.accessRightStorage.save(user.id, user.roles),
+      this.tokenFactory.create(user.id),
+      this.roleService.save(user.id, user.roles),
     ]);
 
     return {
@@ -76,17 +78,9 @@ export class AuthServiceImpl implements AuthService {
       const { sub } = await this.jwtService.verifyAsync<JwtPayload>(
         refreshToken,
       );
-      const user = await this.userService.findOne({
-        id: sub,
-        withRights: true,
-      });
 
-      const [tokens] = await Promise.all([
-        this.tokenGenerator.generate(sub, refreshToken),
-        this.accessRightStorage.save(user.id, user.roles),
-      ]);
+      const tokens = await this.tokenFactory.create(sub, refreshToken);
 
-      // TODO: Missing access token in cache when server restart
       return {
         tokens,
       };
@@ -97,7 +91,7 @@ export class AuthServiceImpl implements AuthService {
         throw new InvalidTokenFormatException();
       }
 
-      await this.accessRightStorage.clean(jwtPayload.sub);
+      await this.roleService.clean(jwtPayload.sub);
 
       throw new LogoutRequiredException();
     }

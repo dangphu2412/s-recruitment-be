@@ -1,10 +1,8 @@
-import {
-  MonthlyMoneyConfig,
-  MonthlyMoneyConfigService,
-  NoMonthlyMoneyConfigFoundException,
-} from '../client';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MonthlyMoneyConfig } from '../domain/data-access/entities/monthly-money-config.entity';
+import { MonthlyMoneyConfigService } from '../domain/core/services/monthly-money-config.service';
+import { NoMonthlyMoneyConfigFoundException } from '../domain/core/exceptions';
 
 export class MonthlyMoneyConfigServiceImpl
   implements MonthlyMoneyConfigService
@@ -14,7 +12,7 @@ export class MonthlyMoneyConfigServiceImpl
     private readonly monthlyMoneyConfigRepository: Repository<MonthlyMoneyConfig>,
   ) {}
 
-  find(): Promise<MonthlyMoneyConfig[]> {
+  findAll(): Promise<MonthlyMoneyConfig[]> {
     return this.monthlyMoneyConfigRepository.find();
   }
 

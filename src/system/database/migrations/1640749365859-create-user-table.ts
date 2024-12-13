@@ -33,6 +33,11 @@ export class CreateUserTable1640749365859 implements MigrationInterface {
             type: 'varchar',
           },
           {
+            name: 'tracking_id',
+            type: 'varchar',
+            isNullable: true,
+          },
+          {
             name: 'phone_number',
             type: 'varchar',
             isNullable: true,
@@ -53,6 +58,11 @@ export class CreateUserTable1640749365859 implements MigrationInterface {
           },
           {
             name: 'created_at',
+            type: 'timestamp',
+            default: 'now()',
+          },
+          {
+            name: 'joined_at',
             type: 'timestamp',
             default: 'now()',
           },

@@ -1,11 +1,11 @@
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../domain/entities/user.entity';
-import {
-  DebtorManagementQuery,
-  UserManagementQuery,
-} from '../domain/vos/user-management-view.vo';
+import { User } from '../domain/data-access/entities/user.entity';
+import { UserStatus } from '../domain/constants/user-constant';
+import { Page, PageRequest } from '../../system/query-shape/dto';
+import { GetUsersQueryRequest } from '../domain/presentation/dto/get-users-query.request';
+import { UserOverviewAggregate } from '../domain/data-access/aggregates/user-overview.aggregate';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -16,24 +16,34 @@ export class UserRepository extends Repository<User> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  findUsersForManagement({
-    offset,
-    size,
-    joinedIn,
-    search = '',
-  }: UserManagementQuery) {
+  async findPaginatedOverviewUsers(
+    query: GetUsersQueryRequest,
+  ): Promise<Page<UserOverviewAggregate>> {
+    const {
+      joinedIn,
+      userStatus,
+      search = '',
+      departmentIds,
+      periodIds,
+    } = query;
+    const { offset, size } = PageRequest.of(query);
+
     const qb = this.createQueryBuilder('users')
       .select([
         'users.id',
         'users.username',
+        'users.fullName',
         'users.email',
         'users.createdAt',
+        'users.joinedAt',
         'users.deletedAt',
       ])
       .skip(offset)
       .take(size)
       .withDeleted()
       .leftJoinAndSelect('users.roles', 'roles')
+      .leftJoinAndSelect('users.department', 'department')
+      .leftJoinAndSelect('users.period', 'period')
       .leftJoinAndSelect('users.operationFee', 'operationFee')
       .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig');
 
@@ -50,54 +60,36 @@ export class UserRepository extends Repository<User> {
       });
     }
 
-    return qb.getManyAndCount();
-  }
+    if (userStatus) {
+      if (userStatus.includes(UserStatus.DEBTOR)) {
+        qb.andWhere(
+          `operationFee.paidMonths < EXTRACT(MONTH FROM age(CURRENT_DATE, users.joinedAt))`,
+        );
+      }
 
-  findDebtorForManagement({
-    joinedIn,
-    search = '',
-    userIds,
-  }: DebtorManagementQuery) {
-    const qb = this.createQueryBuilder('users')
-      .select([
-        'users.id',
-        'users.username',
-        'users.email',
-        'users.createdAt',
-        'users.deletedAt',
-      ])
-      .withDeleted()
-      .leftJoinAndSelect('users.roles', 'roles')
-      .leftJoinAndSelect('users.operationFee', 'operationFee')
-      .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig');
+      if (userStatus.includes(UserStatus.INACTIVE)) {
+        qb.andWhere(`users.deletedAt IS NOT NULL`);
+      }
+    }
 
-    if (joinedIn) {
-      qb.andWhere('users.createdAt BETWEEN :from AND :to', {
-        from: joinedIn.fromDate,
-        to: joinedIn.toDate,
+    if (departmentIds?.length) {
+      qb.andWhere('department.id IN (:...departmentIds)', {
+        departmentIds,
       });
     }
 
-    if (search) {
-      qb.andWhere('users.email LIKE :email', {
-        email: `%${search}%`,
-      }).andWhere(`users.id IN (:...userIds)`, { userIds });
+    if (periodIds?.length) {
+      qb.andWhere('period.id IN (:...periodIds)', {
+        periodIds,
+      });
     }
 
-    return qb.getManyAndCount();
-  }
+    const [data, totalRecords] = await qb.getManyAndCount();
 
-  insertIgnoreDuplicated(users: User[]) {
-    return (
-      this.createQueryBuilder()
-        .insert()
-        .values(users)
-        .orUpdate({
-          conflict_target: ['email'],
-          overwrite: ['username'],
-        })
-        // .orIgnore()
-        .execute()
-    );
+    return Page.of({
+      query,
+      items: data as UserOverviewAggregate[],
+      totalRecords,
+    });
   }
 }

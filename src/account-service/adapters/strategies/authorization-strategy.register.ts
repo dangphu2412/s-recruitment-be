@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { AuthorizationStrategy } from 'src/account-service/domain/interfaces/authorization';
+import { AuthorizationStrategy } from 'src/account-service/domain/core/services/authorization';
 
 export const StrategiesStorage = new Map<string, AuthorizationStrategy>();
 

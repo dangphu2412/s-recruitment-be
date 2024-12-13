@@ -2,6 +2,7 @@ import {
   MigrationInterface,
   QueryRunner,
   Table,
+  TableColumn,
   TableForeignKey,
 } from 'typeorm';
 
@@ -26,23 +27,41 @@ export class CreateOperationFeeTable1667380184103
             isNullable: false,
           },
           {
-            name: 'joined_at',
+            name: 'remain_months',
+            type: 'int',
+            default: 0,
+          },
+          {
+            name: 'paid_months',
+            type: 'int',
+            default: 0,
+          },
+          {
+            name: 'temporary_leave_start',
             type: 'timestamp',
-            default: 'now()',
+            isNullable: true,
+          },
+          {
+            name: 'estimated_return_date',
+            type: 'timestamp',
+            isNullable: true,
           },
           {
             name: 'monthly_config_id',
             type: 'int',
             isNullable: false,
           },
-          {
-            name: 'user_id',
-            type: 'uuid',
-            isNullable: false,
-          },
         ],
       }),
     );
+
+    await queryRunner.addColumns('users', [
+      new TableColumn({
+        name: 'operation_fee_id',
+        type: 'int',
+        isNullable: true,
+      }),
+    ]);
 
     await queryRunner.createForeignKeys('operation_fees', [
       new TableForeignKey({
@@ -50,10 +69,13 @@ export class CreateOperationFeeTable1667380184103
         referencedColumnNames: ['id'],
         referencedTableName: 'monthly_money_configs',
       }),
+    ]);
+
+    await queryRunner.createForeignKeys('users', [
       new TableForeignKey({
-        columnNames: ['user_id'],
+        columnNames: ['operation_fee_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'users',
+        referencedTableName: 'operation_fees',
       }),
     ]);
   }
