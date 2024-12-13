@@ -5,8 +5,7 @@ export function IsSortQueryContains(
   allowFields: string[],
   validationOptions?: ValidationOptions,
 ) {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  return function (target: Object, propertyKey: string) {
+  return function (target: object, propertyKey: string) {
     registerDecorator({
       name: 'isSortQuery',
       target: target.constructor,
