@@ -42,9 +42,8 @@ export class MonthlyMoneyOperationServiceImpl
         entity.paidMoney = 0;
         entity.paidMonths = 0;
 
-        const { identifiers } = await this.operationFeeRepository.insert(
-          entity,
-        );
+        const { identifiers } =
+          await this.operationFeeRepository.insert(entity);
 
         return {
           userId,

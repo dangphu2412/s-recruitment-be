@@ -95,9 +95,8 @@ export class RecruitmentEventController {
     eventId: number,
     @Res() response: FastifyReply,
   ) {
-    const buffer = await this.recruitmentEventService.downloadEmployeesById(
-      eventId,
-    );
+    const buffer =
+      await this.recruitmentEventService.downloadEmployeesById(eventId);
 
     response.header(
       'Content-Disposition',

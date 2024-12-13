@@ -75,9 +75,8 @@ export class AuthServiceImpl implements AuthService {
 
   async renewTokens(refreshToken: string): Promise<LoginCredentials> {
     try {
-      const { sub } = await this.jwtService.verifyAsync<JwtPayload>(
-        refreshToken,
-      );
+      const { sub } =
+        await this.jwtService.verifyAsync<JwtPayload>(refreshToken);
 
       const tokens = await this.tokenFactory.create(sub, refreshToken);
 

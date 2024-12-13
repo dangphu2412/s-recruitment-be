@@ -1,6 +1,6 @@
 README.md
 .idea
-.eslintrc.js
+eslint.config.mjs
 .prettierrc
 .husky
 .github
