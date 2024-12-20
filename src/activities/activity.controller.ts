@@ -32,7 +32,7 @@ export class ActivityController {
     private readonly activityRequestService: ActivityRequestService,
   ) {}
 
-  @CanAccessBy(Permissions.READ_ACTIVITIES)
+  @CanAccessBy(Permissions.WRITE_ACTIVITIES)
   @Get('requests')
   findRequestedActivities(@Query() query: FindRequestedActivityRequestDTO) {
     return this.activityRequestService.findRequestedActivities(query);
@@ -53,7 +53,7 @@ export class ActivityController {
     return this.activityRequestService.findMyRequestedActivity(id, user.sub);
   }
 
-  @CanAccessBy(Permissions.WRITE_ACTIVITIES)
+  @CanAccessBy(Permissions.READ_ACTIVITIES)
   @Post('requests')
   createRequestedActivity(
     @Body() dto: CreateActivityRequestRequest,
