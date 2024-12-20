@@ -97,7 +97,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     });
   }
 
-  async createRequestActivity(dto: CreateActivityRequestDTO): Promise<any> {
+  async createRequestActivity(dto: CreateActivityRequestDTO): Promise<void> {
     await this.activityRequestRepository.insert({
       ...dto,
       approvalStatus: RequestActivityStatus.PENDING,
@@ -110,29 +110,33 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   ): Promise<void> {
     const { id, action, rejectReason, reviseNote } = dto;
 
-    const activity = await this.activityRequestRepository.findOneBy({ id });
+    const activityRequest = await this.activityRequestRepository.findOneBy({
+      id,
+    });
 
-    if (!activity) {
-      throw new Error('Activity not found');
+    if (!activityRequest) {
+      throw new Error('Activity request not found');
     }
 
-    const { nextState, command } = this.getNextState(
-      activity.approvalStatus,
+    const nextStatus = this.getNextState(
+      activityRequest.approvalStatus,
       action,
     );
 
     await this.activityRequestRepository.update(id, {
-      approvalStatus: nextState,
+      approvalStatus: nextStatus,
       ...(rejectReason ? { rejectReason } : {}),
       ...(reviseNote ? { reviseNote } : {}),
     });
 
-    if (ApprovalRequestAction.APPROVE === command) {
+    if (RequestActivityStatus.APPROVED === nextStatus) {
       await this.activityService.createActivity({
-        authorId: activity.authorId,
-        requestType: activity.requestType,
-        timeOfDayId: activity.timeOfDayId,
-        dayOfWeekId: activity.dayOfWeekId,
+        authorId: activityRequest.authorId,
+        requestType: activityRequest.requestType,
+        timeOfDayId: activityRequest.timeOfDayId,
+        dayOfWeekId: activityRequest.dayOfWeekId,
+        requestChangeDay: activityRequest.requestChangeDay,
+        compensatoryDay: activityRequest.compensatoryDay,
       });
     }
   }
@@ -140,12 +144,11 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   private getNextState(
     currentStatus: RequestActivityStatus,
     action: ApprovalRequestAction,
-  ) {
+  ): RequestActivityStatus {
     const transitions = {
       [RequestActivityStatus.PENDING]: {
         [ApprovalRequestAction.APPROVE]: {
           nextState: RequestActivityStatus.APPROVED,
-          command: ApprovalRequestAction.APPROVE,
         },
         [ApprovalRequestAction.REJECT]: {
           nextState: RequestActivityStatus.REJECTED,
@@ -167,7 +170,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       throw new Error('Invalid state transition');
     }
 
-    return transition[action];
+    return transition[action].nextState;
   }
 
   async updateMyRequestActivity(dto: UpdateMyActivityRequestDTO) {
