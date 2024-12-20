@@ -3,4 +3,6 @@ export class CreateActivityDTO {
   requestType: string;
   timeOfDayId: string;
   dayOfWeekId: string;
+  requestChangeDay?: string;
+  compensatoryDay?: string;
 }

@@ -82,8 +82,7 @@ async function bootstrap() {
       logger.log(
         `Memory usage: ${memUsage} MB -` +
           'CPU usage: ' +
-          process.cpuUsage().user / 1000 +
-          '%',
+          process.cpuUsage().user,
       );
     },
   );

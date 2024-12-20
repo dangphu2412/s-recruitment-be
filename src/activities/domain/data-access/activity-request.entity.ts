@@ -32,6 +32,24 @@ export class ActivityRequest {
   rejectReason: string;
 
   @Column({
+    name: 'reason',
+    type: 'varchar',
+  })
+  reason: string;
+
+  @Column({
+    name: 'compensatory_day',
+    type: 'timestamp',
+  })
+  compensatoryDay: string;
+
+  @Column({
+    name: 'request_change_day',
+    type: 'timestamp',
+  })
+  requestChangeDay: string;
+
+  @Column({
     name: 'revise_note',
     type: 'varchar',
   })
