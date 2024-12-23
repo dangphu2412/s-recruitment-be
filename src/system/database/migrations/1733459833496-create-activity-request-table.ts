@@ -23,6 +23,16 @@ export class CreateActivityRequestTable1733459833496
             type: 'varchar',
             isNullable: false,
           },
+          {
+            name: 'from_time',
+            type: 'varchar',
+            isNullable: false,
+          },
+          {
+            name: 'to_time',
+            type: 'varchar',
+            isNullable: false,
+          },
         ],
       }),
     );

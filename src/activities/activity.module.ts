@@ -17,6 +17,7 @@ import {
   DayOfWeeksController,
   DayOfWeekServiceContainer,
 } from './day-of-weeks.controller';
+import { ActivityRepository } from './activity.repository';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import {
     },
     TimeOfDayServiceContainer.createProvider(),
     DayOfWeekServiceContainer.createProvider(),
+    ActivityRepository,
   ],
 })
 export class ActivityModule {}
