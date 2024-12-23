@@ -38,17 +38,14 @@ export class MenuServiceImpl implements MenuService {
         return false;
       }
 
-      const subMenus = permittedMenusKeyByCode[menu.code]?.subMenus;
+      const subMenus = menu?.subMenus;
 
       if (subMenus?.length) {
         if (!permittedMenusKeyByCode[menu.code]) {
           throw new Error(`No menu found: ${menu.code}`);
         }
 
-        permittedMenusKeyByCode[menu.code].subMenus = this.filterMenus(
-          subMenus,
-          permittedMenusKeyByCode,
-        );
+        menu.subMenus = this.filterMenus(subMenus, permittedMenusKeyByCode);
       }
 
       return true;

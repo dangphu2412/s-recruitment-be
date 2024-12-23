@@ -78,6 +78,22 @@ export class CreateActivityRequestTable1733459833496
           {
             name: 'day_of_week_id',
             type: 'varchar',
+            isNullable: true,
+          },
+          {
+            name: 'reason',
+            type: 'varchar',
+            isNullable: true,
+          },
+          {
+            name: 'compensatory_day',
+            type: 'timestamp',
+            isNullable: true,
+          },
+          {
+            name: 'request_change_day',
+            type: 'timestamp',
+            isNullable: true,
           },
           {
             name: 'approval_status',
@@ -142,6 +158,17 @@ export class CreateActivityRequestTable1733459833496
           {
             name: 'day_of_week_id',
             type: 'varchar',
+            isNullable: true,
+          },
+          {
+            name: 'compensatory_day',
+            type: 'timestamp',
+            isNullable: true,
+          },
+          {
+            name: 'request_change_day',
+            type: 'timestamp',
+            isNullable: true,
           },
           {
             name: 'author_id',

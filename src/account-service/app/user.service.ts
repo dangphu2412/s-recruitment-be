@@ -127,8 +127,13 @@ export class UserServiceImpl implements UserService {
 
     const relations = [];
 
-    withRoles && relations.push('roles');
-    withRights && relations.push('roles', 'roles.permissions');
+    if (withRoles) {
+      relations.push('roles');
+    }
+
+    if (withRights) {
+      relations.push('roles', 'roles.permissions');
+    }
 
     return this.userRepository.find({
       where: {

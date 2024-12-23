@@ -10,3 +10,9 @@ export enum ApprovalRequestAction {
   APPROVE = 'APPROVE',
   REJECT = 'REJECT',
 }
+
+export enum RequestTypes {
+  WORKING = 'Working',
+  LATE = 'Late',
+  ABSENCE = 'Absence',
+}

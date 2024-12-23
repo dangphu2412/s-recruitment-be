@@ -64,9 +64,8 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventService {
     newRecruitmentEvent.scoringStandards = dto.scoringStandards;
     newRecruitmentEvent.passPoint = dto.passPoint;
 
-    const { id } = await this.recruitmentEventRepository.save(
-      newRecruitmentEvent,
-    );
+    const { id } =
+      await this.recruitmentEventRepository.save(newRecruitmentEvent);
 
     await this.importEmployees({
       eventId: id as number,
@@ -166,9 +165,8 @@ export class RecruitmentEventUseCaseAdapter implements RecruitmentEventService {
   }
 
   async downloadEmployeesById(eventId: number): Promise<Buffer> {
-    const event = await this.recruitmentEventRepository.findEventReport(
-      eventId,
-    );
+    const event =
+      await this.recruitmentEventRepository.findEventReport(eventId);
     const { employees } = event;
 
     // Build excel file which contains employees data, provide more columns including: average points, vote status.

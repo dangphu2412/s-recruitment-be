@@ -25,7 +25,10 @@ export class SeedMenuSettings1676171233978 implements MigrationInterface {
       [Permissions.READ_ASSESSMENTS]: ['USER_ASSESSMENT'],
       [Permissions.MANAGE_RECRUITMENT]: ['RECRUITMENT', 'RECRUITMENT_OVERVIEW'],
       [Permissions.MANAGE_POSTS]: ['POSTS_OVERVIEW', 'POST'],
-      [Permissions.READ_ACTIVITIES]: ['MY_ACTIVITY_REQUESTS'],
+      [Permissions.READ_ACTIVITIES]: [
+        'ACTIVITY_MANAGEMENT',
+        'MY_ACTIVITY_REQUESTS',
+      ],
       [Permissions.WRITE_ACTIVITIES]: [
         'ACTIVITY_MANAGEMENT',
         'ACTIVITY_REQUESTS',
