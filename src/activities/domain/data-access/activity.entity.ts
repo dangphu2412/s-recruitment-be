@@ -24,6 +24,18 @@ export class Activity {
   })
   requestType: string;
 
+  @Column({
+    name: 'compensatory_day',
+    type: 'timestamp',
+  })
+  compensatoryDay: string;
+
+  @Column({
+    name: 'request_change_day',
+    type: 'timestamp',
+  })
+  requestChangeDay: string;
+
   // Occurrence
   @Column({
     name: 'time_of_day_id',

@@ -24,13 +24,25 @@ import { JwtPayload } from '../account-service/domain/dtos/jwt-payload';
 import { UpdateApprovalActivityRequestRequest } from './domain/presentation/dtos/update-approval-activity-request.request';
 import { UpdateMyActivityRequestRequest } from './domain/presentation/dtos/update-my-activity.request';
 import { FindRequestedActivityRequestDTO } from './domain/presentation/dtos/find-requested-activity-request.dto';
+import {
+  ActivityService,
+  ActivityServiceToken,
+} from './domain/core/services/activity.service';
+import { FindActivitiesRequest } from './domain/presentation/dtos/find-activities.request';
 
 @Controller('activities')
 export class ActivityController {
   constructor(
     @Inject(ActivityRequestServiceToken)
     private readonly activityRequestService: ActivityRequestService,
+    @Inject(ActivityServiceToken)
+    private readonly activityService: ActivityService,
   ) {}
+
+  @Get()
+  findActivities(@Query() query: FindActivitiesRequest) {
+    return this.activityService.findActivities(query);
+  }
 
   @CanAccessBy(Permissions.WRITE_ACTIVITIES)
   @Get('requests')

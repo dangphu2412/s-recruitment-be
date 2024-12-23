@@ -19,6 +19,20 @@ export class TimeOfDay {
   })
   name: string;
 
+  @Column({
+    name: 'from_time',
+    nullable: false,
+    type: 'varchar',
+  })
+  fromTime: string;
+
+  @Column({
+    name: 'to_time',
+    nullable: false,
+    type: 'varchar',
+  })
+  toTime: string;
+
   @OneToMany(
     () => ActivityRequest,
     (activityRequest) => activityRequest.timeOfDay,
