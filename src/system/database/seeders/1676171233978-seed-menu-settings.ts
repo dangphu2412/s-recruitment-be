@@ -17,8 +17,8 @@ export class SeedMenuSettings1676171233978 implements MigrationInterface {
     const permissionDefineMenus: Record<string, Array<string>> = {
       [Permissions.VIEW_USERS]: ['USER_MANAGEMENT', 'ADMIN'],
       [Permissions.EDIT_MEMBER_USER]: ['ADMIN'],
-      [Permissions.VIEW_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
-      [Permissions.EDIT_ACCESS_RIGHTS]: ['ACCESS_CONTROL'],
+      [Permissions.VIEW_ACCESS_RIGHTS]: ['IDENTITY_ACCESS_MANAGEMENT'],
+      [Permissions.EDIT_ACCESS_RIGHTS]: ['IDENTITY_ACCESS_MANAGEMENT'],
       [Permissions.WRITE_USER_GROUPS]: ['USER_GROUPS'],
       [Permissions.READ_USER_GROUPS]: ['USER_GROUPS'],
       [Permissions.WRITE_ASSESSMENTS]: ['USER_ASSESSMENT'],
