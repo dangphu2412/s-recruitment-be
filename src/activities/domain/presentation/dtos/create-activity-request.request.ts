@@ -2,8 +2,8 @@ import {
   IsDateString,
   IsEnum,
   IsNotEmpty,
-  IsOptional,
   IsString,
+  ValidateIf,
 } from 'class-validator';
 import { RequestTypes } from '../../core/constants/request-activity-status.enum';
 
@@ -14,19 +14,23 @@ export class CreateActivityRequestRequest {
   @IsNotEmpty()
   timeOfDayId: string;
 
-  @IsOptional()
   @IsString()
+  @ValidateIf((o) => o.requestType === RequestTypes.WORKING)
   dayOfWeekId: string;
 
-  @IsOptional()
   @IsDateString()
+  @ValidateIf((o) =>
+    [RequestTypes.LATE, RequestTypes.ABSENCE].includes(o.requestType),
+  )
   requestChangeDay?: string;
 
-  @IsOptional()
   @IsDateString()
+  @ValidateIf((o) => RequestTypes.ABSENCE === o.requestType)
   compensatoryDay?: string;
 
-  @IsOptional()
   @IsString()
+  @ValidateIf((o) =>
+    [RequestTypes.LATE, RequestTypes.ABSENCE].includes(o.requestType),
+  )
   reason?: string;
 }
