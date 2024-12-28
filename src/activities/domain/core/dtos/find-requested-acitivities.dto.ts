@@ -3,6 +3,7 @@ import { OffsetPagination } from '../../../../system/query-shape/dto';
 
 export type FindRequestedActivityQueryDTO = OffsetPagination & {
   query: string;
+  departmentIds?: number[];
 };
 
 export type FindRequestedActivitiesResponseDTO = Page<{

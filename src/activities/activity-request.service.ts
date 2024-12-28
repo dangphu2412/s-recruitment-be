@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ActivityRequestService } from './domain/core/services/activity-request.service';
 import { ActivityRequest } from './domain/data-access/activity-request.entity';
 import {
@@ -59,32 +59,42 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     query,
     page,
     size,
+    departmentIds,
   }: FindRequestedActivityQueryDTO): Promise<FindRequestedActivitiesResponseDTO> {
     const { offset } = PageRequest.of({ page, size });
-    const items = await this.activityRequestRepository.find({
-      where: {
-        ...(query
-          ? {
-              author: {
-                fullName: ILike(`%${query}%`),
-              },
-            }
-          : {}),
-      },
-      relations: ['author', 'dayOfWeek', 'timeOfDay'],
-      order: {
-        updatedAt: 'DESC',
-      },
-      skip: offset,
-      take: size,
-    });
+
+    const queryBuilder = this.activityRequestRepository
+      .createQueryBuilder('activity')
+      .leftJoinAndSelect('activity.author', 'author')
+      .leftJoinAndSelect('activity.dayOfWeek', 'dayOfWeek')
+      .leftJoinAndSelect('activity.timeOfDay', 'timeOfDay');
+
+    if (query) {
+      queryBuilder.andWhere('author.fullName ILIKE :query', {
+        query: `%${query}%`,
+      });
+    }
+
+    if (departmentIds) {
+      queryBuilder.leftJoinAndSelect('author.department', 'department');
+      queryBuilder.andWhere('department.id IN (:...departmentIds)', {
+        departmentIds,
+      });
+    }
+
+    queryBuilder
+      .skip(offset)
+      .take(size)
+      .addOrderBy('activity.updatedAt', 'DESC');
+
+    const [items, totalRecords] = await queryBuilder.getManyAndCount();
 
     return Page.of({
       items,
-      totalRecords: items.length,
+      totalRecords,
       query: {
-        page: 1,
-        size: 10,
+        page,
+        size,
       },
     });
   }
