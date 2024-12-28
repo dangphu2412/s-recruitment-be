@@ -29,12 +29,30 @@ export class ActivityRepository extends Repository<Activity> {
       })
       .orWhere(
         new Brackets((qb) => {
-          qb.andWhere('activity.requestType IN (:...requestType2)', {
-            requestType2: [RequestTypes.ABSENCE, RequestTypes.LATE],
-          }).andWhere('activity.createdAt BETWEEN :fromDate AND :toDate', {
-            fromDate,
-            toDate,
-          });
+          qb.andWhere('activity.requestType = :requestType3', {
+            requestType3: RequestTypes.ABSENCE,
+          }).andWhere(
+            'activity.compensatoryDay BETWEEN :fromDate AND :toDate',
+            {
+              fromDate,
+              toDate,
+            },
+          );
+
+          return qb;
+        }),
+      )
+      .orWhere(
+        new Brackets((qb) => {
+          qb.andWhere('activity.requestType = :requestType2', {
+            requestType2: RequestTypes.LATE,
+          }).andWhere(
+            'activity.requestChangeDay BETWEEN :fromDate AND :toDate',
+            {
+              fromDate,
+              toDate,
+            },
+          );
 
           return qb;
         }),

@@ -1,4 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { ActivityRequestService } from './domain/core/services/activity-request.service';
@@ -6,6 +10,7 @@ import { ActivityRequest } from './domain/data-access/activity-request.entity';
 import {
   ApprovalRequestAction,
   RequestActivityStatus,
+  RequestTypes,
 } from './domain/core/constants/request-activity-status.enum';
 import { CreateActivityRequestDTO } from './domain/core/dtos/create-activity-request.dto';
 import { FindRequestedMyActivitiesResponseDTO } from './domain/core/dtos/find-requested-my-acitivities.dto';
@@ -98,10 +103,50 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   }
 
   async createRequestActivity(dto: CreateActivityRequestDTO): Promise<void> {
-    await this.activityRequestRepository.insert({
-      ...dto,
-      approvalStatus: RequestActivityStatus.PENDING,
-    });
+    const entity = this.mapRequestActivityToEntity(dto);
+
+    await this.activityRequestRepository.insert(entity);
+  }
+
+  private mapRequestActivityToEntity(
+    dto: CreateActivityRequestDTO,
+  ): ActivityRequest {
+    if (dto.requestType === RequestTypes.WORKING) {
+      const entity = new ActivityRequest();
+      entity.authorId = dto.authorId;
+      entity.requestType = dto.requestType;
+      entity.timeOfDayId = dto.timeOfDayId;
+      entity.dayOfWeekId = dto.dayOfWeekId;
+      entity.approvalStatus = RequestActivityStatus.PENDING;
+      return entity;
+    }
+
+    if (dto.requestType === RequestTypes.LATE) {
+      const entity = new ActivityRequest();
+      entity.authorId = dto.authorId;
+      entity.requestType = dto.requestType;
+      entity.timeOfDayId = dto.timeOfDayId;
+      entity.requestChangeDay = dto.requestChangeDay;
+      entity.reason = dto.reason;
+      entity.approvalStatus = RequestActivityStatus.PENDING;
+
+      return entity;
+    }
+
+    if (dto.requestType === RequestTypes.ABSENCE) {
+      const entity = new ActivityRequest();
+      entity.authorId = dto.authorId;
+      entity.requestType = dto.requestType;
+      entity.timeOfDayId = dto.timeOfDayId;
+      entity.requestChangeDay = dto.requestChangeDay;
+      entity.compensatoryDay = dto.compensatoryDay;
+      entity.reason = dto.reason;
+      entity.approvalStatus = RequestActivityStatus.PENDING;
+
+      return entity;
+    }
+
+    throw new InternalServerErrorException('Invalid request type');
   }
 
   @Transactional()
