@@ -60,6 +60,9 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     page,
     size,
     departmentIds,
+    fromDate,
+    toDate,
+    status,
   }: FindRequestedActivityQueryDTO): Promise<FindRequestedActivitiesResponseDTO> {
     const { offset } = PageRequest.of({ page, size });
 
@@ -79,6 +82,24 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       queryBuilder.leftJoinAndSelect('author.department', 'department');
       queryBuilder.andWhere('department.id IN (:...departmentIds)', {
         departmentIds,
+      });
+    }
+
+    if (status) {
+      queryBuilder.andWhere('activity.approvalStatus IN (:...status)', {
+        status,
+      });
+    }
+
+    if (fromDate) {
+      queryBuilder.andWhere('activity.updatedAt >= :fromDate', {
+        fromDate,
+      });
+    }
+
+    if (toDate) {
+      queryBuilder.andWhere('activity.updatedAt <= :toDate', {
+        toDate,
       });
     }
 
