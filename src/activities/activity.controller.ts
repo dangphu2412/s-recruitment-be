@@ -92,14 +92,12 @@ export class ActivityController {
   }
 
   @CanAccessBy(Permissions.WRITE_ACTIVITIES)
-  @Patch('requests/:id')
+  @Patch('requests/approval-status')
   updateApprovalRequestedActivity(
-    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateApprovalActivityRequestRequest,
     @CurrentUser() user: JwtPayload,
   ) {
     return this.activityRequestService.updateApprovalRequestActivity({
-      id,
       ...dto,
       authorId: user.sub,
     });
