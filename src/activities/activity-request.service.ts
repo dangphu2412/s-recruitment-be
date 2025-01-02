@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ActivityRequestService } from './domain/core/services/activity-request.service';
 import { ActivityRequest } from './domain/data-access/activity-request.entity';
 import {
@@ -184,43 +184,51 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   async updateApprovalRequestActivity(
     dto: UpdateApprovalActivityRequestDTO,
   ): Promise<void> {
-    const { id, action, rejectReason, reviseNote } = dto;
+    const { ids, action, rejectReason, reviseNote } = dto;
 
-    const activityRequest = await this.activityRequestRepository.findOneBy({
-      id,
+    const activityRequests = await this.activityRequestRepository.findBy({
+      id: In(ids),
     });
 
-    if (!activityRequest) {
+    if (!activityRequests.length) {
       throw new Error('Activity request not found');
     }
 
-    const nextStatus = this.getNextState(
-      activityRequest.approvalStatus,
-      action,
+    await Promise.all(
+      activityRequests.map(async (activityRequest) => {
+        const nextStatus = this.getNextState(
+          activityRequest.approvalStatus,
+          action,
+        );
+
+        if (!nextStatus) {
+          return;
+        }
+
+        await this.activityRequestRepository.update(activityRequest.id, {
+          approvalStatus: nextStatus,
+          ...(rejectReason ? { rejectReason } : {}),
+          ...(reviseNote ? { reviseNote } : {}),
+        });
+
+        if (RequestActivityStatus.APPROVED === nextStatus) {
+          await this.activityService.createActivity({
+            authorId: activityRequest.authorId,
+            requestType: activityRequest.requestType,
+            timeOfDayId: activityRequest.timeOfDayId,
+            dayOfWeekId: activityRequest.dayOfWeekId,
+            requestChangeDay: activityRequest.requestChangeDay,
+            compensatoryDay: activityRequest.compensatoryDay,
+          });
+        }
+      }),
     );
-
-    await this.activityRequestRepository.update(id, {
-      approvalStatus: nextStatus,
-      ...(rejectReason ? { rejectReason } : {}),
-      ...(reviseNote ? { reviseNote } : {}),
-    });
-
-    if (RequestActivityStatus.APPROVED === nextStatus) {
-      await this.activityService.createActivity({
-        authorId: activityRequest.authorId,
-        requestType: activityRequest.requestType,
-        timeOfDayId: activityRequest.timeOfDayId,
-        dayOfWeekId: activityRequest.dayOfWeekId,
-        requestChangeDay: activityRequest.requestChangeDay,
-        compensatoryDay: activityRequest.compensatoryDay,
-      });
-    }
   }
 
   private getNextState(
     currentStatus: RequestActivityStatus,
     action: ApprovalRequestAction,
-  ): RequestActivityStatus {
+  ): RequestActivityStatus | null {
     const transitions = {
       [RequestActivityStatus.PENDING]: {
         [ApprovalRequestAction.APPROVE]: {
@@ -243,7 +251,11 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     const transition = transitions[currentStatus];
 
     if (!transition) {
-      throw new Error('Invalid state transition');
+      return null;
+    }
+
+    if (!transition[action]) {
+      return null;
     }
 
     return transition[action].nextState;
