@@ -7,6 +7,7 @@ export type UserDetail = {
   username: string;
   email: string;
   fullName: string;
+  trackingId: string;
   birthday: Date;
   phoneNumber: string;
   department?: {
