@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  labels:
+    app: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app
+          image: chuotcona123/member-be:latest
+          ports:
+            - containerPort: 3001
+          env:
+            - name: PORT
+              value: "3000"
+            - name: SALT_ROUNDS
+              value: "10"
+            - name: JWT_SECRET
+              value: "supersecret"
+            - name: ACCESS_TOKEN_EXPIRATION
+              value: "15m"
+            - name: REFRESH_TOKEN_EXPIRATION
+              value: "7d"
+            - name: DEFAULT_PASSWORD
+              value: "Test"
+            - name: DB_HOST
+              value: "postgres"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USERNAME
+              value: "postgres"
+            - name: DB_PASSWORD
+              value: "241299"
+            - name: DB_DATABASE
+              value: "baseNest"
+            - name: DB_MIGRATION_RUN
+              value: "true"
+            - name: DB_SYNC
+              value: "false"
+            - name: UPLOAD_DIR
+              value: "/upload"
+            - name: CORS
+              value: "http://localhost:3000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+    type: NodePort
+    selector:
+        app: app
+    ports:
+        - protocol: TCP
+          port: 3000
+          targetPort: 3000
+          nodePort: 30101
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: node-app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-service
+                port:
+                  number: 3000
+
