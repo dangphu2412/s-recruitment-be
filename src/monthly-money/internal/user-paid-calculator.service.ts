@@ -19,7 +19,6 @@ export class UserPaidCalculator {
     const userPayments = await this.paymentRepository.findUserPaymentsByUserId(
       paymentCreatedEvent.userId,
     );
-
     const totalPaid = userPayments.reduce(
       (acc, payment) => acc + payment.amount,
       0,

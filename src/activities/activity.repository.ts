@@ -14,49 +14,58 @@ export class ActivityRepository extends Repository<Activity> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  findActivities({ fromDate, toDate }: FindActivitiesDTO) {
+  findActivities({ fromDate, toDate, authorId }: FindActivitiesDTO) {
     const queryBuilder = this.createQueryBuilder('activity');
 
     // Find all member activities requestType is working
     // And activity of absense and late in time range
     // And the author is still active
+
     queryBuilder
       .leftJoinAndSelect('activity.author', 'author')
       .leftJoinAndSelect('activity.timeOfDay', 'timeOfDay')
       .leftJoinAndSelect('activity.dayOfWeek', 'dayOfWeek')
-      .andWhere('activity.requestType = :requestType', {
-        requestType: RequestTypes.WORKING,
-      })
-      .orWhere(
+      .andWhere(
         new Brackets((qb) => {
-          qb.andWhere('activity.requestType = :requestType3', {
-            requestType3: RequestTypes.ABSENCE,
-          }).andWhere(
-            'activity.compensatoryDay BETWEEN :fromDate AND :toDate',
-            {
-              fromDate,
-              toDate,
-            },
-          );
+          qb.andWhere('activity.requestType = :requestType', {
+            requestType: RequestTypes.WORKING,
+          })
+            .orWhere(
+              new Brackets((qb) => {
+                qb.andWhere('activity.requestType = :requestType3', {
+                  requestType3: RequestTypes.ABSENCE,
+                }).andWhere(
+                  'activity.compensatoryDay BETWEEN :fromDate AND :toDate',
+                  {
+                    fromDate,
+                    toDate,
+                  },
+                );
 
-          return qb;
-        }),
-      )
-      .orWhere(
-        new Brackets((qb) => {
-          qb.andWhere('activity.requestType = :requestType2', {
-            requestType2: RequestTypes.LATE,
-          }).andWhere(
-            'activity.requestChangeDay BETWEEN :fromDate AND :toDate',
-            {
-              fromDate,
-              toDate,
-            },
-          );
+                return qb;
+              }),
+            )
+            .orWhere(
+              new Brackets((qb) => {
+                qb.andWhere('activity.requestType = :requestType2', {
+                  requestType2: RequestTypes.LATE,
+                }).andWhere(
+                  'activity.requestChangeDay BETWEEN :fromDate AND :toDate',
+                  {
+                    fromDate,
+                    toDate,
+                  },
+                );
 
-          return qb;
+                return qb;
+              }),
+            );
         }),
       );
+
+    if (authorId) {
+      queryBuilder.andWhere('activity.authorId = :authorId', { authorId });
+    }
 
     return queryBuilder.getMany();
   }

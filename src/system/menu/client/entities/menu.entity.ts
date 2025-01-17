@@ -21,7 +21,6 @@ export class Menu {
   @Column({
     name: 'name',
     nullable: false,
-    unique: true,
     type: 'varchar',
   })
   name: string;
