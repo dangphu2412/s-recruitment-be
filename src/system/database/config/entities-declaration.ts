@@ -18,6 +18,7 @@ import { ActivityRequest } from '../../../activities/domain/data-access/activity
 import { Activity } from '../../../activities/domain/data-access/activity.entity';
 import { DayOfWeek } from '../../../activities/domain/data-access/day-of-week';
 import { TimeOfDay } from '../../../activities/domain/data-access/time-of-day.entity';
+import { ActivityLog } from '../../../activities/domain/data-access/activity-log.entity';
 
 export const APP_ENTITIES = [
   User,
@@ -37,6 +38,7 @@ export const APP_ENTITIES = [
   Department,
   ActivityRequest,
   Activity,
+  ActivityLog,
   DayOfWeek,
   TimeOfDay,
 ];

@@ -1,14 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: hello-job
+  name: app-seed-job
 spec:
   template:
     metadata:
-      name: hello-job
+      name: app-seed-job
     spec:
       containers:
-        - name: hello
+        - name: app-seed-job
           image: chuotcona123/seed:latest
           command: ["npm", "run", "seed:run"]
           env:
@@ -23,7 +23,7 @@ spec:
             - name: REFRESH_TOKEN_EXPIRATION
               value: "7d"
             - name: DEFAULT_PASSWORD
-              value: "Test"
+              value: "Abcde123456@@"
             - name: DB_HOST
               value: "postgres"
             - name: DB_PORT
@@ -41,6 +41,6 @@ spec:
             - name: UPLOAD_DIR
               value: "/upload"
             - name: CORS
-              value: "http://localhost:3000"
+              value: "http://localhost:3000,http://127.0.0.1:3000"
       restartPolicy: Never
   backoffLimit: 4

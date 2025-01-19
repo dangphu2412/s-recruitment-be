@@ -23,6 +23,7 @@ import { OperationFee } from '../../../../monthly-money/domain/data-access/entit
 import { Department } from './department.entity';
 import { Period } from './period.entity';
 import { ActivityRequest } from '../../../../activities/domain/data-access/activity-request.entity';
+import { ActivityLog } from '../../../../activities/domain/data-access/activity-log.entity';
 
 @Entity({
   name: 'users',
@@ -170,4 +171,7 @@ export class User {
 
   @OneToMany(() => ActivityRequest, (activityRequest) => activityRequest.author)
   activityRequests?: ActivityRequest[];
+
+  @OneToMany(() => ActivityLog, (activityLog) => activityLog.author)
+  activityLogs: ActivityLog[];
 }

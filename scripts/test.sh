@@ -1,9 +1,9 @@
 #!/bin/sh
 
-AUTH_TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMWExOWY0Zi00NGUwLTRjMzgtOWQ1MC1kZTNhM2VmODJiZjciLCJpYXQiOjE3MzU5ODI3MTgsImV4cCI6MTczNTk4MzYxOH0.1NIbdaa3SS9iHa9k_FQ3fdCdr19CD7o86v3UcUdRies"
+AUTH_TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNDYwODY2ZS1kMjE4LTQ5NjEtYTc2ZC1mZTFiOWVjZGZjYmEiLCJpYXQiOjE3MzY4MjU2NjcsImV4cCI6MTczNjgyNjU2N30.AbbEjs-cxIM2QzfY25k1pLBLNjglr_2r_V1a7DfOKps"
 BODY='{"paidAt": "2024/10/02","amount": 100000,"note": "test","monthlyConfigId": 1}'
-USER_ID="d7142b4d-ee2a-48e7-8daa-80ab204cbc00"
+USER_ID="51b1a3db-1bf7-4a61-86e3-29bb861c067d"
 seq 1 10 | xargs -n1 -P4 curl -X POST -H "Content-Type: application/json" \
 -H "Authorization: Bearer $AUTH_TOKEN" \
 -d "$BODY" \
-"http://localhost:3001/users/$USER_ID/payments"
+"http://localhost/users/$USER_ID/payments"

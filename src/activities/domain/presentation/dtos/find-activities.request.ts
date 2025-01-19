@@ -1,4 +1,4 @@
-import { IsDateString } from 'class-validator';
+import { IsDateString, IsOptional, IsUUID } from 'class-validator';
 
 export class FindActivitiesRequest {
   @IsDateString()
@@ -6,4 +6,8 @@ export class FindActivitiesRequest {
 
   @IsDateString()
   toDate: string;
+
+  @IsOptional()
+  @IsUUID('4')
+  authorId?: string;
 }

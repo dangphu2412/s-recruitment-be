@@ -1,21 +1,21 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import {
-  createResourceService,
-  ResourceService,
+  createCRUDService,
+  ResourceCRUDService,
 } from '../system/resource-templates/resource-service-template';
 import { TimeOfDay } from './domain/data-access/time-of-day.entity';
 
-export const TimeOfDayServiceContainer = createResourceService(TimeOfDay);
+export const TimeOfDayCRUDService = createCRUDService(TimeOfDay);
 
 @Controller('time-of-days')
 export class TimeOfDaysController {
   constructor(
-    @Inject(TimeOfDayServiceContainer.token)
-    private readonly timeOfDayService: ResourceService<TimeOfDay>,
+    @Inject(TimeOfDayCRUDService.token)
+    private readonly timeOfDayService: ResourceCRUDService<TimeOfDay>,
   ) {}
 
   @Get()
-  findAll() {
-    return this.timeOfDayService.findAll();
+  find() {
+    return this.timeOfDayService.find();
   }
 }
