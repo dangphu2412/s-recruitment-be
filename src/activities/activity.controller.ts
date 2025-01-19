@@ -8,8 +8,6 @@ import {
   Patch,
   Post,
   Query,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ActivityRequestService,
@@ -31,8 +29,6 @@ import {
   ActivityServiceToken,
 } from './domain/core/services/activity.service';
 import { FindActivitiesRequest } from './domain/presentation/dtos/find-activities.request';
-import { FileInterceptor } from '../system/file';
-import { ApiConsumes } from '@nestjs/swagger';
 
 @Controller('activities')
 export class ActivityController {
@@ -106,16 +102,5 @@ export class ActivityController {
       ...dto,
       authorId: user.sub,
     });
-  }
-
-  @CanAccessBy(Permissions.WRITE_ACTIVITIES)
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiConsumes('multipart/form-data')
-  @Post('logs')
-  uploadTrackFile(
-    @UploadedFile()
-    file: Express.Multer.File,
-  ) {
-    return this.activityService.uploadActivityLogs(file);
   }
 }

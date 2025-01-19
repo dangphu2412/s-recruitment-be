@@ -339,13 +339,13 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       [Permissions.MANAGE_POSTS]: [MenuCode.POST, MenuCode.POSTS_OVERVIEW],
       [Permissions.READ_ACTIVITIES]: [
         MenuCode.ACTIVITY_MANAGEMENT,
-        MenuCode.ACTIVITIES,
-        MenuCode.ACTIVITY_REQUESTS,
         MenuCode.MY_ACTIVITY_REQUESTS,
       ],
       [Permissions.READ_ACTIVITY_LOGS]: [MenuCode.ACTIVITIES_LOGS],
       [Permissions.WRITE_ACTIVITIES]: [
         MenuCode.ACTIVITY_MANAGEMENT,
+        MenuCode.ACTIVITY_REQUESTS,
+        MenuCode.ACTIVITIES,
         MenuCode.ACTIVITY_REQUESTS,
       ],
       [Permissions.WRITE_PERIODS]: [MenuCode.USER_PERIODS],
