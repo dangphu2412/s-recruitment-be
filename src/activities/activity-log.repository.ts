@@ -20,7 +20,11 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
   }
 
   findLogs(findLogsRequest: FindLogsRequest) {
-    const { isLate, fromDate = subWeeks(new Date(), 1).toISOString(), toDate = new Date().toISOString() } = findLogsRequest;
+    const {
+      isLate,
+      fromDate = subWeeks(new Date(), 1).toISOString(),
+      toDate = new Date().toISOString(),
+    } = findLogsRequest;
     const { offset, size } = PageRequest.of(findLogsRequest);
 
     const queryBuilder = this.createQueryBuilder('activityLog').leftJoin(
@@ -59,5 +63,13 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
     `,
       [fromDate, toDate],
     );
+  }
+
+  updateLogs(activityLogs: ActivityLog[]) {
+    return this.createQueryBuilder()
+      .insert()
+      .values(activityLogs)
+      .orIgnore()
+      .execute();
   }
 }
