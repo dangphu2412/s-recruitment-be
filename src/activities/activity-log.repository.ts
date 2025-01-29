@@ -33,36 +33,36 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
     );
 
     if (isLate !== undefined) {
-      queryBuilder.andWhere('activityLog.isLate = :isLate', { isLate });
+      queryBuilder.andWhere('activityLog.isLate = :isLate', {
+        isLate: Boolean(isLate),
+      });
     }
 
-    queryBuilder.andWhere('activityLog.fromTime >= :fromDate', { fromDate });
-    queryBuilder.andWhere('activityLog.toTime <= :toDate', { toDate });
-
-    queryBuilder.orderBy('activityLog.fromTime', 'DESC');
-    queryBuilder.skip(offset);
-    queryBuilder.take(size);
-
-    return queryBuilder.getManyAndCount();
+    return queryBuilder
+      .andWhere('activityLog.fromTime >= :fromDate', { fromDate })
+      .andWhere('activityLog.toTime <= :toDate', { toDate })
+      .orderBy('activityLog.fromTime', 'DESC')
+      .skip(offset)
+      .take(size)
+      .getManyAndCount();
   }
 
-  findAnalyticLogs({
+  async findAnalyticLogs({
     fromDate,
     toDate,
   }: AnalyticLogsAggregateDTO): Promise<AnalyticLogsAggregate> {
-    return this.query(
-      `
-      SELECT
-        COUNT(*) AS total_logs,
-        SUM(CASE WHEN is_late = true THEN 1 ELSE 0 END) AS total_late_logs,
-        SUM(CASE WHEN from_time = to_time THEN 1 ELSE 0 END) AS total_not_late_logs
+    const items = await this.query(
+      `SELECT
+        SUM(CASE WHEN activity_logs.is_late = true THEN 1 ELSE 0 END) AS "lateCount",
+        SUM(CASE WHEN activity_logs.from_time = activity_logs.to_time THEN 1 ELSE 0 END) AS "notFinishedCount",
+        SUM(CASE WHEN activity_logs.is_late = false and  activity_logs.from_time != activity_logs.to_time THEN 1 ELSE 0 END) as "onTimeCount"
       FROM activity_logs
       LEFT JOIN users ON activity_logs.track_id = users.tracking_id
-      WHERE from_time >= $1 AND to_time <= $2
-      GROUP BY users.tracking_id
-    `,
+      WHERE activity_logs.from_time >= $1 AND activity_logs.to_time <= $2`,
       [fromDate, toDate],
     );
+
+    return items[0] ?? {};
   }
 
   updateLogs(activityLogs: ActivityLog[]) {

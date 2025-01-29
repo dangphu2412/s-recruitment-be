@@ -29,7 +29,7 @@ export class ActivityLog {
   @PrimaryColumn({
     name: 'track_id',
     nullable: false,
-    type: 'varchar'
+    type: 'varchar',
   })
   deviceUserId: string;
 
