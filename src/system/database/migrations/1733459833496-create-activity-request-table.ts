@@ -25,12 +25,12 @@ export class CreateActivityRequestTable1733459833496
           },
           {
             name: 'from_time',
-            type: 'varchar',
+            type: 'time without time zone',
             isNullable: false,
           },
           {
             name: 'to_time',
-            type: 'varchar',
+            type: 'time without time zone',
             isNullable: false,
           },
         ],
@@ -215,6 +215,36 @@ export class CreateActivityRequestTable1733459833496
         referencedTableName: 'mdm_day_of_weeks',
       }),
     ]);
+
+    await queryRunner.createTable(
+      new Table({
+        name: 'activity_logs',
+        columns: [
+          {
+            name: 'from_time',
+            type: 'timestamp',
+            isNullable: false,
+            isPrimary: true,
+          },
+          {
+            name: 'to_time',
+            type: 'timestamp',
+            isNullable: false,
+            isPrimary: true,
+          },
+          {
+            name: 'work_status',
+            type: 'varchar',
+          },
+          {
+            name: 'track_id',
+            type: 'varchar',
+            isNullable: false,
+            isPrimary: true,
+          },
+        ],
+      }),
+    );
   }
 
   public async down(): Promise<void> {

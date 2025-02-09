@@ -193,6 +193,7 @@ export class UserServiceImpl implements UserService {
       email: user.email,
       fullName: user.fullName,
       birthday: user.birthday,
+      trackingId: user.trackingId,
       phoneNumber: user.phoneNumber,
       department: user.department,
       period: user.period,

@@ -11,19 +11,34 @@ import { DayOfWeek } from './domain/data-access/day-of-week';
 import { TimeOfDay } from './domain/data-access/time-of-day.entity';
 import {
   TimeOfDaysController,
-  TimeOfDayServiceContainer,
+  TimeOfDayCRUDService,
 } from './time-of-days.controller';
 import {
   DayOfWeeksController,
-  DayOfWeekServiceContainer,
+  DayOfWeekCRUDServiceContainer,
 } from './day-of-weeks.controller';
 import { ActivityRepository } from './activity.repository';
+import { ActivityLog } from './domain/data-access/activity-log.entity';
+import { ActivityLogRepository } from './activity-log.repository';
+import { ActivityLogService } from './activity-log.service';
+import { ActivitiesLogController } from './activities-log.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Activity, ActivityRequest, DayOfWeek, TimeOfDay]),
+    TypeOrmModule.forFeature([
+      Activity,
+      ActivityRequest,
+      DayOfWeek,
+      TimeOfDay,
+      ActivityLog,
+    ]),
   ],
-  controllers: [ActivityController, TimeOfDaysController, DayOfWeeksController],
+  controllers: [
+    ActivityController,
+    ActivitiesLogController,
+    TimeOfDaysController,
+    DayOfWeeksController,
+  ],
   providers: [
     {
       provide: ActivityRequestServiceToken,
@@ -33,9 +48,11 @@ import { ActivityRepository } from './activity.repository';
       provide: ActivityServiceToken,
       useClass: ActivityServiceImpl,
     },
-    TimeOfDayServiceContainer.createProvider(),
-    DayOfWeekServiceContainer.createProvider(),
+    TimeOfDayCRUDService.createProvider(),
+    DayOfWeekCRUDServiceContainer.createProvider(),
     ActivityRepository,
+    ActivityLogRepository,
+    ActivityLogService,
   ],
 })
 export class ActivityModule {}

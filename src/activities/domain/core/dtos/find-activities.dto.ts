@@ -1,6 +1,8 @@
 import { DateRange } from '../../../../system/query-shape/dto/date-range.query';
 
-export type FindActivitiesDTO = DateRange;
+export type FindActivitiesDTO = DateRange & {
+  authorId?: string;
+};
 
 export type FindActivitiesResponseDTO = {
   requestType: string;

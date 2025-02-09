@@ -25,12 +25,14 @@ import { UserGroupsController } from './adapters/user-groups.controller';
 import { UserGroupsServiceToken } from './domain/core/services/user-groups.service';
 import { UserGroupsServiceImpl } from './app/user-groups.service';
 import { UserGroup } from './domain/data-access/entities/user-group.entity';
-import { PeriodController } from './adapters/period.controller';
-import { DepartmentsController } from './adapters/departments.controller';
-import { DepartmentServiceToken } from './domain/core/services/department.service';
-import { DepartmentServiceImpl } from './app/department.service';
-import { PeriodServiceToken } from './domain/core/services/period.service';
-import { PeriodServiceImpl } from './app/period.service';
+import {
+  PeriodController,
+  PeriodCRUDService,
+} from './adapters/period.controller';
+import {
+  DepartmentCRUDService,
+  DepartmentsController,
+} from './adapters/departments.controller';
 import { Department } from './domain/data-access/entities/department.entity';
 import { Period } from './domain/data-access/entities/period.entity';
 
@@ -85,14 +87,8 @@ import { Period } from './domain/data-access/entities/period.entity';
       provide: UserGroupsServiceToken,
       useClass: UserGroupsServiceImpl,
     },
-    {
-      provide: DepartmentServiceToken,
-      useClass: DepartmentServiceImpl,
-    },
-    {
-      provide: PeriodServiceToken,
-      useClass: PeriodServiceImpl,
-    },
+    PeriodCRUDService.createProvider(),
+    DepartmentCRUDService.createProvider(),
   ],
   exports: [PasswordManager, UserServiceToken, RoleServiceToken],
 })

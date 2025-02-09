@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: app-seed-job
+spec:
+  template:
+    metadata:
+      name: app-seed-job
+    spec:
+      containers:
+        - name: app-seed-job
+          image: chuotcona123/seed:latest
+          command: ["npm", "run", "seed:run"]
+          env:
+            - name: PORT
+              value: "3000"
+            - name: SALT_ROUNDS
+              value: "10"
+            - name: JWT_SECRET
+              value: "supersecret"
+            - name: ACCESS_TOKEN_EXPIRATION
+              value: "15m"
+            - name: REFRESH_TOKEN_EXPIRATION
+              value: "7d"
+            - name: DEFAULT_PASSWORD
+              value: "Abcde123456@@"
+            - name: DB_HOST
+              value: "postgres"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USERNAME
+              value: "postgres"
+            - name: DB_PASSWORD
+              value: "241299"
+            - name: DB_DATABASE
+              value: "baseNest"
+            - name: DB_MIGRATION_RUN
+              value: "true"
+            - name: DB_SYNC
+              value: "false"
+            - name: UPLOAD_DIR
+              value: "/upload"
+            - name: CORS
+              value: "http://localhost:3000,http://127.0.0.1:3000"
+      restartPolicy: Never
+  backoffLimit: 4

@@ -39,6 +39,7 @@ export class ActivityController {
     private readonly activityService: ActivityService,
   ) {}
 
+  @CanAccessBy(Permissions.READ_ACTIVITIES)
   @Get()
   findActivities(@Query() query: FindActivitiesRequest) {
     return this.activityService.findActivities(query);

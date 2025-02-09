@@ -14,7 +14,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     CacheModule.register({
       isGlobal: true,
     }),
-    HttpQueryModule.register(),
+    HttpQueryModule.register({
+      defaultSize: 25,
+    }),
     EventEmitterModule.forRoot(),
   ],
   providers: [EnvironmentKeyFactory],

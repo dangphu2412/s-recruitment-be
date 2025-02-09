@@ -21,4 +21,7 @@ export enum Permissions {
   WRITE_USER_GROUPS = 'Write user groups',
   READ_ACTIVITIES = 'Read activities',
   WRITE_ACTIVITIES = 'Write activities',
+  READ_ACTIVITY_LOGS = 'Read activity logs',
+  WRITE_PERIODS = 'Write periods',
+  WRITE_DEPARTMENTS = 'Write departments',
 }

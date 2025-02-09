@@ -4,4 +4,5 @@ export class UpdateUserRequest {
   periodId?: string;
   birthday?: string;
   phoneNumber?: string;
+  trackingId?: string;
 }
