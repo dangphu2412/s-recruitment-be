@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from '../../../account-service/domain/data-access/entities/user.entity';
+import { LogWorkStatus } from '../core/constants/log-work-status.enum';
 
 @Entity({
   name: 'activity_logs',
@@ -20,11 +21,11 @@ export class ActivityLog {
   toTime: string;
 
   @Column({
-    name: 'is_late',
+    name: 'work_status',
     nullable: false,
     type: 'boolean',
   })
-  isLate: boolean;
+  workStatus: LogWorkStatus;
 
   @PrimaryColumn({
     name: 'track_id',
