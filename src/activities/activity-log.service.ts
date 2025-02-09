@@ -11,6 +11,7 @@ import { Activity } from './domain/data-access/activity.entity';
 import { RequestTypes } from './domain/core/constants/request-activity-status.enum';
 import { ActivityLog } from './domain/data-access/activity-log.entity';
 import { ActivityRepository } from './activity.repository';
+import { LogWorkStatus } from './domain/core/constants/log-work-status.enum';
 
 @Injectable()
 export class ActivityLogService {
@@ -121,7 +122,7 @@ export class ActivityLogService {
             entity.deviceUserId = deviceUserId;
             entity.fromTime = logs[0].recordTime;
             entity.toTime = logs[0].recordTime;
-            entity.isLate = false;
+            entity.workStatus = LogWorkStatus.NOT_FINISHED;
             return entity;
           }
 
@@ -130,6 +131,7 @@ export class ActivityLogService {
             entity.deviceUserId = deviceUserId;
             entity.fromTime = logs[0].recordTime;
             entity.toTime = logs[1].recordTime;
+            entity.workStatus = LogWorkStatus.NOT_FINISHED;
 
             if (entity.fromTime > entity.toTime) {
               const temp = entity.toTime;
@@ -139,12 +141,18 @@ export class ActivityLogService {
 
             if (workActivities.length !== 0) {
               const workActivity = workActivities[0];
-              entity.isLate = entity.fromTime > workActivity.timeOfDay.fromTime;
+              entity.workStatus =
+                entity.fromTime > workActivity.timeOfDay.fromTime
+                  ? LogWorkStatus.ON_TIME
+                  : LogWorkStatus.LATE;
             } else if (lateActivities.length !== 0) {
               const lateActivity = lateActivities[0];
-              entity.isLate = entity.fromTime > lateActivity.timeOfDay.fromTime;
+              entity.workStatus =
+                entity.fromTime > lateActivity.timeOfDay.fromTime
+                  ? LogWorkStatus.ON_TIME
+                  : LogWorkStatus.LATE;
             } else if (absenseActivities.length !== 0) {
-              entity.isLate = true;
+              entity.workStatus = LogWorkStatus.LATE;
             }
 
             return entity;
@@ -157,5 +165,57 @@ export class ActivityLogService {
 
       await this.activityLogRepository.updateLogs(newLogs);
     }
+  }
+
+  async syncLogs() {
+    const logs = await this.activityLogRepository.find({
+      where: {
+        workStatus: LogWorkStatus.NOT_FINISHED,
+      },
+    });
+
+    const activities = await this.activityRepository.find({
+      relations: ['author', 'dayOfWeek', 'timeOfDay'],
+    });
+
+    const deviceUserIdToActivities: Record<string, Activity[]> =
+      activities.reduce((result, activity) => {
+        if (!result[activity.author.trackingId]) {
+          result[activity.author.trackingId] = [];
+        }
+        result[activity.author.trackingId].push(activity);
+        return result;
+      }, {});
+
+    for (const log of logs) {
+      const activities = deviceUserIdToActivities[log.deviceUserId] ?? [];
+      const workActivities = activities.filter(
+        (activity) => activity.requestType === RequestTypes.WORKING,
+      );
+      const lateActivities = activities.filter(
+        (activity) => activity.requestType === RequestTypes.LATE,
+      );
+      const absenseActivities = activities.filter(
+        (activity) => activity.requestType === RequestTypes.ABSENCE,
+      );
+
+      if (workActivities.length !== 0) {
+        const workActivity = workActivities[0];
+        log.workStatus =
+          log.fromTime > workActivity.timeOfDay.fromTime
+            ? LogWorkStatus.ON_TIME
+            : LogWorkStatus.LATE;
+      } else if (lateActivities.length !== 0) {
+        const lateActivity = lateActivities[0];
+        log.workStatus =
+          log.fromTime > lateActivity.timeOfDay.fromTime
+            ? LogWorkStatus.ON_TIME
+            : LogWorkStatus.LATE;
+      } else if (absenseActivities.length !== 0) {
+        log.workStatus = LogWorkStatus.LATE;
+      }
+    }
+
+    await this.activityLogRepository.save(logs);
   }
 }

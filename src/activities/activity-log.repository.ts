@@ -9,6 +9,7 @@ import {
   AnalyticLogsAggregate,
   AnalyticLogsAggregateDTO,
 } from './domain/data-access/aggregates/analytic-logs.aggregate';
+import { LogWorkStatus } from './domain/core/constants/log-work-status.enum';
 
 @Injectable()
 export class ActivityLogRepository extends Repository<ActivityLog> {
@@ -21,20 +22,28 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
 
   findLogs(findLogsRequest: FindLogsRequest) {
     const {
-      isLate,
+      workStatus,
       fromDate = subWeeks(new Date(), 1).toISOString(),
       toDate = new Date().toISOString(),
     } = findLogsRequest;
     const { offset, size } = PageRequest.of(findLogsRequest);
 
-    const queryBuilder = this.createQueryBuilder('activityLog').leftJoin(
-      'activityLog.author',
-      'author',
-    );
+    const queryBuilder = this.createQueryBuilder('activityLog')
+      .leftJoinAndSelect('activityLog.author', 'author')
+      .select([
+        'activityLog.fromTime',
+        'activityLog.toTime',
+        'activityLog.deviceUserId',
+        'activityLog.workStatus',
+        'author.email',
+        'author.id',
+      ]);
 
-    if (isLate !== undefined) {
-      queryBuilder.andWhere('activityLog.isLate = :isLate', {
-        isLate: Boolean(isLate),
+    if (workStatus !== undefined) {
+      workStatus.forEach((status) => {
+        queryBuilder.andWhere('activityLog.workStatus = :status', {
+          status: status,
+        });
       });
     }
 
@@ -53,9 +62,9 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
   }: AnalyticLogsAggregateDTO): Promise<AnalyticLogsAggregate> {
     const items = await this.query(
       `SELECT
-        SUM(CASE WHEN activity_logs.is_late = true THEN 1 ELSE 0 END) AS "lateCount",
-        SUM(CASE WHEN activity_logs.from_time = activity_logs.to_time THEN 1 ELSE 0 END) AS "notFinishedCount",
-        SUM(CASE WHEN activity_logs.is_late = false and  activity_logs.from_time != activity_logs.to_time THEN 1 ELSE 0 END) as "onTimeCount"
+        SUM(CASE WHEN activity_logs.work_status = '${LogWorkStatus.LATE}' THEN 1 ELSE 0 END) AS "lateCount",
+        SUM(CASE WHEN activity_logs.work_status = '${LogWorkStatus.NOT_FINISHED}' THEN 1 ELSE 0 END) AS "notFinishedCount",
+        SUM(CASE WHEN activity_logs.work_status = '${LogWorkStatus.ON_TIME}' THEN 1 ELSE 0 END) as "onTimeCount"
       FROM activity_logs
       LEFT JOIN users ON activity_logs.track_id = users.tracking_id
       WHERE activity_logs.from_time >= $1 AND activity_logs.to_time <= $2`,

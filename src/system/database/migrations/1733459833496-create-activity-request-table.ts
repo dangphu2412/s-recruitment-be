@@ -233,9 +233,8 @@ export class CreateActivityRequestTable1733459833496
             isPrimary: true,
           },
           {
-            name: 'is_late',
-            type: 'boolean',
-            default: false,
+            name: 'work_status',
+            type: 'varchar',
           },
           {
             name: 'track_id',
