@@ -93,7 +93,7 @@ export class EnvironmentKeyFactory {
       database: this.getString('DB_DATABASE'),
       synchronize: this.getBoolean('DB_SYNC'),
       entities: APP_ENTITIES,
-      logging: this.configService.get('NODE_ENV') === 'development',
+      logging: false,
       migrationsRun: true,
       migrationsTableName: MIGRATION_CONFIGS.migrationsTableName,
       migrations: MIGRATION_CONFIGS.migrations,
