@@ -13,6 +13,7 @@ import { ClientExceptionFilter } from './system/exception/exception.filter';
 import { EnvironmentKeyFactory } from './system/services';
 import { createSystemClientCode } from './system/exception';
 import { initializeTransactionalContext } from 'typeorm-transactional';
+import morgan from 'morgan';
 
 async function bootstrap() {
   initializeTransactionalContext();
@@ -32,6 +33,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
+  app.use(morgan('common'));
   await app.register(compression, { encodings: ['gzip', 'deflate'] });
   await app.register(contentParser);
   await app.register(fastifyHelmet, {
