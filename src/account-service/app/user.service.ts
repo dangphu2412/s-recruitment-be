@@ -1,7 +1,7 @@
 import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { Page, PageRequest } from 'src/system/query-shape/dto';
-import { omit, xor } from 'lodash';
+import { omit } from 'lodash';
 import { In, InsertResult, IsNull } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { PasswordManager } from './password-manager';
@@ -31,7 +31,6 @@ import { addMonths, differenceInMonths } from 'date-fns';
 import { PaginatedUserProbationDTO } from '../domain/core/dto/user-probation.dto';
 import { UserProbationQueryDTO } from '../domain/core/dto/user-probation-query.dto';
 import { SystemRoles } from '../domain/constants/role-def.enum';
-import { BadRequestFileCreationFormatException } from '../domain/core/exceptions/bad-request-file-creation-format.exception';
 import {
   MonthlyMoneyOperationService,
   MonthlyMoneyOperationServiceToken,
@@ -290,19 +289,20 @@ export class UserServiceImpl implements UserService {
 
         const rows = utils.sheet_to_json<FileRow>(sheet);
         // Validate file columns
-        const requiredColumns = [
-          'Họ và Tên:',
-          'Email',
-          'Username',
-          'Join At',
-          'Department',
-        ];
-        const columns = Object.keys(rows[0]);
+        // const requiredColumns = [
+        //   'Họ và Tên',
+        //   'Email',
+        //   'Join At',
+        //   'Department',
+        //   'Ngày sinh',
+        //   // 'Tracking',
+        // ];
+        // const columns = Object.keys(rows[0]);
 
-        if (xor(requiredColumns, columns).length) {
-          throw new BadRequestFileCreationFormatException();
-        }
-        const usernames = rows.map((row) => row['Username']);
+        // if (xor(requiredColumns, columns).length) {
+        //   throw new BadRequestFileCreationFormatException();
+        // }
+        const usernames = rows.map((row) => row['Email']);
         const existedUsers = await this.userRepository.find({
           where: {
             username: In(usernames),
@@ -338,12 +338,16 @@ export class UserServiceImpl implements UserService {
     const entities = rows.map((row) => {
       const user = new User();
 
-      user.username = row['Username'];
+      user.username = row['Email'];
       user.email = row['Email'];
-      user.fullName = row['Họ và Tên:'];
+      user.fullName = row['Họ và Tên'];
       user.joinedAt = row['Join At'] ? new Date(row['Join At']) : new Date();
       user.periodId = periodId;
-      user.departmentId = row['Department'];
+      user.departmentId = row['Chuyên môn'];
+      user.trackingId = row['Tracking'];
+      user.birthday = row['Ngày sinh']
+        ? new Date(row['Ngày sinh'])
+        : new Date();
       user.password = defaultPwd;
 
       return user;

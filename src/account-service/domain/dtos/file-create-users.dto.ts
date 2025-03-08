@@ -1,10 +1,11 @@
 import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 export type FileRow = {
-  'Họ và Tên:': string;
+  'Họ và Tên': string;
   Email: string;
-  Username: string;
   'Join At': string;
+  Tracking: string;
+  'Ngày sinh': string;
 };
 
 export class FileCreateUsersDto {

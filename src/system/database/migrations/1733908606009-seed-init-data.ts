@@ -20,6 +20,7 @@ import { Category } from '../../../posts-service/domain/data-access/entities/cat
 import { Department } from '../../../account-service/domain/data-access/entities/department.entity';
 import { Period } from '../../../account-service/domain/data-access/entities/period.entity';
 import { MenuCode } from '../../menu/client/menu-code.constant';
+import { DatabaseUtils } from '../utils/database.utils';
 
 type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
   subMenus?: InsertMenu[];
@@ -296,20 +297,20 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       {
         id: 'SUM-MORN',
         name: 'Morning (8:30 - 11h30)',
-        fromTime: '8:30',
-        toTime: '11:30',
+        fromTime: DatabaseUtils.formatTimeToUTC('8:30'),
+        toTime: DatabaseUtils.formatTimeToUTC('11:30'),
       },
       {
         id: 'SUM-AFT',
         name: 'Afternoon (13:30 - 17h30)',
-        fromTime: '13:30',
-        toTime: '17:30',
+        fromTime: DatabaseUtils.formatTimeToUTC('13:30'),
+        toTime: DatabaseUtils.formatTimeToUTC('17:30'),
       },
       {
         id: 'SUM-EVN',
         name: 'Evening (19:00 - 21:30)',
-        fromTime: '19:00',
-        toTime: '21:30',
+        fromTime: DatabaseUtils.formatTimeToUTC('19:00'),
+        toTime: DatabaseUtils.formatTimeToUTC('21:30'),
       },
     ]);
 
@@ -390,12 +391,12 @@ export class SeedInitData1733908606009 implements MigrationInterface {
 
     await departmentRepository.insert([
       {
-        id: 'IT',
+        id: 'Lập trình',
         name: 'IT',
         description: 'Information Technology',
       },
       {
-        id: 'DS',
+        id: 'Thiết kế',
         name: 'Design',
         description: 'Design',
       },

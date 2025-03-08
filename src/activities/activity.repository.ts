@@ -69,4 +69,15 @@ export class ActivityRepository extends Repository<Activity> {
 
     return queryBuilder.getMany();
   }
+
+  findActivitiesByDeviceUserIds(deviceUserIds: string[]) {
+    return this.createQueryBuilder('activity')
+      .leftJoinAndSelect('activity.author', 'author')
+      .leftJoinAndSelect('activity.timeOfDay', 'timeOfDay')
+      .leftJoinAndSelect('activity.dayOfWeek', 'dayOfWeek')
+      .andWhere('author.trackingId IN (:...deviceUserIds)', {
+        deviceUserIds: deviceUserIds,
+      })
+      .getMany();
+  }
 }
