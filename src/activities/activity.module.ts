@@ -22,6 +22,7 @@ import { ActivityLog } from './domain/data-access/activity-log.entity';
 import { ActivityLogRepository } from './activity-log.repository';
 import { ActivityLogService } from './activity-log.service';
 import { ActivitiesLogController } from './activities-log.controller';
+import { ActivityMdmController } from './activity-mdm.controller';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ActivitiesLogController } from './activities-log.controller';
     ActivitiesLogController,
     TimeOfDaysController,
     DayOfWeeksController,
+    ActivityMdmController,
   ],
   providers: [
     {

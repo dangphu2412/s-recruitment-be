@@ -5,12 +5,12 @@ import {
   TableForeignKey,
   TableUnique,
 } from 'typeorm';
-import { DatabaseNamingUtils } from '../utils/database-naming.utils';
+import { DatabaseUtils } from '../utils/database.utils';
 
 export class CreateUserGroupAndUserAssessment1729828382939
   implements MigrationInterface
 {
-  private UNIQUE_NAME_KEY = DatabaseNamingUtils.createUniqueKey(
+  private UNIQUE_NAME_KEY = DatabaseUtils.createUniqueKey(
     'user_groups',
     'name',
   );

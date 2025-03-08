@@ -78,7 +78,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
     return this.createQueryBuilder()
       .insert()
       .values(activityLogs)
-      .orIgnore()
+      .orUpdate(['work_status'], ['from_time', 'to_time', 'track_id'])
       .execute();
   }
 }
