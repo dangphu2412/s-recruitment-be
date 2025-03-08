@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Patch,
   Post,
   Query,
   UploadedFile,
@@ -37,10 +36,5 @@ export class ActivitiesLogController {
     file: Express.Multer.File,
   ) {
     return this.activityLogService.uploadActivityLogs(file);
-  }
-
-  @Patch('/works')
-  syncLogs() {
-    return this.activityLogService.syncLogs();
   }
 }

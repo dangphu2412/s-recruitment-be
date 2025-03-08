@@ -55,7 +55,7 @@ export class ActivityRequest {
   })
   reviseNote: string;
 
-  // Occurrence
+  // Recurring request
   @Column({
     name: 'time_of_day_id',
     type: 'varchar',

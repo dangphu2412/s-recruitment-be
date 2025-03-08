@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
 import { FindLogsRequest } from './domain/presentation/dtos/find-logs.request';
-import { format, subYears } from 'date-fns';
+import { compareAsc, format, parse, subYears } from 'date-fns';
 import { Page } from '../system/query-shape/dto';
 import {
   CreateFileDTO,
@@ -9,9 +9,115 @@ import {
 } from '../file-service/domain/core/dto/file.dto';
 import { Activity } from './domain/data-access/activity.entity';
 import { RequestTypes } from './domain/core/constants/request-activity-status.enum';
-import { ActivityLog } from './domain/data-access/activity-log.entity';
 import { ActivityRepository } from './activity.repository';
 import { LogWorkStatus } from './domain/core/constants/log-work-status.enum';
+import { ActivityLog } from './domain/data-access/activity-log.entity';
+
+class LogSegmentProcessor {
+  private deviceIdMapToDateSegmentedLogs: Map<string, Map<string, LogDTO[]>> =
+    new Map();
+
+  constructor(logs: LogDTO[]) {
+    for (const log of logs) {
+      const dateId = format(new Date(log.recordTime), 'yyyy-MM-dd');
+
+      if (!this.deviceIdMapToDateSegmentedLogs.has(log.deviceUserId)) {
+        this.deviceIdMapToDateSegmentedLogs.set(log.deviceUserId, new Map());
+      }
+
+      const dateSegmentedLogs = this.deviceIdMapToDateSegmentedLogs.get(
+        log.deviceUserId,
+      );
+
+      if (!dateSegmentedLogs.has(dateId)) {
+        dateSegmentedLogs.set(dateId, []);
+      }
+
+      dateSegmentedLogs.get(dateId).push(log);
+    }
+  }
+
+  async onEachDeviceUserId(
+    callback: (deviceId: string, logs: Map<string, LogDTO[]>) => Promise<void>,
+  ) {
+    Logger.log(
+      `Proces logs for users size of ${this.deviceIdMapToDateSegmentedLogs.size}`,
+      LogSegmentProcessor.name,
+    );
+
+    for (const [
+      deviceId,
+      logs,
+    ] of this.deviceIdMapToDateSegmentedLogs.entries()) {
+      Logger.log(
+        `Process on user ${deviceId} with logs size of ${logs.size}`,
+        LogSegmentProcessor.name,
+      );
+      await callback(deviceId, logs);
+      Logger.log(`Finished on user ${deviceId}`, LogSegmentProcessor.name);
+    }
+  }
+}
+
+class WorkStatusPolicy {
+  constructor(
+    private activities: Activity[],
+    private fromDateTime: string,
+    private toDateTime: string,
+  ) {}
+
+  private getHHMMSS(time: string) {
+    return this.parseTime(
+      new Date(time).getUTCHours().toString().padStart(2, '0') +
+        ':' +
+        new Date(time).getUTCMinutes().toString().padStart(2, '0') +
+        ':' +
+        new Date(time).getUTCSeconds().toString().padStart(2, '0'),
+    );
+  }
+
+  private parseTime(time: string) {
+    return parse(time, 'HH:mm:ss', new Date());
+  }
+
+  check(): LogWorkStatus {
+    if (this.activities.length === 0) {
+      return LogWorkStatus.NOT_FINISHED;
+    }
+
+    for (const workActivity of this.activities) {
+      if (workActivity.requestType !== RequestTypes.WORKING) {
+        continue;
+      }
+
+      // Ensure work activity day matches the log date
+      if (
+        parseInt(workActivity.dayOfWeek.id) !==
+        new Date(this.fromDateTime).getUTCDay()
+      ) {
+        continue;
+      }
+
+      // Convert registered working hours
+      const workStart = this.parseTime(workActivity.timeOfDay.fromTime);
+      const workEnd = this.parseTime(workActivity.timeOfDay.toTime);
+
+      // Convert log time
+      const logStart = this.getHHMMSS(this.fromDateTime);
+      const logEnd = this.getHHMMSS(this.toDateTime);
+
+      // Check if the log time overlaps with the defined work time
+      if (
+        compareAsc(logEnd, workStart) >= 0 &&
+        compareAsc(logStart, workEnd) <= 0
+      ) {
+        return LogWorkStatus.ON_TIME;
+      }
+    }
+
+    return LogWorkStatus.LATE;
+  }
+}
 
 @Injectable()
 export class ActivityLogService {
@@ -39,183 +145,89 @@ export class ActivityLogService {
   }
 
   async uploadActivityLogs(file: CreateFileDTO) {
-    const activities = await this.activityRepository.find({
-      relations: ['author', 'dayOfWeek', 'timeOfDay'],
-    });
-    const deviceUserIdToActivities: Record<string, Activity[]> =
-      activities.reduce((result, activity) => {
-        if (!result[activity.author.trackingId]) {
-          result[activity.author.trackingId] = [];
-        }
-        result[activity.author.trackingId].push(activity);
-        return result;
-      }, {});
-
     const data = file.buffer.toString('utf-8');
-    const logs = JSON.parse(data) as LogDTO[];
+    const fullLogs = JSON.parse(data) as LogDTO[];
 
-    const chunks: Array<Array<LogDTO>> = [];
+    const lastYearLogs = this.extractLogsFromLastYear(fullLogs);
+    const logSegmentProcessor = new LogSegmentProcessor(lastYearLogs);
 
-    let chunkPool: Array<LogDTO> = [];
-    let chunkId: null | string = null;
+    await logSegmentProcessor.onEachDeviceUserId(
+      async (deviceUserId: string, dateMapToLogs: Map<string, LogDTO[]>) => {
+        const workActivities =
+          await this.activityRepository.findActivitiesByDeviceUserIds([
+            deviceUserId,
+          ]);
+        const logEntities: ActivityLog[] = [];
 
-    for (const log of logs) {
-      const currentChunkId = format(new Date(log.recordTime), 'yyyy-MM-dd');
+        dateMapToLogs.forEach((userLogs) => {
+          const log = new ActivityLog();
 
-      if (currentChunkId < '2022-01-01') {
-        continue;
-      }
-
-      if (chunkId === null) {
-        chunkId = currentChunkId;
-      }
-
-      if (chunkId === currentChunkId) {
-        chunkPool.push(log);
-      } else {
-        chunks.push(chunkPool);
-        chunkPool = [log];
-        chunkId = currentChunkId;
-      }
-    }
-
-    // Sort the chunks by the recordTime of the first log in the chunk
-    chunks.sort((a, b) => {
-      return (
-        new Date(b[0].recordTime).getTime() -
-        new Date(a[0].recordTime).getTime()
-      );
-    });
-
-    for (const logsOfDay of chunks) {
-      /**
-       * Group the logs by deviceUserId
-       * With each userId, identify the start and end of the activity
-       * Detect if the activity is on time or not by compare to the registered activity
-       */
-      const deviceUserIdMapToLogs = {};
-
-      logsOfDay.forEach((log) => {
-        if (!deviceUserIdMapToLogs[log.deviceUserId]) {
-          deviceUserIdMapToLogs[log.deviceUserId] = [];
-        }
-
-        deviceUserIdMapToLogs[log.deviceUserId].push(log);
-      });
-
-      const newLogs = Object.keys(deviceUserIdMapToLogs)
-        .map((deviceUserId) => {
-          const logs: LogDTO[] = deviceUserIdMapToLogs[deviceUserId];
-          const activities = deviceUserIdToActivities[deviceUserId] ?? [];
-          const workActivities = activities.filter(
-            (activity) => activity.requestType === RequestTypes.WORKING,
-          );
-          const lateActivities = activities.filter(
-            (activity) => activity.requestType === RequestTypes.LATE,
-          );
-          const absenseActivities = activities.filter(
-            (activity) => activity.requestType === RequestTypes.ABSENCE,
-          );
-
-          if (logs.length === 1) {
-            const entity = new ActivityLog();
-            entity.deviceUserId = deviceUserId;
-            entity.fromTime = logs[0].recordTime;
-            entity.toTime = logs[0].recordTime;
-            entity.workStatus = LogWorkStatus.NOT_FINISHED;
-            return entity;
+          if (userLogs.length === 1) {
+            log.fromTime = userLogs[0].recordTime;
+            log.toTime = userLogs[0].recordTime;
+            log.workStatus = LogWorkStatus.NOT_FINISHED;
+            log.deviceUserId = deviceUserId;
+            logEntities.push(log);
+            return;
           }
 
-          if (logs.length === 2) {
-            const entity = new ActivityLog();
-            entity.deviceUserId = deviceUserId;
-            entity.fromTime = logs[0].recordTime;
-            entity.toTime = logs[1].recordTime;
-            entity.workStatus = LogWorkStatus.NOT_FINISHED;
-
-            if (entity.fromTime > entity.toTime) {
-              const temp = entity.toTime;
-              entity.toTime = entity.fromTime;
-              entity.fromTime = temp;
-            }
-
-            if (workActivities.length !== 0) {
-              const workActivity = workActivities[0];
-              entity.workStatus =
-                entity.fromTime > workActivity.timeOfDay.fromTime
-                  ? LogWorkStatus.ON_TIME
-                  : LogWorkStatus.LATE;
-            } else if (lateActivities.length !== 0) {
-              const lateActivity = lateActivities[0];
-              entity.workStatus =
-                entity.fromTime > lateActivity.timeOfDay.fromTime
-                  ? LogWorkStatus.ON_TIME
-                  : LogWorkStatus.LATE;
-            } else if (absenseActivities.length !== 0) {
-              entity.workStatus = LogWorkStatus.LATE;
-            }
-
-            return entity;
+          if (userLogs.length === 2) {
+            // Logs keep order so we do not care about from Time and to Time
+            log.fromTime = userLogs[0].recordTime;
+            log.toTime = userLogs[1].recordTime;
+            log.workStatus = new WorkStatusPolicy(
+              workActivities,
+              userLogs[0].recordTime,
+              userLogs[1].recordTime,
+            ).check();
+            log.deviceUserId = deviceUserId;
+            logEntities.push(log);
+            return;
           }
 
-          console.log('NOT SUPPORT WITH MORE THAN 2 LOGS');
-          return null;
-        })
-        .filter(Boolean);
+          // More than 2 logsByUserDeviceId
+          log.fromTime = userLogs[0].recordTime;
+          log.toTime = userLogs[userLogs.length - 1].recordTime;
+          log.workStatus = new WorkStatusPolicy(
+            workActivities,
+            userLogs[0].recordTime,
+            userLogs[userLogs.length - 1].recordTime,
+          ).check();
+          log.deviceUserId = deviceUserId;
+        });
 
-      await this.activityLogRepository.updateLogs(newLogs);
-    }
+        Logger.log(
+          `Update logs for user ${deviceUserId} with size ${logEntities.length}`,
+          ActivityLogService.name,
+        );
+        await this.activityLogRepository.updateLogs(logEntities);
+      },
+    );
   }
 
-  async syncLogs() {
-    const logs = await this.activityLogRepository.find({
-      where: {
-        workStatus: LogWorkStatus.NOT_FINISHED,
-      },
-    });
+  /**
+   * Apply binary search to find logs from the previous year
+   */
+  private extractLogsFromLastYear(logs: LogDTO[]) {
+    const START_OF_PREVIOUS_YEAR = format(
+      subYears(new Date(), 1),
+      'yyyy-MM-dd',
+    );
+    let left = 0;
+    let right = logs.length - 1;
+    let result = logs.length;
 
-    const activities = await this.activityRepository.find({
-      relations: ['author', 'dayOfWeek', 'timeOfDay'],
-    });
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
 
-    const deviceUserIdToActivities: Record<string, Activity[]> =
-      activities.reduce((result, activity) => {
-        if (!result[activity.author.trackingId]) {
-          result[activity.author.trackingId] = [];
-        }
-        result[activity.author.trackingId].push(activity);
-        return result;
-      }, {});
-
-    for (const log of logs) {
-      const activities = deviceUserIdToActivities[log.deviceUserId] ?? [];
-      const workActivities = activities.filter(
-        (activity) => activity.requestType === RequestTypes.WORKING,
-      );
-      const lateActivities = activities.filter(
-        (activity) => activity.requestType === RequestTypes.LATE,
-      );
-      const absenseActivities = activities.filter(
-        (activity) => activity.requestType === RequestTypes.ABSENCE,
-      );
-
-      if (workActivities.length !== 0) {
-        const workActivity = workActivities[0];
-        log.workStatus =
-          log.fromTime > workActivity.timeOfDay.fromTime
-            ? LogWorkStatus.ON_TIME
-            : LogWorkStatus.LATE;
-      } else if (lateActivities.length !== 0) {
-        const lateActivity = lateActivities[0];
-        log.workStatus =
-          log.fromTime > lateActivity.timeOfDay.fromTime
-            ? LogWorkStatus.ON_TIME
-            : LogWorkStatus.LATE;
-      } else if (absenseActivities.length !== 0) {
-        log.workStatus = LogWorkStatus.LATE;
+      if (logs[mid].recordTime >= START_OF_PREVIOUS_YEAR) {
+        result = mid;
+        right = mid - 1;
+      } else {
+        left = mid + 1;
       }
     }
 
-    await this.activityLogRepository.save(logs);
+    return logs.slice(result);
   }
 }

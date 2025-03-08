@@ -20,6 +20,11 @@ const main = async () => {
   const { data } = await zkInstance.getAttendances();
   const to = './data/attendances.json';
   await fs.writeFile(to, JSON.stringify(data))
+
+  const users = await zkInstance.getUsers()
+
+  const toUsers = './data/users.json';
+  await fs.writeFile(toUsers, JSON.stringify(users))
   await zkInstance.disconnect()
 }
 
