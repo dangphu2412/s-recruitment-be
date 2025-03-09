@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import trackedUsers from '../../data/users.json';
+import trackedUsers from './data/users.json';
 import { Page } from '../system/query-shape/dto';
 
 @Controller('activity-mdm')
