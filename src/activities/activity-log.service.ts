@@ -1,17 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
 import { FindLogsRequest } from './domain/presentation/dtos/find-logs.request';
-import { compareAsc, format, parse, subYears } from 'date-fns';
+import { format, subYears } from 'date-fns';
 import { Page } from '../system/query-shape/dto';
 import {
   CreateFileDTO,
   LogDTO,
 } from '../file-service/domain/core/dto/file.dto';
-import { Activity } from './domain/data-access/activity.entity';
-import { RequestTypes } from './domain/core/constants/request-activity-status.enum';
 import { ActivityRepository } from './activity.repository';
 import { LogWorkStatus } from './domain/core/constants/log-work-status.enum';
 import { ActivityLog } from './domain/data-access/activity-log.entity';
+import { WorkStatusEvaluator } from './work-status-evaluator.service';
 
 class LogSegmentProcessor {
   private deviceIdMapToDateSegmentedLogs: Map<string, Map<string, LogDTO[]>> =
@@ -59,71 +58,12 @@ class LogSegmentProcessor {
   }
 }
 
-class WorkStatusPolicy {
-  constructor(
-    private activities: Activity[],
-    private fromDateTime: string,
-    private toDateTime: string,
-  ) {}
-
-  private getHHMMSS(time: string) {
-    return this.parseTime(
-      new Date(time).getUTCHours().toString().padStart(2, '0') +
-        ':' +
-        new Date(time).getUTCMinutes().toString().padStart(2, '0') +
-        ':' +
-        new Date(time).getUTCSeconds().toString().padStart(2, '0'),
-    );
-  }
-
-  private parseTime(time: string) {
-    return parse(time, 'HH:mm:ss', new Date());
-  }
-
-  check(): LogWorkStatus {
-    if (this.activities.length === 0) {
-      return LogWorkStatus.NOT_FINISHED;
-    }
-
-    for (const workActivity of this.activities) {
-      if (workActivity.requestType !== RequestTypes.WORKING) {
-        continue;
-      }
-
-      // Ensure work activity day matches the log date
-      if (
-        parseInt(workActivity.dayOfWeek.id) !==
-        new Date(this.fromDateTime).getUTCDay()
-      ) {
-        continue;
-      }
-
-      // Convert registered working hours
-      const workStart = this.parseTime(workActivity.timeOfDay.fromTime);
-      const workEnd = this.parseTime(workActivity.timeOfDay.toTime);
-
-      // Convert log time
-      const logStart = this.getHHMMSS(this.fromDateTime);
-      const logEnd = this.getHHMMSS(this.toDateTime);
-
-      // Check if the log time overlaps with the defined work time
-      if (
-        compareAsc(logEnd, workStart) >= 0 &&
-        compareAsc(logStart, workEnd) <= 0
-      ) {
-        return LogWorkStatus.ON_TIME;
-      }
-    }
-
-    return LogWorkStatus.LATE;
-  }
-}
-
 @Injectable()
 export class ActivityLogService {
   constructor(
     private readonly activityLogRepository: ActivityLogRepository,
     private readonly activityRepository: ActivityRepository,
+    private readonly workStatusEvaluator: WorkStatusEvaluator,
   ) {}
 
   async findLogs(findLogsRequest: FindLogsRequest) {
@@ -175,11 +115,11 @@ export class ActivityLogService {
             // Logs keep order so we do not care about from Time and to Time
             log.fromTime = userLogs[0].recordTime;
             log.toTime = userLogs[1].recordTime;
-            log.workStatus = new WorkStatusPolicy(
-              workActivities,
-              userLogs[0].recordTime,
-              userLogs[1].recordTime,
-            ).check();
+            log.workStatus = this.workStatusEvaluator.evaluateStatus({
+              activities: workActivities,
+              fromDateTime: userLogs[0].recordTime,
+              toDateTime: userLogs[1].recordTime,
+            });
             log.deviceUserId = deviceUserId;
             logEntities.push(log);
             return;
@@ -188,11 +128,11 @@ export class ActivityLogService {
           // More than 2 logsByUserDeviceId
           log.fromTime = userLogs[0].recordTime;
           log.toTime = userLogs[userLogs.length - 1].recordTime;
-          log.workStatus = new WorkStatusPolicy(
-            workActivities,
-            userLogs[0].recordTime,
-            userLogs[userLogs.length - 1].recordTime,
-          ).check();
+          log.workStatus = this.workStatusEvaluator.evaluateStatus({
+            activities: workActivities,
+            fromDateTime: userLogs[0].recordTime,
+            toDateTime: userLogs[1].recordTime,
+          });
           log.deviceUserId = deviceUserId;
         });
 

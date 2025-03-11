@@ -23,6 +23,7 @@ import { ActivityLogRepository } from './activity-log.repository';
 import { ActivityLogService } from './activity-log.service';
 import { ActivitiesLogController } from './activities-log.controller';
 import { ActivityMdmController } from './activity-mdm.controller';
+import { WorkStatusEvaluator } from './work-status-evaluator.service';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ActivityMdmController } from './activity-mdm.controller';
     ActivityRepository,
     ActivityLogRepository,
     ActivityLogService,
+    WorkStatusEvaluator,
   ],
 })
 export class ActivityModule {}

@@ -41,6 +41,10 @@ export class RoleServiceImpl implements RoleService {
     this.ttl = ms(refreshTokenExpiration);
   }
 
+  findByName(name: string): Promise<Role> {
+    return this.roleRepository.findOne({ where: { name } });
+  }
+
   async findAccessControlView(): Promise<AccessControlView> {
     const [roles, allPermissions] = await Promise.all([
       this.roleRepository.findAccessControlList(),

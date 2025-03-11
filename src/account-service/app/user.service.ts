@@ -320,8 +320,8 @@ export class UserServiceImpl implements UserService {
         );
 
         if (dto.monthlyConfigId !== undefined) {
-          await this.moneyOperationService.createOperationFee({
-            userIds: insertResult.identifiers.map((item) => item.id),
+          await this.upgradeToMembers({
+            ids: insertResult.identifiers.map((item) => item.id),
             monthlyConfigId: dto.monthlyConfigId,
           });
         }
@@ -406,6 +406,7 @@ export class UserServiceImpl implements UserService {
     if (users.length !== dto.ids.length) {
       throw new NotFoundUserException();
     }
+    const memberRole = await this.roleService.findByName(SystemRoles.MEMBER);
 
     const { items } = await this.moneyOperationService.createOperationFee({
       monthlyConfigId: dto.monthlyConfigId,
@@ -415,6 +416,11 @@ export class UserServiceImpl implements UserService {
     items.forEach((item) => {
       const user = users.find((u) => u.id === item.userId);
       user.operationFeeId = item.operationFeeId;
+
+      if (!user.roles?.length) {
+        user.roles = [];
+        user.roles.push(memberRole);
+      }
     });
 
     await this.userRepository.save(users, {
