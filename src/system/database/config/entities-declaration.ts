@@ -16,8 +16,8 @@ import { Period } from '../../../master-data-service/periods/period.entity';
 import { Department } from '../../../master-data-service/departments/department.entity';
 import { ActivityRequest } from '../../../activities/domain/data-access/activity-request.entity';
 import { Activity } from '../../../activities/domain/data-access/activity.entity';
-import { DayOfWeek } from '../../../activities/domain/data-access/day-of-week';
-import { TimeOfDay } from '../../../activities/domain/data-access/time-of-day.entity';
+import { DayOfWeek } from '../../../master-data-service/day-of-weeks/day-of-week';
+import { TimeOfDay } from '../../../master-data-service/time-of-days/time-of-day.entity';
 import { ActivityLog } from '../../../activities/domain/data-access/activity-log.entity';
 
 export const APP_ENTITIES = [

@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { WorkStatusEvaluator } from '../../src/activities/work-status-evaluator.service';
-import { TimeOfDay } from '../../src/activities/domain/data-access/time-of-day.entity';
-import { DayOfWeek } from '../../src/activities/domain/data-access/day-of-week';
+import { TimeOfDay } from '../../src/master-data-service/time-of-days/time-of-day.entity';
+import { DayOfWeek } from '../../src/master-data-service/day-of-weeks/day-of-week';
 import { User } from '../../src/account-service/domain/data-access/entities/user.entity';
 
 describe('WorkStatusPolicy', () => {

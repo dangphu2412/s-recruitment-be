@@ -25,8 +25,6 @@ import { UserGroupsController } from './management/controllers/user-groups.contr
 import { UserGroupsServiceToken } from './domain/core/services/user-groups.service';
 import { UserGroupsServiceImpl } from './management/services/user-groups.service';
 import { UserGroup } from './domain/data-access/entities/user-group.entity';
-import { PeriodController } from '../master-data-service/periods/period.controller';
-import { DepartmentsController } from '../master-data-service/departments/departments.controller';
 import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
 
 @Module({
@@ -45,8 +43,6 @@ import { MasterDataServiceModule } from '../master-data-service/master-data-serv
     RoleController,
     UserController,
     UserGroupsController,
-    PeriodController,
-    DepartmentsController,
   ],
   providers: [
     JwtStrategy,

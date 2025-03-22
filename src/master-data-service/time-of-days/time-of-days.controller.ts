@@ -2,8 +2,8 @@ import { Controller, Get, Inject } from '@nestjs/common';
 import {
   createCRUDService,
   ResourceCRUDService,
-} from '../system/resource-templates/resource-service-template';
-import { TimeOfDay } from './domain/data-access/time-of-day.entity';
+} from '../../system/resource-templates/resource-service-template';
+import { TimeOfDay } from './time-of-day.entity';
 
 export const TimeOfDayCRUDService = createCRUDService(TimeOfDay);
 
