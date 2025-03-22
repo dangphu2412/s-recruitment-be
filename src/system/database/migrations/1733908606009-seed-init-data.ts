@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { DayOfWeek } from '../../../activities/domain/data-access/day-of-week';
-import { TimeOfDay } from '../../../activities/domain/data-access/time-of-day.entity';
+import { DayOfWeek } from '../../../master-data-service/day-of-weeks/day-of-week';
+import { TimeOfDay } from '../../../master-data-service/time-of-days/time-of-day.entity';
 import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
 import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
 import { RolePermissionConnector } from '../processors/role-permission.connector';

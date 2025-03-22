@@ -7,16 +7,8 @@ import { ActivityRequestServiceToken } from './domain/core/services/activity-req
 import { Activity } from './domain/data-access/activity.entity';
 import { ActivityServiceImpl } from './activity.service';
 import { ActivityServiceToken } from './domain/core/services/activity.service';
-import { DayOfWeek } from './domain/data-access/day-of-week';
-import { TimeOfDay } from './domain/data-access/time-of-day.entity';
-import {
-  TimeOfDaysController,
-  TimeOfDayCRUDService,
-} from './time-of-days.controller';
-import {
-  DayOfWeeksController,
-  DayOfWeekCRUDServiceContainer,
-} from './day-of-weeks.controller';
+import { TimeOfDayCRUDService } from '../master-data-service/time-of-days/time-of-days.controller';
+import { DayOfWeekCRUDServiceContainer } from '../master-data-service/day-of-weeks/day-of-weeks.controller';
 import { ActivityRepository } from './activity.repository';
 import { ActivityLog } from './domain/data-access/activity-log.entity';
 import { ActivityLogRepository } from './activity-log.repository';
@@ -24,22 +16,16 @@ import { ActivityLogService } from './activity-log.service';
 import { ActivitiesLogController } from './activities-log.controller';
 import { ActivityMdmController } from './activity-mdm.controller';
 import { WorkStatusEvaluator } from './work-status-evaluator.service';
+import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Activity,
-      ActivityRequest,
-      DayOfWeek,
-      TimeOfDay,
-      ActivityLog,
-    ]),
+    TypeOrmModule.forFeature([Activity, ActivityRequest, ActivityLog]),
+    MasterDataServiceModule,
   ],
   controllers: [
     ActivityController,
     ActivitiesLogController,
-    TimeOfDaysController,
-    DayOfWeeksController,
     ActivityMdmController,
   ],
   providers: [

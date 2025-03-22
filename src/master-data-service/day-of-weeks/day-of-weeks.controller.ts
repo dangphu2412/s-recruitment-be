@@ -2,8 +2,8 @@ import { Controller, Get, Inject } from '@nestjs/common';
 import {
   createCRUDService,
   ResourceCRUDService,
-} from '../system/resource-templates/resource-service-template';
-import { DayOfWeek } from './domain/data-access/day-of-week';
+} from '../../system/resource-templates/resource-service-template';
+import { DayOfWeek } from './day-of-week';
 
 export const DayOfWeekCRUDServiceContainer = createCRUDService(DayOfWeek);
 
