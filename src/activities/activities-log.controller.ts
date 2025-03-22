@@ -17,6 +17,7 @@ import { ApiConsumes } from '@nestjs/swagger';
 export class ActivitiesLogController {
   constructor(private readonly activityLogService: ActivityLogService) {}
 
+  @CanAccessBy(Permissions.READ_ACTIVITY_LOGS)
   @Get()
   findLogs(@Query() findLogsRequest: FindLogsRequest) {
     return this.activityLogService.findLogs(findLogsRequest);

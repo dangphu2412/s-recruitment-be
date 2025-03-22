@@ -10,7 +10,10 @@ import {
 import { ActivityRepository } from './activity.repository';
 import { LogWorkStatus } from './domain/core/constants/log-work-status.enum';
 import { ActivityLog } from './domain/data-access/activity-log.entity';
-import { WorkStatusEvaluator } from './work-status-evaluator.service';
+import {
+  WorkStatusEvaluator,
+  WorkTimeUtils,
+} from './work-status-evaluator.service';
 
 class LogSegmentProcessor {
   private deviceIdMapToDateSegmentedLogs: Map<string, Map<string, LogDTO[]>> =
@@ -18,7 +21,7 @@ class LogSegmentProcessor {
 
   constructor(logs: LogDTO[]) {
     for (const log of logs) {
-      const dateId = format(new Date(log.recordTime), 'yyyy-MM-dd');
+      const dateId = WorkTimeUtils.formatDate(log.recordTime);
 
       if (!this.deviceIdMapToDateSegmentedLogs.has(log.deviceUserId)) {
         this.deviceIdMapToDateSegmentedLogs.set(log.deviceUserId, new Map());
