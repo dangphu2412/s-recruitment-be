@@ -1,40 +1,33 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './adapters/auth.controller';
-import { AuthServiceImpl } from './app/auth.service';
+import { AuthController } from './registration/controllers/auth.controller';
+import { AuthServiceImpl } from './registration/services/auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './adapters/strategies/jwt.strategy';
-import { TokenGeneratorImpl } from './app/token-factory';
+import { JwtStrategy } from './registration/services/jwt.strategy';
+import { TokenGeneratorImpl } from './registration/services/token-factory';
 import { EnvironmentKeyFactory } from '../system/services';
-import { PasswordManager } from './app/password-manager';
+import { PasswordManager } from './registration/services/password-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RoleAuthorizationStrategy } from './adapters/strategies/role-authorization.strategy';
-import { RoleServiceImpl } from './app/role.service';
-import { RoleRepository } from './app/role.repository';
-import { RoleController } from './adapters/role.controller';
+import { RoleAuthorizationStrategy } from './authorization/services/role-authorization.strategy';
+import { RoleServiceImpl } from './authorization/services/role.service';
+import { RoleRepository } from './authorization/repositories/role.repository';
+import { RoleController } from './authorization/controllers/role.controller';
 import { Permission } from './domain/data-access/entities/permission.entity';
 import { MonthlyMoneyModule } from '../monthly-money/internal/monthly-money.module';
-import { UserController } from './adapters/user.controller';
-import { UserServiceImpl } from './app/user.service';
-import { UserRepository } from './app/user.repository';
+import { UserController } from './management/controllers/user.controller';
+import { UserServiceImpl } from './management/services/user.service';
+import { UserRepository } from './management/repositories/user.repository';
 import { AuthServiceToken, TokenFactoryToken } from './domain/core/services';
 import { User } from './domain/data-access/entities/user.entity';
 import { Role } from './domain/data-access/entities/role.entity';
 import { RoleServiceToken } from './domain/core/services/role.service';
 import { UserServiceToken } from './domain/core/services/user-service';
-import { UserGroupsController } from './adapters/user-groups.controller';
+import { UserGroupsController } from './management/controllers/user-groups.controller';
 import { UserGroupsServiceToken } from './domain/core/services/user-groups.service';
-import { UserGroupsServiceImpl } from './app/user-groups.service';
+import { UserGroupsServiceImpl } from './management/services/user-groups.service';
 import { UserGroup } from './domain/data-access/entities/user-group.entity';
-import {
-  PeriodController,
-  PeriodCRUDService,
-} from './adapters/period.controller';
-import {
-  DepartmentCRUDService,
-  DepartmentsController,
-} from './adapters/departments.controller';
-import { Department } from './domain/data-access/entities/department.entity';
-import { Period } from './domain/data-access/entities/period.entity';
+import { PeriodController } from '../master-data-service/periods/period.controller';
+import { DepartmentsController } from '../master-data-service/departments/departments.controller';
+import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
 
 @Module({
   imports: [
@@ -44,14 +37,8 @@ import { Period } from './domain/data-access/entities/period.entity';
         environmentKeyFactory.getJwtConfig(),
       inject: [EnvironmentKeyFactory],
     }),
-    TypeOrmModule.forFeature([
-      User,
-      Role,
-      Permission,
-      UserGroup,
-      Department,
-      Period,
-    ]),
+    MasterDataServiceModule,
+    TypeOrmModule.forFeature([User, Role, Permission, UserGroup]),
   ],
   controllers: [
     AuthController,
@@ -87,8 +74,6 @@ import { Period } from './domain/data-access/entities/period.entity';
       provide: UserGroupsServiceToken,
       useClass: UserGroupsServiceImpl,
     },
-    PeriodCRUDService.createProvider(),
-    DepartmentCRUDService.createProvider(),
   ],
   exports: [PasswordManager, UserServiceToken, RoleServiceToken],
 })

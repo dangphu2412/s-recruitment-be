@@ -1,4 +1,4 @@
-import { Menu } from '../../menu';
+import { Menu } from '../../../menu';
 import { RecruitmentEvent } from '../../../recruitment/domain/data-access/entities/recruitment-event.entity';
 import { RecruitmentEmployee } from '../../../recruitment/domain/data-access/entities/recruitment-employee.entity';
 import { EmployeeEventPoint } from '../../../recruitment/domain/data-access/entities/employee-event-point.entity';
@@ -12,8 +12,8 @@ import { Payment } from '../../../monthly-money/domain/data-access/entities/paym
 import { UserGroup } from '../../../account-service/domain/data-access/entities/user-group.entity';
 import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
 import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
-import { Period } from '../../../account-service/domain/data-access/entities/period.entity';
-import { Department } from '../../../account-service/domain/data-access/entities/department.entity';
+import { Period } from '../../../master-data-service/periods/period.entity';
+import { Department } from '../../../master-data-service/departments/department.entity';
 import { ActivityRequest } from '../../../activities/domain/data-access/activity-request.entity';
 import { Activity } from '../../../activities/domain/data-access/activity.entity';
 import { DayOfWeek } from '../../../activities/domain/data-access/day-of-week';

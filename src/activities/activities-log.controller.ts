@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 import { ActivityLogService } from './activity-log.service';
 import { FindLogsRequest } from './domain/presentation/dtos/find-logs.request';
-import { CanAccessBy } from '../account-service/adapters/decorators/can-access-by.decorator';
-import { Permissions } from '../account-service/domain/constants/role-def.enum';
+import { CanAccessBy } from '../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../account-service/authorization/access-definition.constant';
 import { FileInterceptor } from '../system/file';
 import { ApiConsumes } from '@nestjs/swagger';
 

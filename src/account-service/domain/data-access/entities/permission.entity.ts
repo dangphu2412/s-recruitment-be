@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Role } from './role.entity';
-import { Menu } from '../../../../system/menu';
+import { Menu } from '../../../../menu';
 
 @Entity({
   name: 'permissions',

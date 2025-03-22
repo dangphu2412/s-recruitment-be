@@ -1,4 +1,4 @@
-import { Menu } from '../../menu';
+import { Menu } from '../../../menu';
 import { In, TreeRepository } from 'typeorm';
 import { keyBy, omit } from 'lodash';
 
