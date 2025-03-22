@@ -124,21 +124,32 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": "./",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
+    "coverageDirectory": "./coverage",
     "testEnvironment": "node",
+    "modulePathIgnorePatterns": [
+      "dist",
+      ".module.ts",
+      ".exception.ts",
+      "index.ts"
+    ],
     "coveragePathIgnorePatterns": [
+      "node_modules/",
       ".module.ts",
       "client",
-      "dtos"
-    ]
+      "dtos",
+      "index.ts"
+    ],
+    "moduleNameMapper": {
+      "src/(.*)": "<rootDir>/src/$1"
+    }
   },
   "lint-staged": {
     "*.ts": [

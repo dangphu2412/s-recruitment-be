@@ -1,18 +1,24 @@
 import { createInterfaceToken } from 'src/system/utils';
 import { Page } from 'src/system/query-shape/dto';
-import { UserManagementViewDTO } from '../dto/users.dto';
-import { CreateUsersDto } from '../../presentation/dto/create-users.dto';
-import { FileCreateUsersDto } from '../../dtos/file-create-users.dto';
+import { UserManagementViewDTO } from '../../../management/controllers/users.dto';
+import { CreateUsersRequestDTO } from '../../../management/controllers/create-users.request';
+import { FileCreateUsersDto } from '../../../management/controllers/file-create-users.dto';
 import { User } from '../../data-access/entities/user.entity';
-import { MyProfile, UserDetail } from '../../dtos/my-profile';
-import { UpdateUserRolesDto } from '../../dtos/update-user-roles.dto';
-import { PaginatedUserProbationDTO } from '../dto/user-probation.dto';
-import { UserProbationQueryDTO } from '../dto/user-probation-query.dto';
-import { UpgradeUserMemberDTO } from '../dto/upgrade-user-member.dto';
-import { GetUserDTO, GetUsersDTO } from '../dto/get-users.dto';
-import { UpdateUserDTO } from '../dto/update-user.dto';
-import { GetUsersQueryDTO } from '../dto/get-users-query.dto';
-import { CreatePaymentRequest } from '../../presentation/dto/create-payment.request';
+import {
+  MyProfile,
+  UserDetail,
+} from '../../../management/dtos/core/my-profile';
+import { UpdateUserRolesDto } from '../../../management/controllers/update-user-roles.dto';
+import { PaginatedUserProbationDTO } from '../../../management/dtos/core/user-probation.dto';
+import { UserProbationQueryDTO } from '../../../management/dtos/core/user-probation-query.dto';
+import { UpgradeUserMemberDTO } from '../../../management/dtos/core/upgrade-user-member.dto';
+import {
+  GetUserDTO,
+  GetUsersDTO,
+} from '../../../management/dtos/core/get-users.dto';
+import { UpdateUserDTO } from '../../../management/dtos/core/update-user.dto';
+import { GetUsersQueryDTO } from '../../../management/dtos/core/get-users-query.dto';
+import { CreatePaymentRequest } from '../../../management/controllers/create-payment.request';
 
 export const UserServiceToken = createInterfaceToken('UserServiceToken');
 
@@ -35,7 +41,7 @@ export interface UserService {
   /**
    * @throws {InsertUserFailedException}
    */
-  createUser(dto: CreateUsersDto): Promise<void>;
+  createUser(dto: CreateUsersRequestDTO): Promise<void>;
   createUsersByFile(
     dto: FileCreateUsersDto,
   ): Promise<{ duplicatedEmails: string[] }[]>;

@@ -1,10 +1,13 @@
 import { createInterfaceToken } from '../../../../system/utils';
-import { BasicLoginDto, LoginCredentials } from '../../dtos/login.credentials';
+import {
+  BasicLoginDTO,
+  UserCredentialsDTO,
+} from '../../../registration/dtos/core/login-credentials.dto';
 
 export const AuthServiceToken = createInterfaceToken('AuthService');
 
 export interface AuthService {
-  login(basicLoginRequestDto: BasicLoginDto): Promise<LoginCredentials>;
-  renewTokens(refreshToken: string): Promise<LoginCredentials>;
+  login(basicLoginRequestDto: BasicLoginDTO): Promise<UserCredentialsDTO>;
+  renewTokens(refreshToken: string): Promise<UserCredentialsDTO>;
   logOut(refreshToken: string): Promise<void>;
 }

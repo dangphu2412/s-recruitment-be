@@ -14,13 +14,10 @@ import {
   ActivityRequestServiceToken,
 } from './domain/core/services/activity-request.service';
 import { CreateActivityRequestRequest } from './domain/presentation/dtos/create-activity-request.request';
-import { CanAccessBy } from '../account-service/adapters/decorators/can-access-by.decorator';
-import { Permissions } from '../account-service/domain/constants/role-def.enum';
-import {
-  CurrentUser,
-  Identified,
-} from '../account-service/adapters/decorators';
-import { JwtPayload } from '../account-service/domain/dtos/jwt-payload';
+import { CanAccessBy } from '../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../account-service/authorization/access-definition.constant';
+import { CurrentUser } from '../account-service/management/user.decorator';
+import { JwtPayload } from '../account-service/registration/jwt-payload';
 import { UpdateApprovalActivityRequestRequest } from './domain/presentation/dtos/update-approval-activity-request.request';
 import { UpdateMyActivityRequestRequest } from './domain/presentation/dtos/update-my-activity.request';
 import { FindRequestedActivityRequestDTO } from './domain/presentation/dtos/find-requested-activity-request.dto';
@@ -29,6 +26,7 @@ import {
   ActivityServiceToken,
 } from './domain/core/services/activity.service';
 import { FindActivitiesRequest } from './domain/presentation/dtos/find-activities.request';
+import { Identified } from '../account-service/registration/identified.decorator';
 
 @Controller('activities')
 export class ActivityController {

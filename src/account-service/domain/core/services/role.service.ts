@@ -1,7 +1,7 @@
 import { createInterfaceToken } from '../../../../system/utils';
-import { AccessControlView } from '../../dtos/role-list.dto';
+import { AccessControlView } from '../../../authorization/dtos/core/role-list.dto';
 import { Role } from '../../data-access/entities/role.entity';
-import { UpdateRoleDto } from '../../dtos/update-role.dto';
+import { UpdateRoleDto } from '../../../authorization/dtos/core/update-role.dto';
 
 export const RoleServiceToken = createInterfaceToken('RoleService');
 

@@ -20,8 +20,8 @@ import { Post } from '../../../../posts-service/domain/data-access/entities/post
 import { Payment } from '../../../../monthly-money/domain/data-access/entities/payment.entity';
 import { UserGroup } from './user-group.entity';
 import { OperationFee } from '../../../../monthly-money/domain/data-access/entities/operation-fee.entity';
-import { Department } from './department.entity';
-import { Period } from './period.entity';
+import { Department } from '../../../../master-data-service/departments/department.entity';
+import { Period } from '../../../../master-data-service/periods/period.entity';
 import { ActivityRequest } from '../../../../activities/domain/data-access/activity-request.entity';
 import { ActivityLog } from '../../../../activities/domain/data-access/activity-log.entity';
 
