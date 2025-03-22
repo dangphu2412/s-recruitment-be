@@ -12,8 +12,10 @@ jobs:
   setups:
     uses: ./.github/workflows/setup-packages-job.yml
 
-  unit-test-check:
+  quality-check:
     needs: [setups]
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     uses: ./.github/workflows/unit-test-job.yml
 
   lint-check:
@@ -23,15 +25,3 @@ jobs:
   build:
     needs: [setups]
     uses: ./.github/workflows/builder-job.yml
-
-  sonarqube-check:
-    name: SonarQube
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: SonarQubeScan
-        uses: SonarSource/sonarqube-scan-action@v4
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

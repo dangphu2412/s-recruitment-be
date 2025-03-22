@@ -10,7 +10,7 @@ type WorkEvaluateDTO = {
   toDateTime: string;
 };
 
-class WorkTimeUtils {
+export class WorkTimeUtils {
   static parseTime(time: string): Date {
     return parse(time, 'HH:mm:ss', new Date());
   }
