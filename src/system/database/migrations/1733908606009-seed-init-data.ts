@@ -7,19 +7,19 @@ import { RolePermissionConnector } from '../processors/role-permission.connector
 import {
   Permissions,
   SystemRoles,
-} from '../../../account-service/domain/constants/role-def.enum';
+} from '../../../account-service/authorization/access-definition.constant';
 import { User } from '../../../account-service/domain/data-access/entities/user.entity';
-import { PasswordManager } from '../../../account-service/app/password-manager';
+import { PasswordManager } from '../../../account-service/registration/services/password-manager';
 import { EnvironmentKeyFactory } from '../../services';
 import { ConfigService } from '@nestjs/config';
-import { Menu } from '../../menu';
+import { Menu } from '../../../menu';
 import { MenuFactory } from '../processors/menu.factory';
 import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
 import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
 import { Category } from '../../../posts-service/domain/data-access/entities/category.entity';
-import { Department } from '../../../account-service/domain/data-access/entities/department.entity';
-import { Period } from '../../../account-service/domain/data-access/entities/period.entity';
-import { MenuCode } from '../../menu/client/menu-code.constant';
+import { Department } from '../../../master-data-service/departments/department.entity';
+import { Period } from '../../../master-data-service/periods/period.entity';
+import { MenuCode } from '../../../menu/client/menu-code.constant';
 import { DatabaseUtils } from '../utils/database.utils';
 
 type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
@@ -48,7 +48,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       },
       {
         name: SystemRoles.LEADER,
-        description: 'User who is the leader of a domain or group',
+        description: 'User who is the leader of a dtos or group',
       },
       {
         name: SystemRoles.MEDIA,
@@ -57,7 +57,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       {
         name: SystemRoles.TRAINER,
         description:
-          'User who is the trainer of a domain or group, can view and edit users',
+          'User who is the trainer of a dtos or group, can view and edit users',
       },
       {
         name: SystemRoles.MEMBER,

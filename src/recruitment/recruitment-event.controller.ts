@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiConsumes, ApiNoContentResponse } from '@nestjs/swagger';
-import { CurrentUser } from 'src/account-service/adapters/decorators';
+import { CurrentUser } from 'src/account-service/management/user.decorator';
 import { FileInterceptor } from 'src/system/file';
 import { Page } from 'src/system/query-shape/dto';
 import {
@@ -23,11 +23,11 @@ import {
   RecruitmentEventService,
   RecruitmentEventServiceToken,
 } from 'src/recruitment/domain/core/recruitment-event.service';
-import { JwtPayload } from '../account-service/domain/dtos/jwt-payload';
+import { JwtPayload } from '../account-service/registration/jwt-payload';
 import { FormBodyParserInterceptor } from '../system/form-body/form-body-parser.interceptor';
 import { GetEventDetailRequest } from './domain/presentation/dto/get-event-detail.request';
-import { CanAccessBy } from '../account-service/adapters/decorators/can-access-by.decorator';
-import { Permissions } from '../account-service/domain/constants/role-def.enum';
+import { CanAccessBy } from '../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../account-service/authorization/access-definition.constant';
 import { FastifyReply } from 'fastify';
 
 @CanAccessBy(Permissions.MANAGE_RECRUITMENT)
