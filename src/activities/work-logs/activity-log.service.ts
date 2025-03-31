@@ -1,15 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
-import { FindLogsRequest } from './domain/presentation/dtos/find-logs.request';
+import { FindLogsRequest } from '../domain/presentation/dtos/find-logs.request';
 import { format, subYears } from 'date-fns';
-import { Page } from '../system/query-shape/dto';
+import { Page } from '../../system/query-shape/dto';
 import {
   CreateFileDTO,
   LogDTO,
-} from '../file-service/domain/core/dto/file.dto';
-import { ActivityRepository } from './activity.repository';
-import { LogWorkStatus } from './domain/core/constants/log-work-status.enum';
-import { ActivityLog } from './domain/data-access/activity-log.entity';
+} from '../../file-service/domain/core/dto/file.dto';
+import { ActivityRepository } from '../managements/activity.repository';
+import { LogWorkStatus } from '../domain/core/constants/log-work-status.enum';
+import { ActivityLog } from '../domain/data-access/activity-log.entity';
 import {
   WorkStatusEvaluator,
   WorkTimeUtils,

@@ -12,51 +12,38 @@ import {
 import {
   ActivityRequestService,
   ActivityRequestServiceToken,
-} from './domain/core/services/activity-request.service';
-import { CreateActivityRequestRequest } from './domain/presentation/dtos/create-activity-request.request';
-import { CanAccessBy } from '../account-service/authorization/can-access-by.decorator';
-import { Permissions } from '../account-service/authorization/access-definition.constant';
-import { CurrentUser } from '../account-service/management/user.decorator';
-import { JwtPayload } from '../account-service/registration/jwt-payload';
-import { UpdateApprovalActivityRequestRequest } from './domain/presentation/dtos/update-approval-activity-request.request';
-import { UpdateMyActivityRequestRequest } from './domain/presentation/dtos/update-my-activity.request';
-import { FindRequestedActivityRequestDTO } from './domain/presentation/dtos/find-requested-activity-request.dto';
-import {
-  ActivityService,
-  ActivityServiceToken,
-} from './domain/core/services/activity.service';
-import { FindActivitiesRequest } from './domain/presentation/dtos/find-activities.request';
-import { Identified } from '../account-service/registration/identified.decorator';
+} from '../domain/core/services/activity-request.service';
+import { CreateActivityRequestRequest } from '../domain/presentation/dtos/create-activity-request.request';
+import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../../account-service/authorization/access-definition.constant';
+import { CurrentUser } from '../../account-service/management/user.decorator';
+import { JwtPayload } from '../../account-service/registration/jwt-payload';
+import { UpdateApprovalActivityRequestRequest } from '../domain/presentation/dtos/update-approval-activity-request.request';
+import { UpdateMyActivityRequestRequest } from '../domain/presentation/dtos/update-my-activity.request';
+import { FindRequestedActivityRequestDTO } from '../domain/presentation/dtos/find-requested-activity-request.dto';
+import { Identified } from '../../account-service/registration/identified.decorator';
 
-@Controller('activities')
-export class ActivityController {
+@Controller('activity-requests')
+export class ActivityRequestController {
   constructor(
     @Inject(ActivityRequestServiceToken)
     private readonly activityRequestService: ActivityRequestService,
-    @Inject(ActivityServiceToken)
-    private readonly activityService: ActivityService,
   ) {}
 
-  @CanAccessBy(Permissions.READ_ACTIVITIES)
-  @Get()
-  findActivities(@Query() query: FindActivitiesRequest) {
-    return this.activityService.findActivities(query);
-  }
-
   @CanAccessBy(Permissions.WRITE_ACTIVITIES)
-  @Get('requests')
+  @Get()
   findRequestedActivities(@Query() query: FindRequestedActivityRequestDTO) {
     return this.activityRequestService.findRequestedActivities(query);
   }
 
   @Identified
-  @Get('my-requests')
+  @Get('my')
   findMyRequestedActivities(@CurrentUser() user: JwtPayload) {
     return this.activityRequestService.findMyRequestedActivities(user.sub);
   }
 
   @Identified
-  @Get('my-requests/:id')
+  @Get('my/:id')
   findMyRequestedActivity(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: JwtPayload,
@@ -65,7 +52,7 @@ export class ActivityController {
   }
 
   @CanAccessBy(Permissions.READ_ACTIVITIES)
-  @Post('requests')
+  @Post()
   createRequestedActivity(
     @Body() dto: CreateActivityRequestRequest,
     @CurrentUser() user: JwtPayload,
@@ -77,7 +64,7 @@ export class ActivityController {
   }
 
   @Identified
-  @Patch('my-requests/:id')
+  @Patch('my/:id')
   updateRequestedActivity(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateMyActivityRequestRequest,
@@ -91,7 +78,7 @@ export class ActivityController {
   }
 
   @CanAccessBy(Permissions.WRITE_ACTIVITIES)
-  @Patch('requests/approval-status')
+  @Patch('approval-status')
   updateApprovalRequestedActivity(
     @Body() dto: UpdateApprovalActivityRequestRequest,
     @CurrentUser() user: JwtPayload,

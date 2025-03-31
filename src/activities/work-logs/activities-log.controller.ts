@@ -7,10 +7,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ActivityLogService } from './activity-log.service';
-import { FindLogsRequest } from './domain/presentation/dtos/find-logs.request';
-import { CanAccessBy } from '../account-service/authorization/can-access-by.decorator';
-import { Permissions } from '../account-service/authorization/access-definition.constant';
-import { FileInterceptor } from '../system/file';
+import { FindLogsRequest } from '../domain/presentation/dtos/find-logs.request';
+import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../../account-service/authorization/access-definition.constant';
+import { FileInterceptor } from '../../system/file';
 import { ApiConsumes } from '@nestjs/swagger';
 
 @Controller('activity-logs')
