@@ -1,10 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
 import trackedUsers from './data/users.json';
-import { Page } from '../system/query-shape/dto';
+import { Page } from '../../system/query-shape/dto';
 
-@Controller('activity-mdm')
+@Controller('tracked-users')
 export class ActivityMdmController {
-  @Get('tracked-users')
+  @Get()
   findTrackedUsers() {
     return Page.of({
       query: {

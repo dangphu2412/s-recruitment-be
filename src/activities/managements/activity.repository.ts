@@ -1,9 +1,9 @@
 import { Brackets, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Activity } from './domain/data-access/activity.entity';
-import { FindActivitiesDTO } from './domain/core/dtos/find-activities.dto';
-import { RequestTypes } from './domain/core/constants/request-activity-status.enum';
+import { Activity } from '../domain/data-access/activity.entity';
+import { FindActivitiesDTO } from '../domain/core/dtos/find-activities.dto';
+import { RequestTypes } from '../domain/core/constants/request-activity-status.enum';
 
 @Injectable()
 export class ActivityRepository extends Repository<Activity> {

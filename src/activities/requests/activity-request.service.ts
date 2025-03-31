@@ -5,28 +5,28 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { ActivityRequestService } from './domain/core/services/activity-request.service';
-import { ActivityRequest } from './domain/data-access/activity-request.entity';
+import { ActivityRequestService } from '../domain/core/services/activity-request.service';
+import { ActivityRequest } from '../domain/data-access/activity-request.entity';
 import {
   ApprovalRequestAction,
   RequestActivityStatus,
   RequestTypes,
-} from './domain/core/constants/request-activity-status.enum';
-import { CreateActivityRequestDTO } from './domain/core/dtos/create-activity-request.dto';
-import { FindRequestedMyActivitiesResponseDTO } from './domain/core/dtos/find-requested-my-acitivities.dto';
-import { Page, PageRequest } from '../system/query-shape/dto';
+} from '../domain/core/constants/request-activity-status.enum';
+import { CreateActivityRequestDTO } from '../domain/core/dtos/create-activity-request.dto';
+import { FindRequestedMyActivitiesResponseDTO } from '../domain/core/dtos/find-requested-my-acitivities.dto';
+import { Page, PageRequest } from '../../system/query-shape/dto';
 import {
   FindRequestedActivitiesResponseDTO,
   FindRequestedActivityQueryDTO,
-} from './domain/core/dtos/find-requested-acitivities.dto';
-import { UpdateApprovalActivityRequestDTO } from './domain/core/dtos/update-approval-activity-request.dto';
+} from '../domain/core/dtos/find-requested-acitivities.dto';
+import { UpdateApprovalActivityRequestDTO } from '../domain/core/dtos/update-approval-activity-request.dto';
 import { Transactional } from 'typeorm-transactional';
 import {
   ActivityService,
   ActivityServiceToken,
-} from './domain/core/services/activity.service';
-import { FindRequestedMyActivityResponseDTO } from './domain/core/dtos/find-requested-my-acitivity.dto';
-import { UpdateMyActivityRequestDTO } from './domain/core/dtos/update-my-activity-request.dto';
+} from '../domain/core/services/activity.service';
+import { FindRequestedMyActivityResponseDTO } from '../domain/core/dtos/find-requested-my-acitivity.dto';
+import { UpdateMyActivityRequestDTO } from '../domain/core/dtos/update-my-activity-request.dto';
 
 @Injectable()
 export class ActivityRequestServiceImpl implements ActivityRequestService {
