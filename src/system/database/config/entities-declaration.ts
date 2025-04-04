@@ -1,7 +1,4 @@
 import { Menu } from '../../../menu';
-import { RecruitmentEvent } from '../../../recruitment/domain/data-access/entities/recruitment-event.entity';
-import { RecruitmentEmployee } from '../../../recruitment/domain/data-access/entities/recruitment-employee.entity';
-import { EmployeeEventPoint } from '../../../recruitment/domain/data-access/entities/employee-event-point.entity';
 import { join } from 'path';
 import { User } from '../../../account-service/domain/data-access/entities/user.entity';
 import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
@@ -28,9 +25,6 @@ export const APP_ENTITIES = [
   MonthlyMoneyConfig,
   OperationFee,
   Permission,
-  RecruitmentEvent,
-  RecruitmentEmployee,
-  EmployeeEventPoint,
   Post,
   Category,
   Payment,

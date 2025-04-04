@@ -8,7 +8,7 @@ export const RoleServiceToken = createInterfaceToken('RoleService');
 export interface RoleService {
   findAccessControlView(): Promise<AccessControlView>;
   findByIds(ids: number[]): Promise<Role[]>;
-  findAccessRightsByUserId(userId: string): Promise<string[]>;
+  findPermissionsByUserId(userId: string): Promise<string[]>;
   findByName(name: string): Promise<Role>;
   updateRole(id: string, dto: UpdateRoleDto): Promise<void>;
   save(userId: string, roles: Role[]): Promise<string[]>;

@@ -8,7 +8,7 @@ jest.mock('bcryptjs', () => ({
   compare: jest.fn(),
 }));
 
-describe('PasswordManager', () => {
+describe(PasswordManager.name, () => {
   let passwordManager: PasswordManager;
   let configService: jest.Mocked<EnvironmentKeyFactory>;
 
@@ -53,7 +53,8 @@ describe('PasswordManager', () => {
       (genSalt as jest.Mock).mockResolvedValue('salt_default');
       (hash as jest.Mock).mockResolvedValue('hashed_default_pwd');
 
-      const result = await passwordManager.getDefaultPassword();
+      await passwordManager.onModuleInit();
+      const result = passwordManager.getDefaultPassword();
 
       expect(configService.getDefaultPwd).toHaveBeenCalled();
       expect(hash).toHaveBeenCalledWith('default123', 'salt_default');
