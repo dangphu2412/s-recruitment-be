@@ -278,7 +278,7 @@ export class UserServiceImpl implements UserService {
     const newUser = this.userRepository.create({
       ...payload,
       username: payload.email,
-      password: await this.passwordManager.getDefaultPassword(),
+      password: this.passwordManager.getDefaultPassword(),
       birthday: payload.birthday ? new Date(payload.birthday) : null,
     });
 
@@ -332,7 +332,7 @@ export class UserServiceImpl implements UserService {
   }
 
   private async createUsersBySheetRow(rows: FileRow[]): Promise<InsertResult> {
-    const defaultPwd = await this.passwordManager.getDefaultPassword();
+    const defaultPwd = this.passwordManager.getDefaultPassword();
 
     const entities = rows.map((row) => {
       const user = new User();

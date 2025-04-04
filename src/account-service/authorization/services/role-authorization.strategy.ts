@@ -6,6 +6,7 @@ import {
   RoleService,
   RoleServiceToken,
 } from '../../domain/core/services/role.service';
+import { Permissions } from '../access-definition.constant';
 
 @Injectable()
 export class RoleAuthorizationStrategy
@@ -20,12 +21,15 @@ export class RoleAuthorizationStrategy
 
   async canAccess(
     { sub }: JwtPayload,
-    requiredRights: string[],
+    requiredPermissions: string[],
   ): Promise<boolean> {
-    const accessRights = await this.roleService.findAccessRightsByUserId(sub);
+    const permissions = await this.roleService.findPermissionsByUserId(sub);
+    console.log(permissions);
 
-    return requiredRights.some((role) =>
-      accessRights.some((right) => right === role),
+    return requiredPermissions.some((requireRight) =>
+      permissions.some(
+        (right) => right === requireRight || right === Permissions.OWNER,
+      ),
     );
   }
 }

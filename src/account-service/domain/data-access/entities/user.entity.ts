@@ -13,8 +13,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { RecruitmentEvent } from '../../../../recruitment/domain/data-access/entities/recruitment-event.entity';
-import { EmployeeEventPoint } from '../../../../recruitment/domain/data-access/entities/employee-event-point.entity';
 import { Role } from './role.entity';
 import { Post } from '../../../../posts-service/domain/data-access/entities/posts.entity';
 import { Payment } from '../../../../monthly-money/domain/data-access/entities/payment.entity';
@@ -142,9 +140,6 @@ export class User {
   })
   userGroups?: UserGroup[];
 
-  @ManyToMany(() => RecruitmentEvent, (event) => event.examiners)
-  joinedRecruitEvents?: RecruitmentEvent[];
-
   @OneToOne(() => OperationFee, (operationFee) => operationFee.user)
   @JoinColumn({
     name: 'operation_fee_id',
@@ -154,9 +149,6 @@ export class User {
 
   @OneToMany(() => Payment, (payment) => payment.user)
   payments?: Payment[];
-
-  @OneToMany(() => EmployeeEventPoint, (point) => point.author)
-  markedEventPoints: EmployeeEventPoint[];
 
   @OneToMany(() => Post, (post) => post.author)
   posts?: Post[];

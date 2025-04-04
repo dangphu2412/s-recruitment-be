@@ -65,6 +65,10 @@ export class SeedInitData1733908606009 implements MigrationInterface {
     ]);
     await permissionRepository.insert([
       {
+        name: Permissions.OWNER,
+        description: 'Owner of system',
+      },
+      {
         name: Permissions.VIEW_ACCESS_RIGHTS,
         description: 'View access rights of system',
       },
@@ -79,14 +83,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       {
         name: Permissions.EDIT_ACCESS_RIGHTS,
         description: 'Edit roles of system',
-      },
-      {
-        name: Permissions.READ_USER_GROUPS,
-        description: 'Read user groups',
-      },
-      {
-        name: Permissions.WRITE_USER_GROUPS,
-        description: 'Write user groups',
       },
       {
         name: Permissions.MANAGE_RECRUITMENT,
@@ -123,22 +119,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
     ]);
 
     const roleNameMapToPermissionNames = {
-      [SystemRoles.SUPER_ADMIN]: [
-        Permissions.VIEW_USERS,
-        Permissions.EDIT_MEMBER_USER,
-        Permissions.EDIT_ACCESS_RIGHTS,
-        Permissions.VIEW_ACCESS_RIGHTS,
-        Permissions.READ_USER_GROUPS,
-        Permissions.WRITE_USER_GROUPS,
-        Permissions.MANAGE_RECRUITMENT,
-        Permissions.MANAGE_MASTER_DATA,
-        Permissions.WRITE_ACTIVITIES,
-        Permissions.READ_ACTIVITIES,
-        Permissions.MANAGE_POSTS,
-        Permissions.WRITE_PERIODS,
-        Permissions.WRITE_DEPARTMENTS,
-        Permissions.READ_ACTIVITY_LOGS,
-      ],
+      [SystemRoles.SUPER_ADMIN]: [Permissions.OWNER],
       [SystemRoles.LEADER]: [
         Permissions.VIEW_USERS,
         Permissions.EDIT_MEMBER_USER,
@@ -176,7 +157,8 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         new ConfigService<Record<string, unknown>, false>(),
       ),
     );
-    const password = await passwordManager.getDefaultPassword();
+    await passwordManager.onModuleInit();
+    const password = passwordManager.getDefaultPassword();
     const user = new User();
     user.fullName = 'Phu Dep Trai';
     user.email = 'noibosgroup@gmail.com';
@@ -198,19 +180,14 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         code: MenuCode.USER_MANAGEMENT,
         subMenus: [
           {
-            name: 'Administrator',
-            accessLink: '/users/admin',
-            code: MenuCode.ADMIN,
+            name: 'User Overview',
+            accessLink: '/users',
+            code: MenuCode.USER_OVERVIEW,
           },
           {
             name: 'IAM',
             accessLink: '/users/iam',
             code: MenuCode.IDENTITY_ACCESS_MANAGEMENT,
-          },
-          {
-            name: 'User Groups',
-            accessLink: '/users/groups',
-            code: MenuCode.USER_GROUPS,
           },
           {
             name: 'Departments',
@@ -260,18 +237,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
             name: 'Activities logs',
             accessLink: '/activities/tracking',
             code: MenuCode.ACTIVITIES_LOGS,
-          },
-        ],
-      },
-      {
-        name: 'Recruitment',
-        iconCode: 'RECRUITMENT_ICON',
-        code: MenuCode.RECRUITMENT,
-        subMenus: [
-          {
-            name: 'Recruitment Overview',
-            accessLink: '/recruitments/overview',
-            code: MenuCode.RECRUITMENT_OVERVIEW,
           },
         ],
       },
@@ -326,12 +291,13 @@ export class SeedInitData1733908606009 implements MigrationInterface {
     );
 
     const permissionDefineMenus: Record<string, Array<string>> = {
-      [Permissions.VIEW_USERS]: [MenuCode.ADMIN, MenuCode.USER_MANAGEMENT],
-      [Permissions.EDIT_MEMBER_USER]: [MenuCode.ADMIN],
+      [Permissions.VIEW_USERS]: [
+        MenuCode.USER_OVERVIEW,
+        MenuCode.USER_MANAGEMENT,
+      ],
+      [Permissions.EDIT_MEMBER_USER]: [MenuCode.USER_OVERVIEW],
       [Permissions.VIEW_ACCESS_RIGHTS]: [MenuCode.IDENTITY_ACCESS_MANAGEMENT],
       [Permissions.EDIT_ACCESS_RIGHTS]: [MenuCode.IDENTITY_ACCESS_MANAGEMENT],
-      [Permissions.WRITE_USER_GROUPS]: [MenuCode.USER_GROUPS],
-      [Permissions.READ_USER_GROUPS]: [MenuCode.USER_GROUPS],
       [Permissions.MANAGE_RECRUITMENT]: [
         MenuCode.RECRUITMENT,
         MenuCode.RECRUITMENT_OVERVIEW,

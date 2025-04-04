@@ -140,7 +140,7 @@ describe('RoleServiceImpl', () => {
   describe('findAccessRightsByUserId', () => {
     it('should return cached rights if available', async () => {
       cacheManager.get.mockResolvedValue(['read', 'write']);
-      const result = await roleService.findAccessRightsByUserId('user-1');
+      const result = await roleService.findPermissionsByUserId('user-1');
 
       expect(result).toEqual(['read', 'write']);
       expect(roleRepository.find).not.toHaveBeenCalled();
@@ -154,7 +154,7 @@ describe('RoleServiceImpl', () => {
         } as Role,
       ]);
 
-      await roleService.findAccessRightsByUserId('user-1');
+      await roleService.findPermissionsByUserId('user-1');
 
       expect(roleRepository.find).toHaveBeenCalled();
       expect(cacheManager.set).toHaveBeenCalled();

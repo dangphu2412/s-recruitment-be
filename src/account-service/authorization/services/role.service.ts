@@ -13,6 +13,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { EnvironmentKeyFactory } from '../../../system/services';
 import ms from 'ms';
+import { Permissions } from '../access-definition.constant';
 
 @Injectable()
 export class RoleServiceImpl implements RoleService {
@@ -110,7 +111,7 @@ export class RoleServiceImpl implements RoleService {
     return this.roleRepository.findBy({ id: In(ids) });
   }
 
-  async findAccessRightsByUserId(userId: string): Promise<string[]> {
+  async findPermissionsByUserId(userId: string): Promise<string[]> {
     const rights: string[] | undefined = await this.cacheManager.get<
       string[] | undefined
     >(RoleServiceImpl.genKey(userId));
@@ -120,6 +121,20 @@ export class RoleServiceImpl implements RoleService {
         where: { users: { id: userId } },
         relations: ['permissions'],
       });
+
+      if (
+        roles.some((role) =>
+          role.permissions.some((p) => p.name === Permissions.OWNER),
+        )
+      ) {
+        const permissions = await this.permissionRepository.find();
+
+        return await this.cacheManager.set(
+          RoleServiceImpl.genKey(userId),
+          permissions.map((permission) => permission.name),
+          this.ttl,
+        );
+      }
 
       return this.save(userId, roles);
     }
