@@ -27,6 +27,15 @@ import {
 } from '../domain/core/services/activity.service';
 import { FindRequestedMyActivityResponseDTO } from '../domain/core/dtos/find-requested-my-acitivity.dto';
 import { UpdateMyActivityRequestDTO } from '../domain/core/dtos/update-my-activity-request.dto';
+import {
+  FileActivityRequestDTO,
+  FileActivityRequestRow,
+} from '../domain/core/dtos/file-create-activity-request.dto';
+import { read, utils } from 'xlsx';
+import {
+  UserService,
+  UserServiceToken,
+} from '../../account-service/domain/core/services/user-service';
 
 @Injectable()
 export class ActivityRequestServiceImpl implements ActivityRequestService {
@@ -35,7 +44,84 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     private readonly activityRequestRepository: Repository<ActivityRequest>,
     @Inject(ActivityServiceToken)
     private readonly activityService: ActivityService,
+    @Inject(UserServiceToken)
+    private readonly userService: UserService,
   ) {}
+
+  async createRequestActivityByFile({
+    file,
+  }: FileActivityRequestDTO): Promise<void> {
+    type UserRequest = {
+      name: string;
+      department: string;
+      registered: { dayOfWeekId: number; timeOfDayId: string }[];
+    };
+    const workbook = read(file.buffer, { type: 'buffer', cellDates: true });
+
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = utils
+      .sheet_to_json<FileActivityRequestRow>(sheet, {
+        header: 1,
+        defval: '',
+      })
+      .slice(2);
+    const results: UserRequest[] = [];
+
+    rows.forEach((row) => {
+      const user = {
+        name: row[1],
+        department: row[2],
+        registered: [],
+      };
+
+      for (let i = 3; i < row.length; i++) {
+        if ('x' === row[i]) {
+          const dayOfWeek = Math.ceil((i - 2) / 3);
+          const timeOfDayMap = {
+            0: 'SUM-MORN',
+            1: 'SUM-AFT',
+            2: 'SUM-EVN',
+          };
+          user.registered.push({
+            // Start from 1 -> 7
+            dayOfWeekId: dayOfWeek === 7 ? 0 : dayOfWeek,
+            // Start from 0,1,2
+            timeOfDayId: timeOfDayMap[Math.ceil((i - 3) % 3)],
+          });
+        }
+      }
+
+      results.push(user);
+    });
+
+    await Promise.all(
+      results
+        .map(async (result) => {
+          const user = await this.userService.findUserByFullname(result.name);
+
+          if (!user) {
+            // Return the list of unmatch users
+            return null;
+          }
+
+          await Promise.all(
+            result.registered.map(async (registered) => {
+              const entity = new ActivityRequest();
+              entity.authorId = user.id;
+              entity.requestType = RequestTypes.WORKING;
+              entity.timeOfDayId = registered.timeOfDayId;
+              entity.dayOfWeekId = registered.dayOfWeekId.toString();
+              entity.approvalStatus = RequestActivityStatus.PENDING;
+
+              await this.activityRequestRepository.insert(entity);
+            }),
+          );
+        })
+        .flat(),
+    );
+
+    return;
+  }
 
   async findMyRequestedActivities(
     userId: string,

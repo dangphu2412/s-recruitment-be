@@ -12,7 +12,7 @@ async function main() {
     keyFilename: `${process.cwd()}/service_account.json`,
   });
 
-  const bucket = storage.bucket('sgroup-bucket');
+  const bucket = storage.bucket('');
   const zkService = new ZKLib(process.env.ZK_IP, 4370, 10000, 4000);
 
   try {

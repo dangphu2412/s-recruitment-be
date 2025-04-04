@@ -19,6 +19,7 @@ import { Activity } from '../../../activities/domain/data-access/activity.entity
 import { DayOfWeek } from '../../../master-data-service/day-of-weeks/day-of-week';
 import { TimeOfDay } from '../../../master-data-service/time-of-days/time-of-day.entity';
 import { ActivityLog } from '../../../activities/domain/data-access/activity-log.entity';
+import { DeviceUser } from '../../../activities/domain/data-access/user-log.entity';
 
 export const APP_ENTITIES = [
   User,
@@ -39,6 +40,7 @@ export const APP_ENTITIES = [
   ActivityRequest,
   Activity,
   ActivityLog,
+  DeviceUser,
   DayOfWeek,
   TimeOfDay,
 ];

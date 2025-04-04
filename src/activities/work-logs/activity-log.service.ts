@@ -96,7 +96,7 @@ export class ActivityLogService {
 
     await logSegmentProcessor.onEachDeviceUserId(
       async (deviceUserId: string, dateMapToLogs: Map<string, LogDTO[]>) => {
-        const workActivities =
+        const activities =
           await this.activityRepository.findActivitiesByDeviceUserIds([
             deviceUserId,
           ]);
@@ -116,10 +116,11 @@ export class ActivityLogService {
 
           if (userLogs.length === 2) {
             // Logs keep order so we do not care about from Time and to Time
+            // TODO: We need to reference the related registered work
             log.fromTime = userLogs[0].recordTime;
             log.toTime = userLogs[1].recordTime;
             log.workStatus = this.workStatusEvaluator.evaluateStatus({
-              activities: workActivities,
+              activities: activities,
               fromDateTime: userLogs[0].recordTime,
               toDateTime: userLogs[1].recordTime,
             });
@@ -132,7 +133,7 @@ export class ActivityLogService {
           log.fromTime = userLogs[0].recordTime;
           log.toTime = userLogs[userLogs.length - 1].recordTime;
           log.workStatus = this.workStatusEvaluator.evaluateStatus({
-            activities: workActivities,
+            activities: activities,
             fromDateTime: userLogs[0].recordTime,
             toDateTime: userLogs[1].recordTime,
           });

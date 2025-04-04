@@ -8,6 +8,8 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ActivityRequestService,
@@ -22,6 +24,9 @@ import { UpdateApprovalActivityRequestRequest } from '../domain/presentation/dto
 import { UpdateMyActivityRequestRequest } from '../domain/presentation/dtos/update-my-activity.request';
 import { FindRequestedActivityRequestDTO } from '../domain/presentation/dtos/find-requested-activity-request.dto';
 import { Identified } from '../../account-service/registration/identified.decorator';
+import { FileInterceptor } from '../../system/file';
+import { ApiConsumes } from '@nestjs/swagger';
+import { FileActivityRequestDTO } from '../domain/core/dtos/file-create-activity-request.dto';
 
 @Controller('activity-requests')
 export class ActivityRequestController {
@@ -60,6 +65,20 @@ export class ActivityRequestController {
     return this.activityRequestService.createRequestActivity({
       ...dto,
       authorId: user.sub,
+    });
+  }
+
+  @Post('/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  createActivityRequestByFile(
+    @Body() dto: FileActivityRequestDTO,
+    @UploadedFile()
+    file: Express.Multer.File,
+  ) {
+    return this.activityRequestService.createRequestActivityByFile({
+      ...dto,
+      file,
     });
   }
 

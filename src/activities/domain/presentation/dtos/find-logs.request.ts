@@ -16,4 +16,8 @@ export class FindLogsRequest extends OffsetPagination {
   @IsOptional()
   @IsDateString()
   toDate?: string;
+
+  @ToManyString()
+  @IsOptional()
+  authors?: string[];
 }

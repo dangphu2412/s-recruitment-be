@@ -25,6 +25,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
       workStatus,
       fromDate = subWeeks(new Date(), 1).toISOString(),
       toDate = new Date().toISOString(),
+      authors,
     } = findLogsRequest;
     const { offset, size } = PageRequest.of(findLogsRequest);
 
@@ -44,6 +45,12 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
         queryBuilder.andWhere('activityLog.workStatus = :status', {
           status: status,
         });
+      });
+    }
+
+    if (authors?.length) {
+      queryBuilder.andWhere('author.id IN (:...authors)', {
+        authors: authors,
       });
     }
 
