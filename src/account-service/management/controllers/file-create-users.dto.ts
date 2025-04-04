@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 export type FileRow = {
   'Họ và Tên': string;
@@ -6,12 +6,10 @@ export type FileRow = {
   'Join At': string;
   Tracking: string;
   'Ngày sinh': string;
+  Khóa: string;
 };
 
 export class FileCreateUsersDto {
-  @IsNotEmpty()
-  periodId: string;
-
   @IsOptional()
   @IsNumber()
   monthlyConfigId?: number;

@@ -33,8 +33,7 @@
     "schema:drop": "npm run db:config -- -d src/system/database/config/migration.config.ts schema:drop",
     "schema:sync": "npm run db:config -- -d src/system/database/config/migration.config.ts schema:sync",
     "db:reload": "npm run migration schema:drop && npm run migrate:latest",
-    "prepare": "husky install",
-    "sync-logs": "node scripts/write-attendence-logs"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@fastify/compress": "^7.0.1",

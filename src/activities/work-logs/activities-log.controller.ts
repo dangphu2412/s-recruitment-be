@@ -28,7 +28,6 @@ export class ActivitiesLogController {
     return this.activityLogService.findAnalyticLogs();
   }
 
-  @CanAccessBy(Permissions.WRITE_ACTIVITIES)
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @Post()

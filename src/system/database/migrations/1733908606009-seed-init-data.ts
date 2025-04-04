@@ -18,7 +18,6 @@ import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/en
 import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
 import { Category } from '../../../posts-service/domain/data-access/entities/category.entity';
 import { Department } from '../../../master-data-service/departments/department.entity';
-import { Period } from '../../../master-data-service/periods/period.entity';
 import { MenuCode } from '../../../menu/client/menu-code.constant';
 import { DatabaseUtils } from '../utils/database.utils';
 
@@ -258,7 +257,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
             code: MenuCode.ACTIVITIES,
           },
           {
-            name: 'Activities tracking',
+            name: 'Activities logs',
             accessLink: '/activities/tracking',
             code: MenuCode.ACTIVITIES_LOGS,
           },
@@ -387,7 +386,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       },
     ]);
     const departmentRepository = queryRunner.manager.getRepository(Department);
-    const periodRepository = queryRunner.manager.getRepository(Period);
 
     await departmentRepository.insert([
       {
@@ -404,19 +402,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         id: 'MO',
         name: 'Marketing Online',
         description: 'Marketing Online',
-      },
-    ]);
-
-    await periodRepository.insert([
-      {
-        id: 'LT2022',
-        name: 'Khoá Lập Trình 2022',
-        description: 'Khoá Lập Trình 2022',
-      },
-      {
-        id: 'LT2023',
-        name: 'Khoá Lập Trình 2023',
-        description: 'Khoá Lập Trình 2023',
       },
     ]);
   }

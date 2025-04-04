@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from './system/database/database.module';
 import { AccountServiceModule } from './account-service/account-service.module';
 import { SystemModule } from './system/system.module';
 import { MenuModule } from './menu/internal/menu.module';
@@ -12,7 +11,6 @@ import { MasterDataServiceModule } from './master-data-service/master-data-servi
 
 @Module({
   imports: [
-    DatabaseModule,
     AccountServiceModule,
     SystemModule,
     MenuModule,

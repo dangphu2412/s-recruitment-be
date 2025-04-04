@@ -40,6 +40,9 @@ import { CreateUserDTO } from '../dtos/core/create-user.dto';
 import { UpdateUserDTO } from '../dtos/core/update-user.dto';
 import { CreatePaymentRequest } from '../controllers/create-payment.request';
 import { PaymentService } from '../../../monthly-money/internal/payment.service';
+import { ResourceCRUDService } from '../../../system/resource-templates/resource-service-template';
+import { Period } from '../../../master-data-service/periods/period.entity';
+import { PeriodCRUDService } from '../../../master-data-service/periods/period.controller';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -51,7 +54,15 @@ export class UserServiceImpl implements UserService {
     @Inject(RoleServiceToken)
     private readonly roleService: RoleService,
     private readonly paymentService: PaymentService,
+    @Inject(PeriodCRUDService.token)
+    private readonly periodService: ResourceCRUDService<Period>,
   ) {}
+
+  findUserByFullname(fullName: string): Promise<User | null> {
+    return this.userRepository.findOneBy({
+      fullName,
+    });
+  }
 
   async findUsers(
     query: GetUsersQueryRequest,
@@ -288,21 +299,15 @@ export class UserServiceImpl implements UserService {
         const sheet = workbook.Sheets[name];
 
         const rows = utils.sheet_to_json<FileRow>(sheet);
-        // Validate file columns
-        // const requiredColumns = [
-        //   'Họ và Tên',
-        //   'Email',
-        //   'Join At',
-        //   'Department',
-        //   'Ngày sinh',
-        //   // 'Tracking',
-        // ];
-        // const columns = Object.keys(rows[0]);
-
-        // if (xor(requiredColumns, columns).length) {
-        //   throw new BadRequestFileCreationFormatException();
-        // }
         const usernames = rows.map((row) => row['Email']);
+        await this.periodService.upsertMany(
+          rows.map((row) => ({
+            id: row['Khóa'],
+            name: row['Khóa'],
+            description: row['Khóa'],
+          })),
+        );
+
         const existedUsers = await this.userRepository.find({
           where: {
             username: In(usernames),
@@ -314,10 +319,7 @@ export class UserServiceImpl implements UserService {
           };
         }
 
-        const insertResult = await this.createUsersBySheetRow(
-          rows,
-          dto.periodId,
-        );
+        const insertResult = await this.createUsersBySheetRow(rows);
 
         if (dto.monthlyConfigId !== undefined) {
           await this.upgradeToMembers({
@@ -329,10 +331,7 @@ export class UserServiceImpl implements UserService {
     );
   }
 
-  private async createUsersBySheetRow(
-    rows: FileRow[],
-    periodId: string,
-  ): Promise<InsertResult> {
+  private async createUsersBySheetRow(rows: FileRow[]): Promise<InsertResult> {
     const defaultPwd = await this.passwordManager.getDefaultPassword();
 
     const entities = rows.map((row) => {
@@ -342,7 +341,7 @@ export class UserServiceImpl implements UserService {
       user.email = row['Email'];
       user.fullName = row['Họ và Tên'];
       user.joinedAt = row['Join At'] ? new Date(row['Join At']) : new Date();
-      user.periodId = periodId;
+      user.periodId = row['Khóa'];
       user.departmentId = row['Chuyên môn'];
       user.trackingId = row['Tracking'];
       user.birthday = row['Ngày sinh']

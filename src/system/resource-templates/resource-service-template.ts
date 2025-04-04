@@ -10,10 +10,21 @@ export interface ResourceCRUDService<E extends ObjectLiteral> {
   find(): Promise<Page<E>>;
   find(query: ResourceQuery): Promise<Page<E>>;
   createOne<DTO>(dto: DTO): Promise<void>;
+  createMany<DTO>(dto: DTO[]): Promise<void>;
+  upsertMany<DTO>(dto: DTO[]): Promise<void>;
 }
 
 export class ResourceCRUDServiceImpl<E> implements ResourceCRUDService<E> {
   constructor(private readonly repository: Repository<E>) {}
+
+  async upsertMany<DTO>(dto: DTO[]): Promise<void> {
+    await this.repository
+      .createQueryBuilder()
+      .insert()
+      .values(dto as unknown as QueryDeepPartialEntity<E>)
+      .orIgnore('ON CONFLICT')
+      .execute();
+  }
 
   find(): Promise<Page<E>>;
   find(query: ResourceQuery): Promise<Page<E>>;
@@ -43,6 +54,10 @@ export class ResourceCRUDServiceImpl<E> implements ResourceCRUDService<E> {
   }
 
   async createOne<DTO>(dto: DTO): Promise<void> {
+    await this.repository.insert(dto as unknown as QueryDeepPartialEntity<E>);
+  }
+
+  async createMany<DTO>(dto: DTO[]): Promise<void> {
     await this.repository.insert(dto as unknown as QueryDeepPartialEntity<E>);
   }
 }

@@ -12,20 +12,31 @@ import { ActivityLog } from './domain/data-access/activity-log.entity';
 import { ActivityLogRepository } from './work-logs/activity-log.repository';
 import { ActivityLogService } from './work-logs/activity-log.service';
 import { ActivitiesLogController } from './work-logs/activities-log.controller';
-import { ActivityMdmController } from './work-logs/activity-mdm.controller';
+import {
+  DeviceUserController,
+  DeviceUserCRUDService,
+} from './work-logs/device-user.controller';
 import { WorkStatusEvaluator } from './work-logs/work-status-evaluator.service';
 import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
 import { ActivityRequestController } from './requests/activity-request.controller';
+import { AccountServiceModule } from '../account-service/account-service.module';
+import { DeviceUser } from './domain/data-access/user-log.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Activity, ActivityRequest, ActivityLog]),
+    TypeOrmModule.forFeature([
+      Activity,
+      ActivityRequest,
+      ActivityLog,
+      DeviceUser,
+    ]),
     MasterDataServiceModule,
+    AccountServiceModule,
   ],
   controllers: [
     ActivityController,
     ActivitiesLogController,
-    ActivityMdmController,
+    DeviceUserController,
     ActivityRequestController,
   ],
   providers: [
@@ -37,6 +48,7 @@ import { ActivityRequestController } from './requests/activity-request.controlle
       provide: ActivityServiceToken,
       useClass: ActivityServiceImpl,
     },
+    DeviceUserCRUDService.createProvider(),
     ActivityRepository,
     ActivityLogRepository,
     ActivityLogService,

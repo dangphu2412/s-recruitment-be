@@ -245,6 +245,23 @@ export class CreateActivityRequestTable1733459833496
         ],
       }),
     );
+
+    await queryRunner.createTable(
+      new Table({
+        name: 'device_user_logs',
+        columns: [
+          {
+            name: 'device_user_id',
+            type: 'varchar',
+            isPrimary: true,
+          },
+          {
+            name: 'name',
+            type: 'varchar',
+          },
+        ],
+      }),
+    );
   }
 
   public async down(): Promise<void> {
