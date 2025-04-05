@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { ActivityLog } from './activity-log.entity';
 
 @Entity({
   name: 'device_user_logs',
@@ -9,11 +10,14 @@ export class DeviceUser {
     nullable: false,
     type: 'varchar',
   })
-  deviceUserId: string;
+  trackingId: string;
 
   @Column({
     name: 'name',
     type: 'varchar',
   })
   name: string;
+
+  @OneToMany(() => ActivityLog, (activityLog) => activityLog.deviceAuthor)
+  activityLogs: ActivityLog[];
 }

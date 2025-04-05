@@ -24,7 +24,6 @@ export class RoleAuthorizationStrategy
     requiredPermissions: string[],
   ): Promise<boolean> {
     const permissions = await this.roleService.findPermissionsByUserId(sub);
-    console.log(permissions);
 
     return requiredPermissions.some((requireRight) =>
       permissions.some(

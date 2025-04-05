@@ -40,7 +40,7 @@ export class DeviceUserController {
     const entities = data.data.map((item) => {
       const deviceUserLog = new DeviceUser();
 
-      deviceUserLog.deviceUserId = item.userId;
+      deviceUserLog.trackingId = item.userId;
       deviceUserLog.name = item.name;
 
       return deviceUserLog;
