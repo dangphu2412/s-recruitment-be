@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import { User } from '../../account-service/domain/data-access/entities/user.entity';
+import { User } from '../../account-service/shared/entities/user.entity';
 
 @Entity({
   name: 'mdm_departments',

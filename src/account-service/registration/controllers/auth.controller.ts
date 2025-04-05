@@ -1,8 +1,11 @@
 import { Body, Controller, Delete, Inject, Post } from '@nestjs/common';
 import { ApiNoContentResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthService, AuthServiceToken } from '../../domain/core/services';
 import { BasicLoginRequestDto } from '../dtos/presentations/basic-login.request.dto';
 import { RenewTokensRequestDto } from '../dtos/presentations/renew-tokens.request.dto';
+import {
+  AuthService,
+  AuthServiceToken,
+} from '../interfaces/auth-service.interface';
 
 @ApiTags('auth')
 @Controller({

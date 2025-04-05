@@ -35,7 +35,7 @@ import { read, utils } from 'xlsx';
 import {
   UserService,
   UserServiceToken,
-} from '../../account-service/domain/core/services/user-service';
+} from '../../account-service/management/interfaces/user-service.interface';
 
 @Injectable()
 export class ActivityRequestServiceImpl implements ActivityRequestService {

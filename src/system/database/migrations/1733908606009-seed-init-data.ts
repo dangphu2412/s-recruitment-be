@@ -1,14 +1,14 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { DayOfWeek } from '../../../master-data-service/day-of-weeks/day-of-week';
 import { TimeOfDay } from '../../../master-data-service/time-of-days/time-of-day.entity';
-import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
-import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
+import { Role } from '../../../account-service/shared/entities/role.entity';
+import { Permission } from '../../../account-service/shared/entities/permission.entity';
 import { RolePermissionConnector } from '../processors/role-permission.connector';
 import {
   Permissions,
   SystemRoles,
 } from '../../../account-service/authorization/access-definition.constant';
-import { User } from '../../../account-service/domain/data-access/entities/user.entity';
+import { User } from '../../../account-service/shared/entities/user.entity';
 import { PasswordManager } from '../../../account-service/registration/services/password-manager';
 import { EnvironmentKeyFactory } from '../../services';
 import { ConfigService } from '@nestjs/config';

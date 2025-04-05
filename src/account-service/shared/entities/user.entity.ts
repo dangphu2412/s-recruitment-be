@@ -14,14 +14,13 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Role } from './role.entity';
-import { Post } from '../../../../posts-service/domain/data-access/entities/posts.entity';
-import { Payment } from '../../../../monthly-money/domain/data-access/entities/payment.entity';
-import { UserGroup } from './user-group.entity';
-import { OperationFee } from '../../../../monthly-money/domain/data-access/entities/operation-fee.entity';
-import { Department } from '../../../../master-data-service/departments/department.entity';
-import { Period } from '../../../../master-data-service/periods/period.entity';
-import { ActivityRequest } from '../../../../activities/domain/data-access/activity-request.entity';
-import { ActivityLog } from '../../../../activities/domain/data-access/activity-log.entity';
+import { Post } from '../../../posts-service/domain/data-access/entities/posts.entity';
+import { Payment } from '../../../monthly-money/domain/data-access/entities/payment.entity';
+import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
+import { Department } from '../../../master-data-service/departments/department.entity';
+import { Period } from '../../../master-data-service/periods/period.entity';
+import { ActivityRequest } from '../../../activities/domain/data-access/activity-request.entity';
+import { ActivityLog } from '../../../activities/domain/data-access/activity-log.entity';
 
 @Entity({
   name: 'users',
@@ -125,20 +124,6 @@ export class User {
     },
   })
   roles?: Role[];
-
-  @ManyToMany(() => UserGroup, (userGroups) => userGroups.users)
-  @JoinTable({
-    name: 'users_user_groups',
-    joinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'group_id',
-      referencedColumnName: 'id',
-    },
-  })
-  userGroups?: UserGroup[];
 
   @OneToOne(() => OperationFee, (operationFee) => operationFee.user)
   @JoinColumn({

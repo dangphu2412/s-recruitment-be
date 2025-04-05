@@ -30,7 +30,7 @@ import { UserManagementViewDTO } from './users.dto';
 import {
   UserService,
   UserServiceToken,
-} from '../../domain/core/services/user-service';
+} from '../interfaces/user-service.interface';
 import { JwtPayload } from '../../registration/jwt-payload';
 import { CreateUsersRequestDTO } from './create-users.request';
 import { PaymentService } from '../../../monthly-money/internal/payment.service';

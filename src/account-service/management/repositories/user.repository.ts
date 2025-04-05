@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../domain/data-access/entities/user.entity';
+import { User } from '../../shared/entities/user.entity';
 import { UserStatus } from '../user-status.constant';
 import { Page, PageRequest } from '../../../system/query-shape/dto';
 import { GetUsersQueryRequest } from '../controllers/get-users-query.request';

@@ -8,7 +8,7 @@ import {
   TreeChildren,
   TreeParent,
 } from 'typeorm';
-import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
+import { Permission } from '../../../account-service/shared/entities/permission.entity';
 
 @Entity({
   name: 'menus',

@@ -13,16 +13,11 @@ import { read, utils } from 'xlsx';
 import {
   RoleService,
   RoleServiceToken,
-} from '../../domain/core/services/role.service';
-import { UserService } from '../../domain/core/services/user-service';
+} from '../../authorization/interfaces/role-service.interface';
+import { UserService } from '../interfaces/user-service.interface';
 import { MyProfile, UserDetail } from '../dtos/core/my-profile';
-import {
-  EmailExistedException,
-  InsertUserFailedException,
-  NotFoundUserException,
-} from '../../domain/core/exceptions';
 import { GetUserDTO } from '../dtos/core/get-users.dto';
-import { User } from '../../domain/data-access/entities/user.entity';
+import { User } from '../../shared/entities/user.entity';
 import { GetUsersQueryRequest } from '../controllers/get-users-query.request';
 import { UserManagementViewDTO } from '../controllers/users.dto';
 import { Transactional } from 'typeorm-transactional';
@@ -43,6 +38,9 @@ import { PaymentService } from '../../../monthly-money/internal/payment.service'
 import { ResourceCRUDService } from '../../../system/resource-templates/resource-service-template';
 import { Period } from '../../../master-data-service/periods/period.entity';
 import { PeriodCRUDService } from '../../../master-data-service/periods/period.controller';
+import { NotFoundUserException } from '../exceptions/not-found-user.exception';
+import { InsertUserFailedException } from '../exceptions/insert-user-failed.exception';
+import { EmailExistedException } from '../exceptions/email-existed.exception';
 
 @Injectable()
 export class UserServiceImpl implements UserService {

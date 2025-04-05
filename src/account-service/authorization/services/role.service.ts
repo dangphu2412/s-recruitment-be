@@ -3,17 +3,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import { In, Repository } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Permission } from '../../domain/data-access/entities/permission.entity';
-import { RoleService } from '../../domain/core/services/role.service';
+import { Permission } from '../../shared/entities/permission.entity';
+import { RoleService } from '../interfaces/role-service.interface';
 import { AccessControlView, Right } from '../dtos/core/role-list.dto';
 import { UpdateRoleDto } from '../dtos/core/update-role.dto';
-import { InvalidRoleUpdateException } from '../../domain/core/exceptions';
-import { Role } from '../../domain/data-access/entities/role.entity';
+import { Role } from '../../shared/entities/role.entity';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { EnvironmentKeyFactory } from '../../../system/services';
 import ms from 'ms';
 import { Permissions } from '../access-definition.constant';
+import { InvalidRoleUpdateException } from '../exceptions/invalid-role-update.exception';
 
 @Injectable()
 export class RoleServiceImpl implements RoleService {

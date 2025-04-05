@@ -1,5 +1,5 @@
-import { createInterfaceToken } from '../../../../system/utils';
-import { TokenDTO } from '../../../registration/dtos/core/login-credentials.dto';
+import { createInterfaceToken } from '../../../system/utils';
+import { TokenDTO } from '../dtos/core/login-credentials.dto';
 
 export const TokenFactoryToken = createInterfaceToken('TokenFactoryToken');
 
