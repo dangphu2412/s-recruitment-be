@@ -31,6 +31,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
 
     const queryBuilder = this.createQueryBuilder('activityLog')
       .leftJoinAndSelect('activityLog.author', 'author')
+      .leftJoinAndSelect('activityLog.deviceAuthor', 'deviceAuthor')
       .select([
         'activityLog.fromTime',
         'activityLog.toTime',
@@ -38,6 +39,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
         'activityLog.workStatus',
         'author.email',
         'author.id',
+        'deviceAuthor.name',
       ]);
 
     if (workStatus !== undefined) {
