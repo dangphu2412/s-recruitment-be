@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { User } from '../../../account-service/domain/data-access/entities/user.entity';
+import { User } from '../../../account-service/shared/entities/user.entity';
 import { LogWorkStatus } from '../core/constants/log-work-status.enum';
 
 @Entity({

@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../../account-service/domain/data-access/entities/user.entity';
+import { User } from '../../../account-service/shared/entities/user.entity';
 import { RequestActivityStatus } from '../core/constants/request-activity-status.enum';
 import { TimeOfDay } from '../../../master-data-service/time-of-days/time-of-day.entity';
 import { DayOfWeek } from '../../../master-data-service/day-of-weeks/day-of-week';

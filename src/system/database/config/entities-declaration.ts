@@ -1,12 +1,11 @@
 import { Menu } from '../../../menu';
 import { join } from 'path';
-import { User } from '../../../account-service/domain/data-access/entities/user.entity';
-import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
-import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
+import { User } from '../../../account-service/shared/entities/user.entity';
+import { Role } from '../../../account-service/shared/entities/role.entity';
+import { Permission } from '../../../account-service/shared/entities/permission.entity';
 import { Post } from '../../../posts-service/domain/data-access/entities/posts.entity';
 import { Category } from '../../../posts-service/domain/data-access/entities/category.entity';
 import { Payment } from '../../../monthly-money/domain/data-access/entities/payment.entity';
-import { UserGroup } from '../../../account-service/domain/data-access/entities/user-group.entity';
 import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
 import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
 import { Period } from '../../../master-data-service/periods/period.entity';
@@ -28,7 +27,6 @@ export const APP_ENTITIES = [
   Post,
   Category,
   Payment,
-  UserGroup,
   Period,
   Department,
   ActivityRequest,

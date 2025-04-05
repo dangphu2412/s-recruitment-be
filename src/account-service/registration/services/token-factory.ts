@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { EnvironmentKeyFactory } from 'src/system/services';
-import { TokenFactory } from '../../domain/core/services';
 import { TokenDTO } from '../dtos/core/login-credentials.dto';
 import { JwtPayload } from '../jwt-payload';
+import { TokenFactory } from '../interfaces/token-factory.interface';
 
 @Injectable()
 export class TokenGeneratorImpl implements TokenFactory {

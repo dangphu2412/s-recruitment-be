@@ -5,25 +5,23 @@ import isEmpty from 'lodash/isEmpty';
 import { PasswordManager } from './password-manager';
 import { UserCredentialsDTO } from '../dtos/core/login-credentials.dto';
 import {
-  IncorrectUsernamePasswordException,
-  InvalidTokenFormatException,
-  LogoutRequiredException,
-} from '../../domain/core/exceptions';
-import {
-  AuthService,
-  TokenFactory,
-  TokenFactoryToken,
-} from '../../domain/core/services';
-import {
   UserService,
   UserServiceToken,
-} from '../../domain/core/services/user-service';
+} from '../../management/interfaces/user-service.interface';
 import { JwtPayload } from '../jwt-payload';
 import {
   RoleService,
   RoleServiceToken,
-} from '../../domain/core/services/role.service';
+} from '../../authorization/interfaces/role-service.interface';
 import { BasicLoginRequestDto } from '../dtos/presentations/basic-login.request.dto';
+import { InvalidTokenFormatException } from '../exceptions/invalid-token-format.exception';
+import { LogoutRequiredException } from '../exceptions/logout-required.exception';
+import { IncorrectUsernamePasswordException } from '../exceptions/incorrect-username-password.exception';
+import {
+  TokenFactory,
+  TokenFactoryToken,
+} from '../interfaces/token-factory.interface';
+import { AuthService } from '../interfaces/auth-service.interface';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {

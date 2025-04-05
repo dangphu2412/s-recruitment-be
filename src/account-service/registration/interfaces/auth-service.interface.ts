@@ -1,8 +1,8 @@
-import { createInterfaceToken } from '../../../../system/utils';
+import { createInterfaceToken } from '../../../system/utils';
 import {
   BasicLoginDTO,
   UserCredentialsDTO,
-} from '../../../registration/dtos/core/login-credentials.dto';
+} from '../dtos/core/login-credentials.dto';
 
 export const AuthServiceToken = createInterfaceToken('AuthService');
 

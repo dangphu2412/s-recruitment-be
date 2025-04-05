@@ -11,21 +11,18 @@ import { RoleAuthorizationStrategy } from './authorization/services/role-authori
 import { RoleServiceImpl } from './authorization/services/role.service';
 import { RoleRepository } from './authorization/repositories/role.repository';
 import { RoleController } from './authorization/controllers/role.controller';
-import { Permission } from './domain/data-access/entities/permission.entity';
+import { Permission } from './shared/entities/permission.entity';
 import { MonthlyMoneyModule } from '../monthly-money/internal/monthly-money.module';
 import { UserController } from './management/controllers/user.controller';
 import { UserServiceImpl } from './management/services/user.service';
 import { UserRepository } from './management/repositories/user.repository';
-import { AuthServiceToken, TokenFactoryToken } from './domain/core/services';
-import { User } from './domain/data-access/entities/user.entity';
-import { Role } from './domain/data-access/entities/role.entity';
-import { RoleServiceToken } from './domain/core/services/role.service';
-import { UserServiceToken } from './domain/core/services/user-service';
-import { UserGroupsController } from './management/controllers/user-groups.controller';
-import { UserGroupsServiceToken } from './domain/core/services/user-groups.service';
-import { UserGroupsServiceImpl } from './management/services/user-groups.service';
-import { UserGroup } from './domain/data-access/entities/user-group.entity';
+import { User } from './shared/entities/user.entity';
+import { Role } from './shared/entities/role.entity';
+import { RoleServiceToken } from './authorization/interfaces/role-service.interface';
+import { UserServiceToken } from './management/interfaces/user-service.interface';
 import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
+import { AuthServiceToken } from './registration/interfaces/auth-service.interface';
+import { TokenFactoryToken } from './registration/interfaces/token-factory.interface';
 
 @Module({
   imports: [
@@ -36,14 +33,9 @@ import { MasterDataServiceModule } from '../master-data-service/master-data-serv
       inject: [EnvironmentKeyFactory],
     }),
     MasterDataServiceModule,
-    TypeOrmModule.forFeature([User, Role, Permission, UserGroup]),
+    TypeOrmModule.forFeature([User, Role, Permission]),
   ],
-  controllers: [
-    AuthController,
-    RoleController,
-    UserController,
-    UserGroupsController,
-  ],
+  controllers: [AuthController, RoleController, UserController],
   providers: [
     JwtStrategy,
     PasswordManager,
@@ -65,10 +57,6 @@ import { MasterDataServiceModule } from '../master-data-service/master-data-serv
     {
       provide: UserServiceToken,
       useClass: UserServiceImpl,
-    },
-    {
-      provide: UserGroupsServiceToken,
-      useClass: UserGroupsServiceImpl,
     },
   ],
   exports: [PasswordManager, UserServiceToken, RoleServiceToken],

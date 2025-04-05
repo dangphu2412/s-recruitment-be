@@ -1,24 +1,18 @@
 import { createInterfaceToken } from 'src/system/utils';
 import { Page } from 'src/system/query-shape/dto';
-import { UserManagementViewDTO } from '../../../management/controllers/users.dto';
-import { CreateUsersRequestDTO } from '../../../management/controllers/create-users.request';
-import { FileCreateUsersDto } from '../../../management/controllers/file-create-users.dto';
-import { User } from '../../data-access/entities/user.entity';
-import {
-  MyProfile,
-  UserDetail,
-} from '../../../management/dtos/core/my-profile';
-import { UpdateUserRolesDto } from '../../../management/controllers/update-user-roles.dto';
-import { PaginatedUserProbationDTO } from '../../../management/dtos/core/user-probation.dto';
-import { UserProbationQueryDTO } from '../../../management/dtos/core/user-probation-query.dto';
-import { UpgradeUserMemberDTO } from '../../../management/dtos/core/upgrade-user-member.dto';
-import {
-  GetUserDTO,
-  GetUsersDTO,
-} from '../../../management/dtos/core/get-users.dto';
-import { UpdateUserDTO } from '../../../management/dtos/core/update-user.dto';
-import { GetUsersQueryDTO } from '../../../management/dtos/core/get-users-query.dto';
-import { CreatePaymentRequest } from '../../../management/controllers/create-payment.request';
+import { UserManagementViewDTO } from '../controllers/users.dto';
+import { CreateUsersRequestDTO } from '../controllers/create-users.request';
+import { FileCreateUsersDto } from '../controllers/file-create-users.dto';
+import { User } from '../../shared/entities/user.entity';
+import { MyProfile, UserDetail } from '../dtos/core/my-profile';
+import { UpdateUserRolesDto } from '../controllers/update-user-roles.dto';
+import { PaginatedUserProbationDTO } from '../dtos/core/user-probation.dto';
+import { UserProbationQueryDTO } from '../dtos/core/user-probation-query.dto';
+import { UpgradeUserMemberDTO } from '../dtos/core/upgrade-user-member.dto';
+import { GetUserDTO, GetUsersDTO } from '../dtos/core/get-users.dto';
+import { UpdateUserDTO } from '../dtos/core/update-user.dto';
+import { GetUsersQueryDTO } from '../dtos/core/get-users-query.dto';
+import { CreatePaymentRequest } from '../controllers/create-payment.request';
 
 export const UserServiceToken = createInterfaceToken('UserServiceToken');
 

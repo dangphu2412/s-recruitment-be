@@ -3,11 +3,11 @@ import { Repository } from 'typeorm';
 import ms from 'ms';
 import { RoleServiceImpl } from '../../../src/account-service/authorization/services/role.service';
 import { RoleRepository } from '../../../src/account-service/authorization/repositories/role.repository';
-import { Permission } from '../../../src/account-service/domain/data-access/entities/permission.entity';
+import { Permission } from '../../../src/account-service/shared/entities/permission.entity';
 import { EnvironmentKeyFactory } from '../../../src/system/services';
-import { Role } from '../../../src/account-service/domain/data-access/entities/role.entity';
-import { InvalidRoleUpdateException } from '../../../src/account-service/domain/core/exceptions';
+import { Role } from '../../../src/account-service/shared/entities/role.entity';
 import { AccessControlList } from '../../../src/account-service/authorization/dtos/aggregates/access-control-list.aggregate';
+import { InvalidRoleUpdateException } from '../../../src/account-service/authorization/exceptions/invalid-role-update.exception';
 
 jest.mock('ms');
 

@@ -1,5 +1,5 @@
 import { RoleController } from '../../../src/account-service/authorization/controllers/role.controller';
-import { RoleService } from '../../../src/account-service/domain/core/services/role.service';
+import { RoleService } from '../../../src/account-service/authorization/interfaces/role-service.interface';
 import { UpdateRoleRequestDto } from '../../../src/account-service/management/controllers/update-role-request.dto';
 import { AccessControlView } from '../../../src/account-service/authorization/dtos/core/role-list.dto';
 

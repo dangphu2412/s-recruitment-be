@@ -1,4 +1,4 @@
-import { User } from '../../../domain/data-access/entities/user.entity';
+import { User } from '../../../shared/entities/user.entity';
 
 export type UserOverviewAggregate = RequiredWith<
   User,
