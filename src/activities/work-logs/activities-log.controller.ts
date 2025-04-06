@@ -12,6 +12,7 @@ import { CanAccessBy } from '../../account-service/authorization/can-access-by.d
 import { Permissions } from '../../account-service/authorization/access-definition.constant';
 import { FileInterceptor } from '../../system/file';
 import { ApiConsumes } from '@nestjs/swagger';
+import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
 
 @Controller('activity-logs')
 export class ActivitiesLogController {
@@ -24,8 +25,8 @@ export class ActivitiesLogController {
   }
 
   @Get('analytics')
-  findAnalyticLogs() {
-    return this.activityLogService.findAnalyticLogs();
+  findAnalyticLogs(@Query() findAnalyticLogRequest: FindAnalyticLogRequest) {
+    return this.activityLogService.findAnalyticLogs(findAnalyticLogRequest);
   }
 
   @UseInterceptors(FileInterceptor('file'))
