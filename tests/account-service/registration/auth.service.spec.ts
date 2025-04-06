@@ -52,7 +52,7 @@ describe('AuthServiceImpl', () => {
           provide: RoleServiceToken,
           useValue: {
             clean: jest.fn(),
-            save: jest.fn(),
+            findPermissionsByUserId: jest.fn(),
           },
         },
         {
@@ -110,17 +110,18 @@ describe('AuthServiceImpl', () => {
       userService.findOne.mockResolvedValue(user);
       passwordManager.compare.mockResolvedValue(true);
       tokenFactory.create.mockResolvedValue(tokens);
-      roleService.save.mockResolvedValue(undefined);
+      roleService.findPermissionsByUserId.mockResolvedValue(undefined);
 
       const result = await authService.login(dto);
 
       expect(userService.findOne).toHaveBeenCalledWith({
         username: 'john',
-        withRights: true,
       });
       expect(passwordManager.compare).toHaveBeenCalledWith('secret', 'hashed');
       expect(tokenFactory.create).toHaveBeenCalledWith('user-id');
-      expect(roleService.save).toHaveBeenCalledWith('user-id', ['admin']);
+      expect(roleService.findPermissionsByUserId).toHaveBeenCalledWith(
+        'user-id',
+      );
       expect(result).toEqual({ tokens });
     });
 

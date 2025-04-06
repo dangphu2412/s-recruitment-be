@@ -10,6 +10,11 @@ type WorkEvaluateDTO = {
   toDateTime: string;
 };
 
+type WorkEvaluateResult = {
+  status: LogWorkStatus;
+  activityId: Activity['id'] | null;
+};
+
 export class WorkTimeUtils {
   static parseTime(time: string): Date {
     return parse(time, 'HH:mm:ss', new Date());
@@ -135,33 +140,46 @@ class WorkingHandler implements WorkStatusHandler {
 }
 
 @Injectable()
-export class WorkStatusEvaluator {
-  private readonly handlers: Record<string, WorkStatusHandler> = {
+export class ActivityMatcher {
+  private readonly workStatusHandlers: Record<string, WorkStatusHandler> = {
     [RequestTypes.ABSENCE]: new AbsenceHandler(),
     [RequestTypes.LATE]: new LateHandler(),
     [RequestTypes.WORKING]: new WorkingHandler(),
   };
 
-  evaluateStatus({
+  match({
     activities,
     toDateTime,
     fromDateTime,
-  }: WorkEvaluateDTO): LogWorkStatus {
+  }: WorkEvaluateDTO): WorkEvaluateResult {
     if (activities.length === 0) {
-      return LogWorkStatus.NOT_FINISHED;
+      return {
+        status: LogWorkStatus.NOT_FINISHED,
+        activityId: null,
+      };
     }
 
     for (const activity of activities) {
-      const handler = this.handlers[activity.requestType];
+      const workStatusHandler = this.workStatusHandlers[activity.requestType];
 
-      if (handler) {
-        const status = handler.handle(activity, fromDateTime, toDateTime);
+      if (workStatusHandler) {
+        const status = workStatusHandler.handle(
+          activity,
+          fromDateTime,
+          toDateTime,
+        );
         if (status !== null) {
-          return status;
+          return {
+            status,
+            activityId: activity.id,
+          };
         }
       }
     }
 
-    return LogWorkStatus.NOT_FINISHED;
+    return {
+      status: LogWorkStatus.NOT_FINISHED,
+      activityId: null,
+    };
   }
 }

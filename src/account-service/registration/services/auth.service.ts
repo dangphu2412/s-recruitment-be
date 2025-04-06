@@ -51,7 +51,6 @@ export class AuthServiceImpl implements AuthService {
   }: BasicLoginRequestDto): Promise<UserCredentialsDTO> {
     const user = await this.userService.findOne({
       username,
-      withRights: true,
     });
 
     if (
@@ -63,7 +62,7 @@ export class AuthServiceImpl implements AuthService {
 
     const [tokens] = await Promise.all([
       this.tokenFactory.create(user.id),
-      this.roleService.save(user.id, user.roles),
+      this.roleService.findPermissionsByUserId(user.id),
     ]);
 
     return {

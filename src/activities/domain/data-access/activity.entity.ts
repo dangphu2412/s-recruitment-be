@@ -86,4 +86,11 @@ export class Activity {
     referencedColumnName: 'id',
   })
   dayOfWeek: DayOfWeek;
+
+  // @OneToMany(() => ActivityLog, (log) => log.activity)
+  // @JoinColumn({
+  //   name: 'id',
+  //   referencedColumnName: 'activity_id',
+  // })
+  // logs: ActivityLog[];
 }

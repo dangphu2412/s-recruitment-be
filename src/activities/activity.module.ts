@@ -16,7 +16,7 @@ import {
   DeviceUserController,
   DeviceUserCRUDService,
 } from './work-logs/device-user.controller';
-import { WorkStatusEvaluator } from './work-logs/work-status-evaluator.service';
+import { ActivityMatcher } from './work-logs/work-status-evaluator.service';
 import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
 import { ActivityRequestController } from './requests/activity-request.controller';
 import { AccountServiceModule } from '../account-service/account-service.module';
@@ -52,7 +52,7 @@ import { DeviceUser } from './domain/data-access/user-log.entity';
     ActivityRepository,
     ActivityLogRepository,
     ActivityLogService,
-    WorkStatusEvaluator,
+    ActivityMatcher,
   ],
 })
 export class ActivityModule {}
