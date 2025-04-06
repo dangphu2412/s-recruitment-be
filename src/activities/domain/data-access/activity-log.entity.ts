@@ -28,6 +28,12 @@ export class ActivityLog {
   })
   workStatus: LogWorkStatus;
 
+  @Column({
+    name: 'activity_id',
+    type: 'int',
+  })
+  activityId: number;
+
   @PrimaryColumn({
     name: 'track_id',
     nullable: false,
@@ -48,4 +54,7 @@ export class ActivityLog {
     referencedColumnName: 'trackingId',
   })
   deviceAuthor: DeviceUser;
+
+  // @ManyToOne(() => Activity, (user) => user.logs)
+  // activity: Activity;
 }

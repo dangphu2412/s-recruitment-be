@@ -952,6 +952,11 @@ export class TableSetup1720749365859 implements MigrationInterface {
             isNullable: false,
             isPrimary: true,
           },
+          {
+            name: 'activity_id',
+            type: 'int',
+            isNullable: true,
+          },
         ],
       }),
     );

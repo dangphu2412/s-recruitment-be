@@ -11,7 +11,7 @@ import { ActivityRepository } from '../managements/activity.repository';
 import { LogWorkStatus } from '../domain/core/constants/log-work-status.enum';
 import { ActivityLog } from '../domain/data-access/activity-log.entity';
 import {
-  WorkStatusEvaluator,
+  ActivityMatcher,
   WorkTimeUtils,
 } from './work-status-evaluator.service';
 import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
@@ -67,7 +67,7 @@ export class ActivityLogService {
   constructor(
     private readonly activityLogRepository: ActivityLogRepository,
     private readonly activityRepository: ActivityRepository,
-    private readonly workStatusEvaluator: WorkStatusEvaluator,
+    private readonly workStatusEvaluator: ActivityMatcher,
   ) {}
 
   async findLogs(findLogsRequest: FindLogsRequest) {
@@ -123,26 +123,31 @@ export class ActivityLogService {
           if (userLogs.length === 2) {
             // Logs keep order so we do not care about from Time and to Time
             // TODO: We need to reference the related registered work
-            log.fromTime = userLogs[0].recordTime;
-            log.toTime = userLogs[1].recordTime;
-            log.workStatus = this.workStatusEvaluator.evaluateStatus({
+            const { status, activityId } = this.workStatusEvaluator.match({
               activities: activities,
               fromDateTime: userLogs[0].recordTime,
               toDateTime: userLogs[1].recordTime,
             });
+            log.fromTime = userLogs[0].recordTime;
+            log.toTime = userLogs[1].recordTime;
+            log.workStatus = status;
             log.deviceUserId = deviceUserId;
+            log.activityId = activityId;
             logEntities.push(log);
             return;
           }
 
-          // More than 2 logsByUserDeviceId
-          log.fromTime = userLogs[0].recordTime;
-          log.toTime = userLogs[userLogs.length - 1].recordTime;
-          log.workStatus = this.workStatusEvaluator.evaluateStatus({
+          const { status, activityId } = this.workStatusEvaluator.match({
             activities: activities,
             fromDateTime: userLogs[0].recordTime,
             toDateTime: userLogs[1].recordTime,
           });
+
+          // More than 2 logsByUserDeviceId
+          log.fromTime = userLogs[0].recordTime;
+          log.activityId = activityId;
+          log.toTime = userLogs[userLogs.length - 1].recordTime;
+          log.workStatus = status;
           log.deviceUserId = deviceUserId;
         });
 
