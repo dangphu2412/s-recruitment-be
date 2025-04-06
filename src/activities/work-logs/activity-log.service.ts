@@ -14,6 +14,7 @@ import {
   WorkStatusEvaluator,
   WorkTimeUtils,
 } from './work-status-evaluator.service';
+import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
 
 class LogSegmentProcessor {
   private deviceIdMapToDateSegmentedLogs: Map<string, Map<string, LogDTO[]>> =
@@ -80,10 +81,15 @@ export class ActivityLogService {
     });
   }
 
-  findAnalyticLogs() {
+  findAnalyticLogs(findAnalyticLogRequest: FindAnalyticLogRequest) {
+    const {
+      fromDate = subYears(new Date(), 1).toISOString(),
+      toDate = new Date().toISOString(),
+    } = findAnalyticLogRequest;
+
     return this.activityLogRepository.findAnalyticLogs({
-      fromDate: subYears(new Date(), 1).toISOString(),
-      toDate: new Date().toISOString(),
+      fromDate,
+      toDate,
     });
   }
 
