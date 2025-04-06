@@ -11,7 +11,7 @@ import {
   RelationId,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../../../account-service/domain/data-access/entities/user.entity';
+import { User } from '../../../../account-service/shared/entities/user.entity';
 import { Category } from './category.entity';
 
 @Entity({

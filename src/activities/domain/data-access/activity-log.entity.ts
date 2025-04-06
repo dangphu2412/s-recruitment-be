@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { User } from '../../../account-service/domain/data-access/entities/user.entity';
+import { User } from '../../../account-service/shared/entities/user.entity';
 import { LogWorkStatus } from '../core/constants/log-work-status.enum';
+import { DeviceUser } from './user-log.entity';
 
 @Entity({
   name: 'activity_logs',
@@ -27,6 +28,12 @@ export class ActivityLog {
   })
   workStatus: LogWorkStatus;
 
+  @Column({
+    name: 'activity_id',
+    type: 'int',
+  })
+  activityId: number;
+
   @PrimaryColumn({
     name: 'track_id',
     nullable: false,
@@ -40,4 +47,14 @@ export class ActivityLog {
     referencedColumnName: 'trackingId',
   })
   author: User;
+
+  @ManyToOne(() => DeviceUser, (user) => user.activityLogs)
+  @JoinColumn({
+    name: 'track_id',
+    referencedColumnName: 'trackingId',
+  })
+  deviceAuthor: DeviceUser;
+
+  // @ManyToOne(() => Activity, (user) => user.logs)
+  // activity: Activity;
 }

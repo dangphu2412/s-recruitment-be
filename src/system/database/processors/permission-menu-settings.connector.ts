@@ -1,6 +1,6 @@
-import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
+import { Permission } from '../../../account-service/shared/entities/permission.entity';
 import { In, Repository } from 'typeorm';
-import { Menu } from '../../menu';
+import { Menu } from '../../../menu';
 
 type MenuSettings = {
   permissionCode: string;

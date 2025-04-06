@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { MonthlyMoneyConfig } from './monthly-money-config.entity';
-import { User } from '../../../../account-service/domain/data-access/entities/user.entity';
+import { User } from '../../../../account-service/shared/entities/user.entity';
 
 @Entity({
   name: 'operation_fees',

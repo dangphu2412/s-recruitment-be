@@ -2,6 +2,9 @@ name: Unit test job
 
 on:
   workflow_call:
+    secrets:
+      SONAR_TOKEN:
+        required: true
 
 jobs:
   setups:
@@ -30,5 +33,9 @@ jobs:
             - cache-node-modules-
 
       - name: Run unit tests
-        run: |
-          pnpm test
+        run: pnpm test:cov
+          
+      - name: SonarQubeScan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

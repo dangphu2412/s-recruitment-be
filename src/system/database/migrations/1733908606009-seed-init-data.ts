@@ -1,25 +1,24 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { DayOfWeek } from '../../../activities/domain/data-access/day-of-week';
-import { TimeOfDay } from '../../../activities/domain/data-access/time-of-day.entity';
-import { Role } from '../../../account-service/domain/data-access/entities/role.entity';
-import { Permission } from '../../../account-service/domain/data-access/entities/permission.entity';
+import { DayOfWeek } from '../../../master-data-service/day-of-weeks/day-of-week';
+import { TimeOfDay } from '../../../master-data-service/time-of-days/time-of-day.entity';
+import { Role } from '../../../account-service/shared/entities/role.entity';
+import { Permission } from '../../../account-service/shared/entities/permission.entity';
 import { RolePermissionConnector } from '../processors/role-permission.connector';
 import {
   Permissions,
   SystemRoles,
-} from '../../../account-service/domain/constants/role-def.enum';
-import { User } from '../../../account-service/domain/data-access/entities/user.entity';
-import { PasswordManager } from '../../../account-service/app/password-manager';
+} from '../../../account-service/authorization/access-definition.constant';
+import { User } from '../../../account-service/shared/entities/user.entity';
+import { PasswordManager } from '../../../account-service/registration/services/password-manager';
 import { EnvironmentKeyFactory } from '../../services';
 import { ConfigService } from '@nestjs/config';
-import { Menu } from '../../menu';
+import { Menu } from '../../../menu';
 import { MenuFactory } from '../processors/menu.factory';
 import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
 import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
 import { Category } from '../../../posts-service/domain/data-access/entities/category.entity';
-import { Department } from '../../../account-service/domain/data-access/entities/department.entity';
-import { Period } from '../../../account-service/domain/data-access/entities/period.entity';
-import { MenuCode } from '../../menu/client/menu-code.constant';
+import { Department } from '../../../master-data-service/departments/department.entity';
+import { MenuCode } from '../../../menu/client/menu-code.constant';
 import { DatabaseUtils } from '../utils/database.utils';
 
 type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
@@ -48,7 +47,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       },
       {
         name: SystemRoles.LEADER,
-        description: 'User who is the leader of a domain or group',
+        description: 'User who is the leader of a dtos or group',
       },
       {
         name: SystemRoles.MEDIA,
@@ -57,7 +56,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       {
         name: SystemRoles.TRAINER,
         description:
-          'User who is the trainer of a domain or group, can view and edit users',
+          'User who is the trainer of a dtos or group, can view and edit users',
       },
       {
         name: SystemRoles.MEMBER,
@@ -65,6 +64,10 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       },
     ]);
     await permissionRepository.insert([
+      {
+        name: Permissions.OWNER,
+        description: 'Owner of system',
+      },
       {
         name: Permissions.VIEW_ACCESS_RIGHTS,
         description: 'View access rights of system',
@@ -80,14 +83,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       {
         name: Permissions.EDIT_ACCESS_RIGHTS,
         description: 'Edit roles of system',
-      },
-      {
-        name: Permissions.READ_USER_GROUPS,
-        description: 'Read user groups',
-      },
-      {
-        name: Permissions.WRITE_USER_GROUPS,
-        description: 'Write user groups',
       },
       {
         name: Permissions.MANAGE_RECRUITMENT,
@@ -124,22 +119,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
     ]);
 
     const roleNameMapToPermissionNames = {
-      [SystemRoles.SUPER_ADMIN]: [
-        Permissions.VIEW_USERS,
-        Permissions.EDIT_MEMBER_USER,
-        Permissions.EDIT_ACCESS_RIGHTS,
-        Permissions.VIEW_ACCESS_RIGHTS,
-        Permissions.READ_USER_GROUPS,
-        Permissions.WRITE_USER_GROUPS,
-        Permissions.MANAGE_RECRUITMENT,
-        Permissions.MANAGE_MASTER_DATA,
-        Permissions.WRITE_ACTIVITIES,
-        Permissions.READ_ACTIVITIES,
-        Permissions.MANAGE_POSTS,
-        Permissions.WRITE_PERIODS,
-        Permissions.WRITE_DEPARTMENTS,
-        Permissions.READ_ACTIVITY_LOGS,
-      ],
+      [SystemRoles.SUPER_ADMIN]: [Permissions.OWNER],
       [SystemRoles.LEADER]: [
         Permissions.VIEW_USERS,
         Permissions.EDIT_MEMBER_USER,
@@ -177,7 +157,8 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         new ConfigService<Record<string, unknown>, false>(),
       ),
     );
-    const password = await passwordManager.getDefaultPassword();
+    await passwordManager.onModuleInit();
+    const password = passwordManager.getDefaultPassword();
     const user = new User();
     user.fullName = 'Phu Dep Trai';
     user.email = 'noibosgroup@gmail.com';
@@ -199,19 +180,14 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         code: MenuCode.USER_MANAGEMENT,
         subMenus: [
           {
-            name: 'Administrator',
-            accessLink: '/users/admin',
-            code: MenuCode.ADMIN,
+            name: 'User Overview',
+            accessLink: '/users',
+            code: MenuCode.USER_OVERVIEW,
           },
           {
             name: 'IAM',
             accessLink: '/users/iam',
             code: MenuCode.IDENTITY_ACCESS_MANAGEMENT,
-          },
-          {
-            name: 'User Groups',
-            accessLink: '/users/groups',
-            code: MenuCode.USER_GROUPS,
           },
           {
             name: 'Departments',
@@ -258,21 +234,9 @@ export class SeedInitData1733908606009 implements MigrationInterface {
             code: MenuCode.ACTIVITIES,
           },
           {
-            name: 'Activities tracking',
+            name: 'Activities logs',
             accessLink: '/activities/tracking',
             code: MenuCode.ACTIVITIES_LOGS,
-          },
-        ],
-      },
-      {
-        name: 'Recruitment',
-        iconCode: 'RECRUITMENT_ICON',
-        code: MenuCode.RECRUITMENT,
-        subMenus: [
-          {
-            name: 'Recruitment Overview',
-            accessLink: '/recruitments/overview',
-            code: MenuCode.RECRUITMENT_OVERVIEW,
           },
         ],
       },
@@ -327,12 +291,13 @@ export class SeedInitData1733908606009 implements MigrationInterface {
     );
 
     const permissionDefineMenus: Record<string, Array<string>> = {
-      [Permissions.VIEW_USERS]: [MenuCode.ADMIN, MenuCode.USER_MANAGEMENT],
-      [Permissions.EDIT_MEMBER_USER]: [MenuCode.ADMIN],
+      [Permissions.VIEW_USERS]: [
+        MenuCode.USER_OVERVIEW,
+        MenuCode.USER_MANAGEMENT,
+      ],
+      [Permissions.EDIT_MEMBER_USER]: [MenuCode.USER_OVERVIEW],
       [Permissions.VIEW_ACCESS_RIGHTS]: [MenuCode.IDENTITY_ACCESS_MANAGEMENT],
       [Permissions.EDIT_ACCESS_RIGHTS]: [MenuCode.IDENTITY_ACCESS_MANAGEMENT],
-      [Permissions.WRITE_USER_GROUPS]: [MenuCode.USER_GROUPS],
-      [Permissions.READ_USER_GROUPS]: [MenuCode.USER_GROUPS],
       [Permissions.MANAGE_RECRUITMENT]: [
         MenuCode.RECRUITMENT,
         MenuCode.RECRUITMENT_OVERVIEW,
@@ -387,7 +352,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       },
     ]);
     const departmentRepository = queryRunner.manager.getRepository(Department);
-    const periodRepository = queryRunner.manager.getRepository(Period);
 
     await departmentRepository.insert([
       {
@@ -404,19 +368,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         id: 'MO',
         name: 'Marketing Online',
         description: 'Marketing Online',
-      },
-    ]);
-
-    await periodRepository.insert([
-      {
-        id: 'LT2022',
-        name: 'Khoá Lập Trình 2022',
-        description: 'Khoá Lập Trình 2022',
-      },
-      {
-        id: 'LT2023',
-        name: 'Khoá Lập Trình 2023',
-        description: 'Khoá Lập Trình 2023',
       },
     ]);
   }

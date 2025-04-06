@@ -36,4 +36,5 @@ lerna-debug.log*
 
 # Deployment
 .env
+service_account.json
 upload/

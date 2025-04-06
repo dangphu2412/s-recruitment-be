@@ -15,10 +15,10 @@ import {
   PostServiceToken,
 } from '../domain/core/services/post.service';
 import { CreatePostRequest } from '../domain/presentation/dto/create-post.request';
-import { CanAccessBy } from '../../account-service/adapters/decorators/can-access-by.decorator';
-import { Permissions } from '../../account-service/domain/constants/role-def.enum';
-import { CurrentUser } from '../../account-service/adapters/decorators';
-import { JwtPayload } from '../../account-service/domain/dtos/jwt-payload';
+import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../../account-service/authorization/access-definition.constant';
+import { CurrentUser } from '../../account-service/management/user.decorator';
+import { JwtPayload } from '../../account-service/registration/jwt-payload';
 import { OffsetPagination } from '../../system/query-shape/dto';
 import { EditPostRequest } from '../domain/presentation/dto/edit-post.request';
 

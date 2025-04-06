@@ -4,10 +4,12 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { EnvironmentKeyFactory } from './services';
 import { HttpQueryModule } from './query-shape/http-query.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { DatabaseModule } from './database/database.module';
 
 @Global()
 @Module({
   imports: [
+    DatabaseModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

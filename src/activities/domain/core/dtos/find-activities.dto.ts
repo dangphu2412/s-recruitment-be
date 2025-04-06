@@ -5,6 +5,7 @@ export type FindActivitiesDTO = DateRange & {
 };
 
 export type FindActivitiesResponseDTO = {
+  id: number;
   requestType: string;
   requestChangeDay: string;
   compensatoryDay: string;

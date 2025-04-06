@@ -7,9 +7,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../../account-service/domain/data-access/entities/user.entity';
-import { TimeOfDay } from './time-of-day.entity';
-import { DayOfWeek } from './day-of-week';
+import { User } from '../../../account-service/shared/entities/user.entity';
+import { TimeOfDay } from '../../../master-data-service/time-of-days/time-of-day.entity';
+import { DayOfWeek } from '../../../master-data-service/day-of-weeks/day-of-week';
 
 @Entity({
   name: 'activities',
@@ -86,4 +86,11 @@ export class Activity {
     referencedColumnName: 'id',
   })
   dayOfWeek: DayOfWeek;
+
+  // @OneToMany(() => ActivityLog, (log) => log.activity)
+  // @JoinColumn({
+  //   name: 'id',
+  //   referencedColumnName: 'activity_id',
+  // })
+  // logs: ActivityLog[];
 }

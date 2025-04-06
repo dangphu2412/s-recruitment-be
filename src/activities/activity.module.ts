@@ -1,45 +1,43 @@
 import { Module } from '@nestjs/common';
 import { ActivityRequest } from './domain/data-access/activity-request.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ActivityController } from './activity.controller';
-import { ActivityRequestServiceImpl } from './activity-request.service';
+import { ActivityController } from './managements/activity.controller';
+import { ActivityRequestServiceImpl } from './requests/activity-request.service';
 import { ActivityRequestServiceToken } from './domain/core/services/activity-request.service';
 import { Activity } from './domain/data-access/activity.entity';
-import { ActivityServiceImpl } from './activity.service';
+import { ActivityServiceImpl } from './managements/activity.service';
 import { ActivityServiceToken } from './domain/core/services/activity.service';
-import { DayOfWeek } from './domain/data-access/day-of-week';
-import { TimeOfDay } from './domain/data-access/time-of-day.entity';
-import {
-  TimeOfDaysController,
-  TimeOfDayCRUDService,
-} from './time-of-days.controller';
-import {
-  DayOfWeeksController,
-  DayOfWeekCRUDServiceContainer,
-} from './day-of-weeks.controller';
-import { ActivityRepository } from './activity.repository';
+import { ActivityRepository } from './managements/activity.repository';
 import { ActivityLog } from './domain/data-access/activity-log.entity';
-import { ActivityLogRepository } from './activity-log.repository';
-import { ActivityLogService } from './activity-log.service';
-import { ActivitiesLogController } from './activities-log.controller';
-import { ActivityMdmController } from './activity-mdm.controller';
+import { ActivityLogRepository } from './work-logs/activity-log.repository';
+import { ActivityLogService } from './work-logs/activity-log.service';
+import { ActivitiesLogController } from './work-logs/activities-log.controller';
+import {
+  DeviceUserController,
+  DeviceUserCRUDService,
+} from './work-logs/device-user.controller';
+import { ActivityMatcher } from './work-logs/work-status-evaluator.service';
+import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
+import { ActivityRequestController } from './requests/activity-request.controller';
+import { AccountServiceModule } from '../account-service/account-service.module';
+import { DeviceUser } from './domain/data-access/user-log.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Activity,
       ActivityRequest,
-      DayOfWeek,
-      TimeOfDay,
       ActivityLog,
+      DeviceUser,
     ]),
+    MasterDataServiceModule,
+    AccountServiceModule,
   ],
   controllers: [
     ActivityController,
     ActivitiesLogController,
-    TimeOfDaysController,
-    DayOfWeeksController,
-    ActivityMdmController,
+    DeviceUserController,
+    ActivityRequestController,
   ],
   providers: [
     {
@@ -50,11 +48,11 @@ import { ActivityMdmController } from './activity-mdm.controller';
       provide: ActivityServiceToken,
       useClass: ActivityServiceImpl,
     },
-    TimeOfDayCRUDService.createProvider(),
-    DayOfWeekCRUDServiceContainer.createProvider(),
+    DeviceUserCRUDService.createProvider(),
     ActivityRepository,
     ActivityLogRepository,
     ActivityLogService,
+    ActivityMatcher,
   ],
 })
 export class ActivityModule {}
