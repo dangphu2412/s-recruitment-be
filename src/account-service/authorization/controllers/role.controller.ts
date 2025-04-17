@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Inject, Param, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateRoleRequestDto } from '../../management/controllers/update-role-request.dto';
 import {
@@ -7,6 +15,7 @@ import {
 } from '../interfaces/role-service.interface';
 import { CanAccessBy } from '../can-access-by.decorator';
 import { Permissions } from '../access-definition.constant';
+import { CreateRoleRequestDTO } from '../../management/controllers/create-role-request.dto';
 
 @ApiTags('roles')
 @Controller({
@@ -33,5 +42,12 @@ export class RoleController {
     @Body() updateRoleDto: UpdateRoleRequestDto,
   ) {
     await this.roleService.updateRole(roleId, updateRoleDto);
+  }
+
+  @CanAccessBy(Permissions.EDIT_ACCESS_RIGHTS)
+  @Post()
+  @ApiNoContentResponse()
+  async createRole(@Body() createRoleRequestDTO: CreateRoleRequestDTO) {
+    await this.roleService.createRole(createRoleRequestDTO);
   }
 }

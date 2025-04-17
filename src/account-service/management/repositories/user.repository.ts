@@ -20,11 +20,11 @@ export class UserRepository extends Repository<User> {
     query: GetUsersQueryRequest,
   ): Promise<Page<UserOverviewAggregate>> {
     const {
-      joinedIn,
       userStatus,
       search = '',
       departmentIds,
       periodIds,
+      roleIds,
     } = query;
     const { offset, size } = PageRequest.of(query);
 
@@ -46,13 +46,6 @@ export class UserRepository extends Repository<User> {
       .leftJoinAndSelect('users.period', 'period')
       .leftJoinAndSelect('users.operationFee', 'operationFee')
       .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig');
-
-    if (joinedIn) {
-      qb.andWhere('users.createdAt BETWEEN :from AND :to', {
-        from: joinedIn.fromDate,
-        to: joinedIn.toDate,
-      });
-    }
 
     if (search) {
       qb.andWhere('users.email LIKE :email', {
@@ -81,6 +74,12 @@ export class UserRepository extends Repository<User> {
     if (periodIds?.length) {
       qb.andWhere('period.id IN (:...periodIds)', {
         periodIds,
+      });
+    }
+
+    if (roleIds?.length) {
+      qb.andWhere('roles.id IN (:...roleIds)', {
+        roleIds,
       });
     }
 

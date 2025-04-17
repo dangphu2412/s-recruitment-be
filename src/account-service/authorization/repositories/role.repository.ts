@@ -14,8 +14,8 @@ export class RoleRepository extends Repository<Role> {
   }
 
   findAccessControlList(): Promise<AccessControlList> {
-    return this.find({
-      relations: ['permissions'],
-    }) as Promise<AccessControlList>;
+    return this.createQueryBuilder('roles')
+      .leftJoinAndSelect('roles.permissions', 'permissions')
+      .getMany() as Promise<AccessControlList>;
   }
 }
