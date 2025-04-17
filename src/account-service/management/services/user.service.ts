@@ -22,7 +22,7 @@ import { GetUsersQueryRequest } from '../controllers/get-users-query.request';
 import { UserManagementViewDTO } from '../controllers/users.dto';
 import { Transactional } from 'typeorm-transactional';
 import { UpdateUserRolesDto } from '../controllers/update-user-roles.dto';
-import { addMonths, differenceInMonths } from 'date-fns';
+import { addMonths, differenceInMonths, parse } from 'date-fns';
 import { PaginatedUserProbationDTO } from '../dtos/core/user-probation.dto';
 import { UserProbationQueryDTO } from '../dtos/core/user-probation-query.dto';
 import { SystemRoles } from '../../authorization/access-definition.constant';
@@ -338,7 +338,9 @@ export class UserServiceImpl implements UserService {
       user.username = row['Email'];
       user.email = row['Email'];
       user.fullName = row['Họ và Tên'];
-      user.joinedAt = row['Join At'] ? new Date(row['Join At']) : new Date();
+      user.joinedAt = row['Join At']
+        ? new Date(row['Join At'])
+        : this.calculateJoinDate(row['Khóa']);
       user.periodId = row['Khóa'];
       user.departmentId = row['Chuyên môn'];
       user.trackingId = row['Tracking'];
@@ -351,6 +353,69 @@ export class UserServiceImpl implements UserService {
     });
 
     return this.userRepository.insert(entities);
+  }
+
+  /**
+   * Calculates the join date based on a Vietnamese season and year string.
+   *
+   * @param {string} yearSeasonString - The input string in the format "Season Year" (e.g., "Đông 2017", "Xuân 2021").
+   * @returns {string | null} The calculated date string in "dd-MM-yyyy" format, or null if the input is invalid.
+   */
+  private calculateJoinDate(yearSeasonString: string): Date {
+    // 1. Validate Input
+    if (!yearSeasonString || typeof yearSeasonString !== 'string') {
+      Logger.error('Invalid input: Please provide a non-empty string.');
+      return null;
+    }
+
+    const trimmedInput = yearSeasonString.trim();
+    // 2. Find the delimiter index
+    const delimiterIndex = trimmedInput.indexOf('-');
+
+    // Check if hyphen exists and is not at the very start or end
+    if (delimiterIndex <= 0 || delimiterIndex === trimmedInput.length - 1) {
+      Logger.error(
+        `Invalid format: "${yearSeasonString}". Delimiter '-' not found or incorrectly placed. Expected 'YYYY - Season'.`,
+      );
+      return null;
+    }
+
+    // 3. Split using substring and trim parts
+    const yearString = trimmedInput.substring(0, delimiterIndex).trim();
+    const seasonName = trimmedInput.substring(delimiterIndex + 1).trim();
+
+    // 3. Validate Year (same logic as before)
+    const year = parseInt(yearString, 10);
+    if (isNaN(year) || !/^\d{4}$/.test(yearString)) {
+      Logger.error(`Invalid year: "${yearString}". Expected a 4-digit year.`);
+      return null;
+    }
+    // Optional: Add reasonable year range check if needed
+    // if (year < 1900 || year > 2100) {
+    //   console.error(`Year out of reasonable range: ${year}`);
+    //   return null;
+    // }
+
+    // 4. Map Season to End Date (DD/MM) - Map remains the same
+    const seasonEndDateMap = {
+      xuân: '30-04', // Spring -> End of April
+      hè: '31-08', // Summer -> End of August
+      thu: '30-11', // Autumn -> End of November
+      đông: '30-12', // Winter -> End of December (Matching your example: 30/12/2017)
+    };
+
+    const dayMonth = seasonEndDateMap[seasonName.toLowerCase()];
+
+    // 5. Validate Season Name (same logic as before)
+    if (!dayMonth) {
+      Logger.error(
+        `Unknown season: "${seasonName}". Expected 'Xuân', 'Hè', 'Thu', or 'Đông'.`,
+      );
+      return null;
+    }
+
+    // 6. Construct and Return Final Date String (same logic as before)
+    return parse(`${dayMonth}-${year}`, 'dd-MM-yyyy', new Date());
   }
 
   async createUserPayment(

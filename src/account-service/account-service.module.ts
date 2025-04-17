@@ -23,6 +23,9 @@ import { UserServiceToken } from './management/interfaces/user-service.interface
 import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
 import { AuthServiceToken } from './registration/interfaces/auth-service.interface';
 import { TokenFactoryToken } from './registration/interfaces/token-factory.interface';
+import { PermissionServiceImpl } from './authorization/services/permission.service';
+import { PermissionServiceToken } from './authorization/interfaces/permission-service.interface';
+import { PermissionController } from './authorization/controllers/permissions.controller';
 
 @Module({
   imports: [
@@ -35,7 +38,12 @@ import { TokenFactoryToken } from './registration/interfaces/token-factory.inter
     MasterDataServiceModule,
     TypeOrmModule.forFeature([User, Role, Permission]),
   ],
-  controllers: [AuthController, RoleController, UserController],
+  controllers: [
+    AuthController,
+    RoleController,
+    UserController,
+    PermissionController,
+  ],
   providers: [
     JwtStrategy,
     PasswordManager,
@@ -53,6 +61,10 @@ import { TokenFactoryToken } from './registration/interfaces/token-factory.inter
     {
       provide: RoleServiceToken,
       useClass: RoleServiceImpl,
+    },
+    {
+      provide: PermissionServiceToken,
+      useClass: PermissionServiceImpl,
     },
     {
       provide: UserServiceToken,

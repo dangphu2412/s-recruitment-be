@@ -14,6 +14,7 @@ import { EnvironmentKeyFactory } from '../../../system/services';
 import ms from 'ms';
 import { Permissions } from '../access-definition.constant';
 import { InvalidRoleUpdateException } from '../exceptions/invalid-role-update.exception';
+import { CreateRoleRequestDTO } from 'src/account-service/management/controllers/create-role-request.dto';
 
 @Injectable()
 export class RoleServiceImpl implements RoleService {
@@ -42,6 +43,10 @@ export class RoleServiceImpl implements RoleService {
     this.ttl = ms(refreshTokenExpiration);
   }
 
+  async createRole(createRoleRequestDTO: CreateRoleRequestDTO): Promise<void> {
+    await this.roleRepository.insert(createRoleRequestDTO);
+  }
+
   findByName(name: string): Promise<Role> {
     return this.roleRepository.findOne({ where: { name } });
   }
@@ -67,6 +72,7 @@ export class RoleServiceImpl implements RoleService {
           name: role.name,
           description: role.description,
           isEditable: role.isEditable,
+          assignedUsers: role.users,
           rights: allPermissions.map<Right>((permission: Permission) => {
             return {
               ...permission,

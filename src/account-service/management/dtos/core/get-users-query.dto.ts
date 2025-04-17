@@ -12,4 +12,6 @@ export type GetUsersQueryDTO = OffsetPagination & {
   departmentIds?: number[];
 
   periodIds?: number[];
+
+  roleIds?: number[];
 };
