@@ -368,18 +368,21 @@ export class UserServiceImpl implements UserService {
       return null;
     }
 
-    // 2. Split by " - " delimiter (allowing for optional spaces)
-    const parts = yearSeasonString.trim().split(/\s*-\s*/);
-    if (parts.length !== 2) {
+    const trimmedInput = yearSeasonString.trim();
+    // 2. Find the delimiter index
+    const delimiterIndex = trimmedInput.indexOf('-');
+
+    // Check if hyphen exists and is not at the very start or end
+    if (delimiterIndex <= 0 || delimiterIndex === trimmedInput.length - 1) {
       Logger.error(
-        `Invalid format: "${yearSeasonString}". Expected 'YYYY - Season' (e.g., '2024 - Đông').`,
+        `Invalid format: "${yearSeasonString}". Delimiter '-' not found or incorrectly placed. Expected 'YYYY - Season'.`,
       );
       return null;
     }
 
-    // Parts are now swapped compared to the previous version
-    const yearString = parts[0];
-    const seasonName = parts[1];
+    // 3. Split using substring and trim parts
+    const yearString = trimmedInput.substring(0, delimiterIndex).trim();
+    const seasonName = trimmedInput.substring(delimiterIndex + 1).trim();
 
     // 3. Validate Year (same logic as before)
     const year = parseInt(yearString, 10);
