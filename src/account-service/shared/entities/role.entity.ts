@@ -14,7 +14,7 @@ import { Permission } from './permission.entity';
 })
 export class Role {
   @PrimaryGeneratedColumn('increment')
-  id: string;
+  id: number;
 
   @Column({
     name: 'name',
@@ -44,7 +44,7 @@ export class Role {
   isEditable: boolean;
 
   @ManyToMany(() => User, (user) => user.roles)
-  users?: User[];
+  users: User[];
 
   @ManyToMany(() => Permission, (permission) => permission.roles)
   @JoinTable({
@@ -58,5 +58,5 @@ export class Role {
       referencedColumnName: 'id',
     },
   })
-  permissions?: Permission[];
+  permissions: Permission[];
 }

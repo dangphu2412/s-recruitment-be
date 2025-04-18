@@ -1,6 +1,6 @@
 import { RoleController } from '../../../src/account-service/authorization/controllers/role.controller';
 import { RoleService } from '../../../src/account-service/authorization/interfaces/role-service.interface';
-import { UpdateRoleRequestDto } from '../../../src/account-service/management/controllers/update-role-request.dto';
+import { UpdateRoleRequestDto } from '../../../src/account-service/authorization/dtos/presentation/update-role-request.dto';
 import { AccessControlView } from '../../../src/account-service/authorization/dtos/core/role-list.dto';
 
 describe('RoleController', () => {
@@ -23,11 +23,11 @@ describe('RoleController', () => {
   describe('getRoles', () => {
     it('should call roleService.findAccessControlView and return result', async () => {
       const mockRoles = {
-        access: [{ id: '1', name: 'Admin' }],
+        access: [{ id: 1, name: 'Admin' }],
       } as AccessControlView;
       roleService.findAccessControlView.mockResolvedValue(mockRoles);
 
-      const result = await roleController.getRoles();
+      const result = await roleController.getRoles({});
 
       expect(roleService.findAccessControlView).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockRoles);
@@ -36,7 +36,7 @@ describe('RoleController', () => {
 
   describe('updateRole', () => {
     it('should call roleService.updateRole with correct params', async () => {
-      const roleId = 'role-123';
+      const roleId = 123;
       const updateRoleDto: UpdateRoleRequestDto = {
         rights: [1],
       };

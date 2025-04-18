@@ -19,7 +19,7 @@ export type UserDetail = {
     name: string;
   };
   roles: {
-    id: string;
+    id: number;
     name: string;
   }[];
   isProbation: boolean;
