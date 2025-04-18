@@ -210,6 +210,7 @@ export class UserServiceImpl implements UserService {
       roles: user.roles,
       createdAt: user.createdAt,
       isProbation: !user.operationFee,
+      joinedAt: user.joinedAt,
     };
   }
 
