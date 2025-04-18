@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../shared/entities/user.entity';
 import { UserStatus } from '../user-status.constant';
 import { Page, PageRequest } from '../../../system/query-shape/dto';
-import { GetUsersQueryRequest } from '../controllers/get-users-query.request';
+import { GetUsersQueryRequest } from '../dtos/presentations/get-users-query.request';
 import { UserOverviewAggregate } from '../dtos/aggregates/user-overview.aggregate';
 
 @Injectable()
