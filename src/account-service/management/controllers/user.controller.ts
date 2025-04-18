@@ -21,23 +21,25 @@ import {
 import { CurrentUser } from '../user.decorator';
 import { CanAccessBy } from '../../authorization/can-access-by.decorator';
 import { Page } from '../../../system/query-shape/types';
-import { UpdateUserRolesDto } from './update-user-roles.dto';
+import { UpdateUserRolesDto } from '../dtos/presentations/update-user-roles.dto';
 import { FileInterceptor } from '../../../system/file';
-import { FileCreateUsersDto } from './file-create-users.dto';
+import { FileCreateUsersDto } from '../dtos/presentations/file-create-users.dto';
 import { Permissions } from '../../authorization/access-definition.constant';
-import { GetUsersQueryRequest } from './get-users-query.request';
-import { UserManagementViewDTO } from './users.dto';
+import {
+  GetUsersQueryRequest,
+  UserManagementViewDTO,
+} from '../dtos/presentations/get-users-query.request';
 import {
   UserService,
   UserServiceToken,
 } from '../interfaces/user-service.interface';
 import { JwtPayload } from '../../registration/jwt-payload';
-import { CreateUsersRequestDTO } from './create-users.request';
+import { CreateUsersRequestDTO } from '../dtos/presentations/create-users.request';
 import { PaymentService } from '../../../monthly-money/internal/payment.service';
-import { CreatePaymentRequest } from './create-payment.request';
-import { UpgradeUserMemberRequest } from './upgrade-user-member.request';
-import { UserProbationRequest } from './get-users-probation.request';
-import { UpdateUserRequest } from './update-user.request';
+import { CreatePaymentRequest } from '../dtos/presentations/create-payment.request';
+import { UpgradeUserMemberRequest } from '../dtos/presentations/upgrade-user-member.request';
+import { UserProbationRequest } from '../dtos/presentations/get-users-probation.request';
+import { UpdateUserRequest } from '../dtos/presentations/update-user.request';
 import { Identified } from '../../registration/identified.decorator';
 
 @ApiTags('users')

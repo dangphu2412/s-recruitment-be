@@ -1,18 +1,18 @@
 import { createInterfaceToken } from 'src/system/utils';
 import { Page } from 'src/system/query-shape/dto';
-import { UserManagementViewDTO } from '../controllers/users.dto';
-import { CreateUsersRequestDTO } from '../controllers/create-users.request';
-import { FileCreateUsersDto } from '../controllers/file-create-users.dto';
+import { CreateUsersRequestDTO } from '../dtos/presentations/create-users.request';
+import { FileCreateUsersDto } from '../dtos/presentations/file-create-users.dto';
 import { User } from '../../shared/entities/user.entity';
 import { MyProfile, UserDetail } from '../dtos/core/my-profile';
-import { UpdateUserRolesDto } from '../controllers/update-user-roles.dto';
+import { UpdateUserRolesDto } from '../dtos/presentations/update-user-roles.dto';
 import { PaginatedUserProbationDTO } from '../dtos/core/user-probation.dto';
 import { UserProbationQueryDTO } from '../dtos/core/user-probation-query.dto';
 import { UpgradeUserMemberDTO } from '../dtos/core/upgrade-user-member.dto';
 import { GetUserDTO, GetUsersDTO } from '../dtos/core/get-users.dto';
 import { UpdateUserDTO } from '../dtos/core/update-user.dto';
 import { GetUsersQueryDTO } from '../dtos/core/get-users-query.dto';
-import { CreatePaymentRequest } from '../controllers/create-payment.request';
+import { CreatePaymentRequest } from '../dtos/presentations/create-payment.request';
+import { UserManagementViewDTO } from '../dtos/presentations/get-users-query.request';
 
 export const UserServiceToken = createInterfaceToken('UserServiceToken');
 

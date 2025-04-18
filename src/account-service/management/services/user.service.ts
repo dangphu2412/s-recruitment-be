@@ -8,7 +8,7 @@ import { PasswordManager } from '../../registration/services/password-manager';
 import {
   FileCreateUsersDto,
   FileRow,
-} from '../controllers/file-create-users.dto';
+} from '../dtos/presentations/file-create-users.dto';
 import { read, utils } from 'xlsx';
 import {
   RoleService,
@@ -18,10 +18,12 @@ import { UserService } from '../interfaces/user-service.interface';
 import { MyProfile, UserDetail } from '../dtos/core/my-profile';
 import { GetUserDTO } from '../dtos/core/get-users.dto';
 import { User } from '../../shared/entities/user.entity';
-import { GetUsersQueryRequest } from '../controllers/get-users-query.request';
-import { UserManagementViewDTO } from '../controllers/users.dto';
+import {
+  GetUsersQueryRequest,
+  UserManagementViewDTO,
+} from '../dtos/presentations/get-users-query.request';
 import { Transactional } from 'typeorm-transactional';
-import { UpdateUserRolesDto } from '../controllers/update-user-roles.dto';
+import { UpdateUserRolesDto } from '../dtos/presentations/update-user-roles.dto';
 import { addMonths, differenceInMonths, parse } from 'date-fns';
 import { PaginatedUserProbationDTO } from '../dtos/core/user-probation.dto';
 import { UserProbationQueryDTO } from '../dtos/core/user-probation-query.dto';
@@ -33,7 +35,7 @@ import {
 import { UpgradeUserMemberDTO } from '../dtos/core/upgrade-user-member.dto';
 import { CreateUserDTO } from '../dtos/core/create-user.dto';
 import { UpdateUserDTO } from '../dtos/core/update-user.dto';
-import { CreatePaymentRequest } from '../controllers/create-payment.request';
+import { CreatePaymentRequest } from '../dtos/presentations/create-payment.request';
 import { PaymentService } from '../../../monthly-money/internal/payment.service';
 import { ResourceCRUDService } from '../../../system/resource-templates/resource-service-template';
 import { Period } from '../../../master-data-service/periods/period.entity';

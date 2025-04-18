@@ -8,6 +8,7 @@ import { EnvironmentKeyFactory } from '../../../src/system/services';
 import { Role } from '../../../src/account-service/shared/entities/role.entity';
 import { AccessControlList } from '../../../src/account-service/authorization/dtos/aggregates/access-control-list.aggregate';
 import { InvalidRoleUpdateException } from '../../../src/account-service/authorization/exceptions/invalid-role-update.exception';
+import { UserRepository } from '../../../src/account-service/management/repositories/user.repository';
 
 jest.mock('ms');
 
@@ -17,6 +18,7 @@ describe('RoleServiceImpl', () => {
   let permissionRepository: jest.Mocked<Repository<Permission>>;
   let cacheManager: jest.Mocked<Cache>;
   let environmentKeyFactory: jest.Mocked<EnvironmentKeyFactory>;
+  let userRepository: jest.Mocked<UserRepository>;
 
   beforeEach(() => {
     roleRepository = {
@@ -50,6 +52,7 @@ describe('RoleServiceImpl', () => {
       permissionRepository,
       cacheManager,
       environmentKeyFactory,
+      userRepository,
     );
   });
 
@@ -59,7 +62,7 @@ describe('RoleServiceImpl', () => {
 
   describe('findByName', () => {
     it('should call roleRepository.findOne', async () => {
-      const mockRole = { id: '1', name: 'Admin' } as Role;
+      const mockRole = { id: 1, name: 'Admin' } as Role;
       roleRepository.findOne.mockResolvedValue(mockRole);
 
       const result = await roleService.findByName('Admin');
@@ -91,7 +94,7 @@ describe('RoleServiceImpl', () => {
       roleRepository.findAccessControlList.mockResolvedValue(mockRoles);
       permissionRepository.find.mockResolvedValue(mockPermissions);
 
-      const result = await roleService.findAccessControlView();
+      const result = await roleService.findAccessControlView({});
 
       expect(result.access.length).toBe(1);
       expect(result.access[0].rights.length).toBe(2);
@@ -110,13 +113,13 @@ describe('RoleServiceImpl', () => {
       permissionRepository.find.mockResolvedValue([]);
 
       await expect(
-        roleService.updateRole('role-1', { rights: [1, 2] }),
+        roleService.updateRole(1, { rights: [1, 2] }),
       ).rejects.toThrow(InvalidRoleUpdateException);
     });
 
     it('should update role permissions and clear related cache', async () => {
       const mockRole = {
-        id: 'role-1',
+        id: 1,
         isEditable: true,
         users: [{ id: 'user-1' }],
         permissions: [],
@@ -128,10 +131,10 @@ describe('RoleServiceImpl', () => {
         { id: 'p2' } as Permission,
       ]);
 
-      await roleService.updateRole('role-1', { rights: [1, 2] });
+      await roleService.updateRole(1, { rights: [1, 2] });
 
       expect(roleRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'role-1' }),
+        expect.objectContaining({ id: 1 }),
       );
       expect(cacheManager.store.del).toHaveBeenCalledWith(['RK-user-1']);
     });

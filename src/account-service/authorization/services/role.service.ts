@@ -14,7 +14,10 @@ import { EnvironmentKeyFactory } from '../../../system/services';
 import ms from 'ms';
 import { Permissions } from '../access-definition.constant';
 import { InvalidRoleUpdateException } from '../exceptions/invalid-role-update.exception';
-import { CreateRoleRequestDTO } from 'src/account-service/management/controllers/create-role-request.dto';
+import { CreateRoleRequestDTO } from 'src/account-service/authorization/dtos/presentation/create-role-request.dto';
+import { UpdateAssignedPersonsRequestDTO } from 'src/account-service/authorization/dtos/presentation/update-assigned-persons.request';
+import { UserRepository } from '../../management/repositories/user.repository';
+import { GetAccessControlRequestDTO } from '../dtos/presentation/get-access-control.request';
 
 @Injectable()
 export class RoleServiceImpl implements RoleService {
@@ -37,10 +40,29 @@ export class RoleServiceImpl implements RoleService {
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     environmentKeyFactory: EnvironmentKeyFactory,
+    private userRepository: UserRepository,
   ) {
     const refreshTokenExpiration =
       environmentKeyFactory.getRefreshTokenExpiration();
     this.ttl = ms(refreshTokenExpiration);
+  }
+
+  async updateAssignedPersonsToRole(
+    id: number,
+    dto: UpdateAssignedPersonsRequestDTO,
+  ): Promise<void> {
+    const users = await this.userRepository.find({
+      where: {
+        id: In(dto.userIds),
+      },
+      select: ['id'],
+    });
+
+    if (users.length !== dto.userIds.length) {
+      throw new InvalidRoleUpdateException();
+    }
+
+    await this.roleRepository.updateAssignedPerson(id, dto.userIds);
   }
 
   async createRole(createRoleRequestDTO: CreateRoleRequestDTO): Promise<void> {
@@ -51,9 +73,11 @@ export class RoleServiceImpl implements RoleService {
     return this.roleRepository.findOne({ where: { name } });
   }
 
-  async findAccessControlView(): Promise<AccessControlView> {
+  async findAccessControlView(
+    dto: GetAccessControlRequestDTO,
+  ): Promise<AccessControlView> {
     const [roles, allPermissions] = await Promise.all([
-      this.roleRepository.findAccessControlList(),
+      this.roleRepository.findAccessControlList(dto),
       this.permissionRepository.find(),
     ]);
 
@@ -72,7 +96,7 @@ export class RoleServiceImpl implements RoleService {
           name: role.name,
           description: role.description,
           isEditable: role.isEditable,
-          assignedUsers: role.users,
+          totalUsers: role.totalUsers,
           rights: allPermissions.map<Right>((permission: Permission) => {
             return {
               ...permission,
@@ -85,7 +109,7 @@ export class RoleServiceImpl implements RoleService {
   }
 
   async updateRole(
-    id: string,
+    id: number,
     { rights: permissionIds }: UpdateRoleDto,
   ): Promise<void> {
     const uniqueIds = uniq(permissionIds);
