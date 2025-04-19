@@ -24,4 +24,5 @@ export type UserDetail = {
   }[];
   isProbation: boolean;
   createdAt: Date;
+  joinedAt: Date;
 };

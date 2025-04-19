@@ -48,15 +48,19 @@ export class UserRepository extends Repository<User> {
       .leftJoinAndSelect('operationFee.monthlyConfig', 'monthlyConfig');
 
     if (search) {
-      qb.andWhere('users.email LIKE :email', {
-        email: `%${search}%`,
-      });
+      qb.andWhere(
+        '(users.email ILIKE :email OR users.fullName ILIKE :fullName)',
+        {
+          email: `%${search}%`,
+          fullName: `%${search}%`,
+        },
+      );
     }
 
     if (userStatus) {
       if (userStatus.includes(UserStatus.DEBTOR)) {
         qb.andWhere(
-          `operationFee.paidMonths < EXTRACT(MONTH FROM age(CURRENT_DATE, users.joinedAt))`,
+          `operationFee.paidMonths < EXTRACT(MONTH FROM AGE(CURRENT_DATE, users.joinedAt))`,
         );
       }
 
