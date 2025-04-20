@@ -26,7 +26,7 @@ export interface UserService {
     userProbationQueryInput: UserProbationQueryDTO,
   ): Promise<PaginatedUserProbationDTO>;
   findUsers(query: GetUsersQueryDTO): Promise<Page<UserManagementViewDTO>>;
-  findUserByFullname(fullName: string): Promise<User | null>;
+  findUsersByFullNames(fullNames: string[]): Promise<User[]>;
 
   /**
    * @throws {NotFoundUserException}

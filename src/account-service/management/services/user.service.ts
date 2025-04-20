@@ -58,9 +58,9 @@ export class UserServiceImpl implements UserService {
     private readonly periodService: ResourceCRUDService<Period>,
   ) {}
 
-  findUserByFullname(fullName: string): Promise<User | null> {
-    return this.userRepository.findOneBy({
-      fullName,
+  findUsersByFullNames(fullNames: string[]): Promise<User[]> {
+    return this.userRepository.findBy({
+      fullName: In(fullNames),
     });
   }
 
