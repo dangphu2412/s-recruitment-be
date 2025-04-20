@@ -36,6 +36,7 @@ import {
   UserService,
   UserServiceToken,
 } from '../../account-service/management/interfaces/user-service.interface';
+import { keyBy } from 'lodash';
 
 type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
 
@@ -73,32 +74,35 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       ActivityRequestServiceImpl.createUserActivityRequestByRow,
     );
 
-    await Promise.all(
-      results
-        .map(async (result) => {
-          // TODO: Need to improve by batch query users instead of finding each
-          const user = await this.userService.findUserByFullname(result.name);
+    const users = await this.userService.findUsersByFullNames([
+      ...new Set(results.map((result) => result.name)),
+    ]);
+    const fullNameMapToUser = keyBy(users, 'fullName');
 
-          if (!user) {
-            // Return the list of unmatch users
-            return null;
-          }
+    const entities = results
+      .map((result) => {
+        const user = fullNameMapToUser[result.name];
 
-          await Promise.all(
-            result.activitySheetRequests.map(async (registered) => {
-              const entity = new ActivityRequest();
-              entity.authorId = user.id;
-              entity.requestType = RequestTypes.WORKING;
-              entity.timeOfDayId = registered.timeOfDayId;
-              entity.dayOfWeekId = registered.dayOfWeekId.toString();
-              entity.approvalStatus = RequestActivityStatus.PENDING;
+        if (!user) {
+          // Return the list of unmatch users
+          return null;
+        }
 
-              await this.activityRequestRepository.insert(entity);
-            }),
-          );
-        })
-        .flat(),
-    );
+        return result.activitySheetRequests.map((registered) => {
+          const entity = new ActivityRequest();
+          entity.authorId = user.id;
+          entity.requestType = RequestTypes.WORKING;
+          entity.timeOfDayId = registered.timeOfDayId;
+          entity.dayOfWeekId = registered.dayOfWeekId.toString();
+          entity.approvalStatus = RequestActivityStatus.PENDING;
+
+          return entity;
+        });
+      })
+      .filter(Boolean)
+      .flat();
+
+    await this.activityRequestRepository.insert(entities);
 
     return;
   }
@@ -109,39 +113,26 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       activitySheetRequests: [],
     };
     const ACTIVITY_CELL_START_INDEX = 3;
-    const TIME_OF_DAY_CELL_LENGTH = 3;
+    const TIME_SLOTS = ['SUM-MORN', 'SUM-AFT', 'SUM-EVN'] as const;
+    const TIME_SLOTS_PER_DAY = TIME_SLOTS.length;
 
-    for (
-      let cellIndex = ACTIVITY_CELL_START_INDEX;
-      cellIndex < row.length;
-      cellIndex++
-    ) {
-      if (['x', 'X'].includes(row[cellIndex])) {
-        const dayOfWeek = Math.ceil((cellIndex - 2) / 3);
-        const timeOfDayMap = {
-          0: 'SUM-MORN',
-          1: 'SUM-AFT',
-          2: 'SUM-EVN',
-        };
+    for (let i = ACTIVITY_CELL_START_INDEX; i < row.length; i++) {
+      const cell = row[i];
+      if (['x', 'X'].includes(cell)) {
+        const offset = i - ACTIVITY_CELL_START_INDEX;
+
+        const dayIndexMondayBased = Math.floor(offset / TIME_SLOTS_PER_DAY); // 0 = Monday, 6 = Sunday
+        const timeSlotIndex = offset % TIME_SLOTS_PER_DAY;
+
+        // Convert to JS Date.getDay format: 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const dayOfWeekId = (dayIndexMondayBased + 1) % 7;
 
         user.activitySheetRequests.push({
-          /**
-           * Day of week values stay from 0 (sunday), 1(monday) -> 6 Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
-           * The calculation dayOfWeek will return values from 7 (sunday), 1(monday) -> 6
-           * So we need a check here
-           */
-          dayOfWeekId: dayOfWeek === 7 ? 0 : dayOfWeek,
-          // Start from 0,1,2
-          timeOfDayId:
-            timeOfDayMap[
-              Math.ceil(
-                (cellIndex - TIME_OF_DAY_CELL_LENGTH) % TIME_OF_DAY_CELL_LENGTH,
-              )
-            ],
+          dayOfWeekId,
+          timeOfDayId: TIME_SLOTS[timeSlotIndex],
         });
       }
     }
-
     return user;
   }
 
@@ -288,6 +279,9 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     throw new InternalServerErrorException('Invalid request type');
   }
 
+  /**
+   * TODO: Batch update instead of single update
+   */
   @Transactional()
   async updateApprovalRequestActivity(
     dto: UpdateApprovalActivityRequestDTO,
