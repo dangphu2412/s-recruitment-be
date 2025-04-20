@@ -37,6 +37,13 @@ import {
   UserServiceToken,
 } from '../../account-service/management/interfaces/user-service.interface';
 
+type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
+
+type UserActivityRequest = {
+  name: string;
+  activitySheetRequests: ActivitySheetRequest[];
+};
+
 @Injectable()
 export class ActivityRequestServiceImpl implements ActivityRequestService {
   constructor(
@@ -51,52 +58,25 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   async createRequestActivityByFile({
     file,
   }: FileActivityRequestDTO): Promise<void> {
-    type UserRequest = {
-      name: string;
-      department: string;
-      registered: { dayOfWeekId: number; timeOfDayId: string }[];
-    };
-    const workbook = read(file.buffer, { type: 'buffer', cellDates: true });
+    const workbook = read(file.buffer, { type: 'buffer' });
 
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = utils
+
+    const HEADER_ROW_COUNT = 2;
+    const dataRows = utils
       .sheet_to_json<FileActivityRequestRow>(sheet, {
         header: 1,
         defval: '',
       })
-      .slice(2);
-    const results: UserRequest[] = [];
-
-    rows.forEach((row) => {
-      const user = {
-        name: row[1],
-        department: row[2],
-        registered: [],
-      };
-
-      for (let i = 3; i < row.length; i++) {
-        if ('x' === row[i]) {
-          const dayOfWeek = Math.ceil((i - 2) / 3);
-          const timeOfDayMap = {
-            0: 'SUM-MORN',
-            1: 'SUM-AFT',
-            2: 'SUM-EVN',
-          };
-          user.registered.push({
-            // Start from 1 -> 7
-            dayOfWeekId: dayOfWeek === 7 ? 0 : dayOfWeek,
-            // Start from 0,1,2
-            timeOfDayId: timeOfDayMap[Math.ceil((i - 3) % 3)],
-          });
-        }
-      }
-
-      results.push(user);
-    });
+      .slice(HEADER_ROW_COUNT);
+    const results: UserActivityRequest[] = dataRows.map(
+      ActivityRequestServiceImpl.createUserActivityRequestByRow,
+    );
 
     await Promise.all(
       results
         .map(async (result) => {
+          // TODO: Need to improve by batch query users instead of finding each
           const user = await this.userService.findUserByFullname(result.name);
 
           if (!user) {
@@ -105,7 +85,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
           }
 
           await Promise.all(
-            result.registered.map(async (registered) => {
+            result.activitySheetRequests.map(async (registered) => {
               const entity = new ActivityRequest();
               entity.authorId = user.id;
               entity.requestType = RequestTypes.WORKING;
@@ -121,6 +101,48 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     );
 
     return;
+  }
+
+  static createUserActivityRequestByRow(row: string[]): UserActivityRequest {
+    const user: UserActivityRequest = {
+      name: row[1],
+      activitySheetRequests: [],
+    };
+    const ACTIVITY_CELL_START_INDEX = 3;
+    const TIME_OF_DAY_CELL_LENGTH = 3;
+
+    for (
+      let cellIndex = ACTIVITY_CELL_START_INDEX;
+      cellIndex < row.length;
+      cellIndex++
+    ) {
+      if (['x', 'X'].includes(row[cellIndex])) {
+        const dayOfWeek = Math.ceil((cellIndex - 2) / 3);
+        const timeOfDayMap = {
+          0: 'SUM-MORN',
+          1: 'SUM-AFT',
+          2: 'SUM-EVN',
+        };
+
+        user.activitySheetRequests.push({
+          /**
+           * Day of week values stay from 0 (sunday), 1(monday) -> 6 Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
+           * The calculation dayOfWeek will return values from 7 (sunday), 1(monday) -> 6
+           * So we need a check here
+           */
+          dayOfWeekId: dayOfWeek === 7 ? 0 : dayOfWeek,
+          // Start from 0,1,2
+          timeOfDayId:
+            timeOfDayMap[
+              Math.ceil(
+                (cellIndex - TIME_OF_DAY_CELL_LENGTH) % TIME_OF_DAY_CELL_LENGTH,
+              )
+            ],
+        });
+      }
+    }
+
+    return user;
   }
 
   async findMyRequestedActivities(
