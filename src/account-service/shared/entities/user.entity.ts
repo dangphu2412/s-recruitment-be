@@ -14,7 +14,6 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Role } from './role.entity';
-import { Post } from '../../../posts-service/domain/data-access/entities/posts.entity';
 import { Payment } from '../../../monthly-money/domain/data-access/entities/payment.entity';
 import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
 import { Department } from '../../../master-data-service/departments/department.entity';
@@ -134,9 +133,6 @@ export class User {
 
   @OneToMany(() => Payment, (payment) => payment.user)
   payments?: Payment[];
-
-  @OneToMany(() => Post, (post) => post.author)
-  posts?: Post[];
 
   @ManyToOne(() => Department, (department) => department.users)
   @JoinColumn({ name: 'department_id' })
