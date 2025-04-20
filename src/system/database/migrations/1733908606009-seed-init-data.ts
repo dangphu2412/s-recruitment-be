@@ -16,7 +16,6 @@ import { Menu } from '../../../menu';
 import { MenuFactory } from '../processors/menu.factory';
 import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
 import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
-import { Category } from '../../../posts-service/domain/data-access/entities/category.entity';
 import { Department } from '../../../master-data-service/departments/department.entity';
 import { MenuCode } from '../../../menu/client/menu-code.constant';
 import { DatabaseUtils } from '../utils/database.utils';
@@ -83,14 +82,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       {
         name: Permissions.EDIT_ACCESS_RIGHTS,
         description: 'Edit roles of system',
-      },
-      {
-        name: Permissions.MANAGE_RECRUITMENT,
-        description: 'Manage recruitment',
-      },
-      {
-        name: Permissions.MANAGE_POSTS,
-        description: 'Manage public posts of S-Group',
       },
       {
         name: Permissions.MANAGE_MASTER_DATA,
@@ -202,18 +193,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         ],
       },
       {
-        name: 'Posts',
-        iconCode: 'POST_ICON',
-        code: MenuCode.POST,
-        subMenus: [
-          {
-            name: 'Post management',
-            accessLink: '/posts/overview',
-            code: MenuCode.POSTS_OVERVIEW,
-          },
-        ],
-      },
-      {
         name: 'Activities',
         iconCode: 'ACTIVITY_MANAGEMENT_ICON',
         code: MenuCode.ACTIVITY_MANAGEMENT,
@@ -298,11 +277,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       [Permissions.EDIT_MEMBER_USER]: [MenuCode.USER_OVERVIEW],
       [Permissions.VIEW_ACCESS_RIGHTS]: [MenuCode.IDENTITY_ACCESS_MANAGEMENT],
       [Permissions.EDIT_ACCESS_RIGHTS]: [MenuCode.IDENTITY_ACCESS_MANAGEMENT],
-      [Permissions.MANAGE_RECRUITMENT]: [
-        MenuCode.RECRUITMENT,
-        MenuCode.RECRUITMENT_OVERVIEW,
-      ],
-      [Permissions.MANAGE_POSTS]: [MenuCode.POST, MenuCode.POSTS_OVERVIEW],
       [Permissions.READ_ACTIVITIES]: [
         MenuCode.ACTIVITY_MANAGEMENT,
         MenuCode.MY_ACTIVITY_REQUESTS,
@@ -327,30 +301,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       }),
     );
 
-    const categoryRepository = queryRunner.manager.getRepository(Category);
-
-    await categoryRepository.insert([
-      {
-        id: 'cong-nghe',
-        name: 'Công nghệ',
-        summary: 'Đây là nơi đăng các nội dung về Công Nghệ',
-      },
-      {
-        id: 'thiet-ke',
-        name: 'Thiết Kế',
-        summary: 'Đây là nơi đăng các nội dung về Thiết Kế',
-      },
-      {
-        id: 'marketing-online',
-        name: 'Marketing Online',
-        summary: 'Đây là nơi đăng các nội dung về Marketing Online',
-      },
-      {
-        id: 'noi-bo',
-        name: 'Nội bộ',
-        summary: 'Đây là nơi đăng các nội dung về nội bộ',
-      },
-    ]);
     const departmentRepository = queryRunner.manager.getRepository(Department);
 
     await departmentRepository.insert([
