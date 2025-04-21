@@ -162,6 +162,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     fromDate,
     toDate,
     status,
+    requestTypes,
   }: FindRequestedActivityQueryDTO): Promise<FindRequestedActivitiesResponseDTO> {
     const { offset } = PageRequest.of({ page, size });
 
@@ -187,6 +188,12 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     if (status) {
       queryBuilder.andWhere('activity.approvalStatus IN (:...status)', {
         status,
+      });
+    }
+
+    if (requestTypes) {
+      queryBuilder.andWhere('activity.requestType IN (:...requestTypes)', {
+        requestTypes,
       });
     }
 

@@ -18,4 +18,8 @@ export class FindRequestedActivityRequestDTO extends OffsetPagination {
   @IsOptional()
   @ToManyString()
   status?: string[];
+
+  @IsOptional()
+  @ToManyString()
+  requestTypes?: string[];
 }
