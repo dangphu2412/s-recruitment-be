@@ -7,6 +7,7 @@ export type FindRequestedActivityQueryDTO = OffsetPagination & {
   fromDate?: string;
   toDate?: string;
   status?: string[];
+  requestTypes?: string[];
 };
 
 export type FindRequestedActivitiesResponseDTO = Page<{
