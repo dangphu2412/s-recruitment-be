@@ -1,10 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../src/account-service/registration/services/jwt.guard';
-import { createSystemClientCode } from '../../../src/system/exception';
-
-jest.mock('../../../src/system/exception', () => ({
-  createSystemClientCode: jest.fn().mockReturnValue('UNAUTHORIZED_CUSTOM_CODE'),
-}));
 
 describe('JwtAuthGuard', () => {
   let jwtAuthGuard: JwtAuthGuard;
@@ -33,7 +28,6 @@ describe('JwtAuthGuard', () => {
           }),
         }),
       );
-      expect(createSystemClientCode).toHaveBeenCalledWith('UNAUTHORIZED');
     });
 
     it('should throw UnauthorizedException if there is an error', () => {
@@ -41,7 +35,6 @@ describe('JwtAuthGuard', () => {
       expect(() => jwtAuthGuard.handleRequest(err, null)).toThrowError(
         UnauthorizedException,
       );
-      expect(createSystemClientCode).toHaveBeenCalledWith('UNAUTHORIZED');
     });
   });
 });

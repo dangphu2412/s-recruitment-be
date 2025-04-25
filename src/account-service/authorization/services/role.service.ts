@@ -1,5 +1,5 @@
 import { RoleRepository } from '../repositories/role.repository';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { In, Repository } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,7 +12,6 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import ms from 'ms';
 import { Permissions } from '../access-definition.constant';
-import { InvalidRoleUpdateException } from '../exceptions/invalid-role-update.exception';
 import { CreateRoleRequestDTO } from 'src/account-service/authorization/dtos/presentation/create-role-request.dto';
 import { UpdateAssignedPersonsRequestDTO } from 'src/account-service/authorization/dtos/presentation/update-assigned-persons.request';
 import { UserRepository } from '../../management/repositories/user.repository';
@@ -57,7 +56,7 @@ export class RoleServiceImpl implements RoleService {
     });
 
     if (users.length !== dto.userIds.length) {
-      throw new InvalidRoleUpdateException();
+      throw new NotFoundException();
     }
 
     await this.roleRepository.updateAssignedPerson(id, dto.userIds);
@@ -125,7 +124,7 @@ export class RoleServiceImpl implements RoleService {
     ]);
 
     if (!role || !role?.isEditable || permissions.length !== uniqueIds.length) {
-      throw new InvalidRoleUpdateException();
+      throw new NotFoundException();
     }
 
     role.permissions = permissions;

@@ -6,9 +6,9 @@ import { RoleRepository } from '../../../src/account-service/authorization/repos
 import { Permission } from '../../../src/account-service/shared/entities/permission.entity';
 import { Role } from '../../../src/account-service/shared/entities/role.entity';
 import { AccessControlList } from '../../../src/account-service/authorization/dtos/aggregates/access-control-list.aggregate';
-import { InvalidRoleUpdateException } from '../../../src/account-service/authorization/exceptions/invalid-role-update.exception';
 import { UserRepository } from '../../../src/account-service/management/repositories/user.repository';
 import { ConfigService } from '@nestjs/config';
+import { NotFoundException } from '@nestjs/common';
 
 jest.mock('ms');
 
@@ -103,7 +103,7 @@ describe('RoleServiceImpl', () => {
   });
 
   describe('updateRole', () => {
-    it('should throw InvalidRoleUpdateException for invalid role or permissions', async () => {
+    it('should throw NotFoundException for invalid role or permissions', async () => {
       roleRepository.findOne.mockResolvedValue({
         id: 1,
         isEditable: false,
@@ -114,7 +114,7 @@ describe('RoleServiceImpl', () => {
 
       await expect(
         roleService.updateRole(1, { rights: [1, 2] }),
-      ).rejects.toThrow(InvalidRoleUpdateException);
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should update role permissions and clear related cache', async () => {

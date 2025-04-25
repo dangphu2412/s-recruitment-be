@@ -29,12 +29,12 @@ export interface UserService {
   findUsersByFullNames(fullNames: string[]): Promise<User[]>;
 
   /**
-   * @throws {NotFoundUserException}
+   * @throws {NotFoundException}
    */
   assertIdExist(id: string): Promise<void>;
 
   /**
-   * @throws {InsertUserFailedException}
+   * @throws {ConflictException}
    */
   createUser(dto: CreateUsersRequestDTO): Promise<void>;
   createUsersByFile(
