@@ -1,4 +1,11 @@
-import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { Page, PageRequest } from 'src/system/query-shape/dto';
 import { omit } from 'lodash';
@@ -40,9 +47,6 @@ import { PaymentService } from '../../../monthly-money/internal/payment.service'
 import { ResourceCRUDService } from '../../../system/resource-templates/resource-service-template';
 import { Period } from '../../../master-data-service/periods/period.entity';
 import { PeriodCRUDService } from '../../../master-data-service/periods/period.controller';
-import { NotFoundUserException } from '../exceptions/not-found-user.exception';
-import { InsertUserFailedException } from '../exceptions/insert-user-failed.exception';
-import { EmailExistedException } from '../exceptions/email-existed.exception';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -256,7 +260,7 @@ export class UserServiceImpl implements UserService {
     }
 
     if (!user) {
-      throw new NotFoundUserException();
+      throw new NotFoundException();
     }
 
     if (user.deletedAt === null) {
@@ -273,7 +277,7 @@ export class UserServiceImpl implements UserService {
         email: payload.email,
       })
     ) {
-      throw new EmailExistedException();
+      throw new NotFoundException();
     }
 
     const newUser = this.userRepository.create({
@@ -287,7 +291,7 @@ export class UserServiceImpl implements UserService {
       await this.userRepository.insert(newUser);
     } catch (error) {
       Logger.error(error.message, error.stack, UserServiceImpl.name);
-      throw new InsertUserFailedException();
+      throw new ConflictException('User existed');
     }
   }
 
@@ -452,7 +456,7 @@ export class UserServiceImpl implements UserService {
     });
 
     if (!user) {
-      throw new NotFoundUserException();
+      throw new NotFoundException();
     }
 
     if (payload.roleIds) {
@@ -469,7 +473,7 @@ export class UserServiceImpl implements UserService {
     });
 
     if (users.length !== dto.ids.length) {
-      throw new NotFoundUserException();
+      throw new NotFoundException();
     }
     const memberRole = await this.roleService.findByName(SystemRoles.MEMBER);
 
@@ -501,7 +505,7 @@ export class UserServiceImpl implements UserService {
         },
       }))
     ) {
-      throw new NotFoundUserException();
+      throw new NotFoundException();
     }
   }
 }
