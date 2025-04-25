@@ -4,11 +4,11 @@ import ms from 'ms';
 import { RoleServiceImpl } from '../../../src/account-service/authorization/services/role.service';
 import { RoleRepository } from '../../../src/account-service/authorization/repositories/role.repository';
 import { Permission } from '../../../src/account-service/shared/entities/permission.entity';
-import { EnvironmentKeyFactory } from '../../../src/system/services';
 import { Role } from '../../../src/account-service/shared/entities/role.entity';
 import { AccessControlList } from '../../../src/account-service/authorization/dtos/aggregates/access-control-list.aggregate';
 import { InvalidRoleUpdateException } from '../../../src/account-service/authorization/exceptions/invalid-role-update.exception';
 import { UserRepository } from '../../../src/account-service/management/repositories/user.repository';
+import { ConfigService } from '@nestjs/config';
 
 jest.mock('ms');
 
@@ -17,7 +17,7 @@ describe('RoleServiceImpl', () => {
   let roleRepository: jest.Mocked<RoleRepository>;
   let permissionRepository: jest.Mocked<Repository<Permission>>;
   let cacheManager: jest.Mocked<Cache>;
-  let environmentKeyFactory: jest.Mocked<EnvironmentKeyFactory>;
+  let configService: jest.Mocked<ConfigService>;
   let userRepository: jest.Mocked<UserRepository>;
 
   beforeEach(() => {
@@ -41,8 +41,8 @@ describe('RoleServiceImpl', () => {
       },
     } as any;
 
-    environmentKeyFactory = {
-      getRefreshTokenExpiration: jest.fn().mockReturnValue('7d'),
+    configService = {
+      getOrThrow: jest.fn().mockReturnValue('7d'),
     } as any;
 
     (ms as any).mockReturnValue(604800000); // 7 days in ms
@@ -51,7 +51,7 @@ describe('RoleServiceImpl', () => {
       roleRepository,
       permissionRepository,
       cacheManager,
-      environmentKeyFactory,
+      configService,
       userRepository,
     );
   });

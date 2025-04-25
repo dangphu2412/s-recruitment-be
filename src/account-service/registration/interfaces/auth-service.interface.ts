@@ -1,10 +1,10 @@
-import { createInterfaceToken } from '../../../system/utils';
+import { createProviderToken } from '../../../system/nestjs-extensions';
 import {
   BasicLoginDTO,
   UserCredentialsDTO,
 } from '../dtos/core/login-credentials.dto';
 
-export const AuthServiceToken = createInterfaceToken('AuthService');
+export const AuthServiceToken = createProviderToken('AuthService');
 
 export interface AuthService {
   login(basicLoginRequestDto: BasicLoginDTO): Promise<UserCredentialsDTO>;

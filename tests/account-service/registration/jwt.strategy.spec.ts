@@ -1,24 +1,20 @@
-import { EnvironmentKeyFactory } from '../../../src/system/services';
 import { JwtStrategy } from '../../../src/account-service/registration/services/jwt.strategy';
+import { ConfigService } from '@nestjs/config';
 
 describe('JwtStrategy', () => {
   let jwtStrategy: JwtStrategy;
-  let environmentKeyFactory: jest.Mocked<EnvironmentKeyFactory>;
+  let configService: jest.Mocked<ConfigService>;
 
   beforeEach(() => {
-    environmentKeyFactory = {
-      getJwtConfig: jest.fn().mockReturnValue({ secret: 'mock_secret_key' }),
+    configService = {
+      getOrThrow: jest.fn().mockReturnValue('mock_secret_key'),
     } as any;
 
-    jwtStrategy = new JwtStrategy(environmentKeyFactory);
+    jwtStrategy = new JwtStrategy(configService);
   });
 
   it('should be defined', () => {
     expect(jwtStrategy).toBeDefined();
-  });
-
-  it('should call EnvironmentKeyFactory.getJwtConfig in constructor', () => {
-    expect(environmentKeyFactory.getJwtConfig).toHaveBeenCalled();
   });
 
   describe('validate', () => {

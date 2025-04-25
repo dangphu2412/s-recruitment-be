@@ -10,7 +10,6 @@ import { UpdateRoleDto } from '../dtos/core/update-role.dto';
 import { Role } from '../../shared/entities/role.entity';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
-import { EnvironmentKeyFactory } from '../../../system/services';
 import ms from 'ms';
 import { Permissions } from '../access-definition.constant';
 import { InvalidRoleUpdateException } from '../exceptions/invalid-role-update.exception';
@@ -18,6 +17,7 @@ import { CreateRoleRequestDTO } from 'src/account-service/authorization/dtos/pre
 import { UpdateAssignedPersonsRequestDTO } from 'src/account-service/authorization/dtos/presentation/update-assigned-persons.request';
 import { UserRepository } from '../../management/repositories/user.repository';
 import { GetAccessControlRequestDTO } from '../dtos/presentation/get-access-control.request';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RoleServiceImpl implements RoleService {
@@ -39,12 +39,10 @@ export class RoleServiceImpl implements RoleService {
     private readonly permissionRepository: Repository<Permission>,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    environmentKeyFactory: EnvironmentKeyFactory,
+    configService: ConfigService,
     private userRepository: UserRepository,
   ) {
-    const refreshTokenExpiration =
-      environmentKeyFactory.getRefreshTokenExpiration();
-    this.ttl = ms(refreshTokenExpiration);
+    this.ttl = ms(configService.getOrThrow<string>('REFRESH_TOKEN_EXPIRATION'));
   }
 
   async updateAssignedPersonsToRole(

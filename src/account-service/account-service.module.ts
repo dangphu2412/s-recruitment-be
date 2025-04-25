@@ -2,9 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './registration/controllers/auth.controller';
 import { AuthServiceImpl } from './registration/services/auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './registration/services/jwt.strategy';
 import { TokenGeneratorImpl } from './registration/services/token-factory';
-import { EnvironmentKeyFactory } from '../system/services';
 import { PasswordManager } from './registration/services/password-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleAuthorizationStrategy } from './authorization/services/role-authorization.strategy';
@@ -26,14 +24,18 @@ import { TokenFactoryToken } from './registration/interfaces/token-factory.inter
 import { PermissionServiceImpl } from './authorization/services/permission.service';
 import { PermissionServiceToken } from './authorization/interfaces/permission-service.interface';
 import { PermissionController } from './authorization/controllers/permissions.controller';
+import { SALT_ROUNDS } from './registration/interfaces/password-manager.interface';
+import { ConfigService } from '@nestjs/config';
+import { JwtStrategy } from './registration/services/jwt.strategy';
 
 @Module({
   imports: [
     MonthlyMoneyModule,
     JwtModule.registerAsync({
-      useFactory: (environmentKeyFactory: EnvironmentKeyFactory) =>
-        environmentKeyFactory.getJwtConfig(),
-      inject: [EnvironmentKeyFactory],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.getOrThrow('JWT_SECRET'),
+      }),
+      inject: [ConfigService],
     }),
     MasterDataServiceModule,
     TypeOrmModule.forFeature([User, Role, Permission]),
@@ -69,6 +71,13 @@ import { PermissionController } from './authorization/controllers/permissions.co
     {
       provide: UserServiceToken,
       useClass: UserServiceImpl,
+    },
+    {
+      provide: SALT_ROUNDS,
+      useFactory: (configService: ConfigService) => {
+        return +configService.get('SALT_ROUNDS');
+      },
+      inject: [ConfigService],
     },
   ],
   exports: [PasswordManager, UserServiceToken, RoleServiceToken],

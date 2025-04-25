@@ -1,7 +1,7 @@
-import { createInterfaceToken } from '../../../system/utils';
+import { createProviderToken } from '../../../system/nestjs-extensions';
 import { Permission } from '../../shared/entities/permission.entity';
 
-export const PermissionServiceToken = createInterfaceToken('PermissionService');
+export const PermissionServiceToken = createProviderToken('PermissionService');
 
 export interface PermissionService {
   findAll(): Promise<Permission[]>;
