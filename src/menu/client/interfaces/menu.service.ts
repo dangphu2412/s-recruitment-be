@@ -1,7 +1,7 @@
 import { Menu } from '../entities/menu.entity';
-import { createInterfaceToken } from '../../../system/utils';
+import { createProviderToken } from '../../../system/nestjs-extensions';
 
-export const MenuServiceToken = createInterfaceToken('MenuService');
+export const MenuServiceToken = createProviderToken('MenuService');
 
 export interface MenuService {
   findMenusByUserId(userId: string): Promise<Menu[]>;

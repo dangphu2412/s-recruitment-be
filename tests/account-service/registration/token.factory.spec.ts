@@ -1,23 +1,22 @@
 import { JwtService } from '@nestjs/jwt';
 import { TokenGeneratorImpl } from '../../../src/account-service/registration/services/token-factory';
-import { EnvironmentKeyFactory } from '../../../src/system/services';
+import { ConfigService } from '@nestjs/config';
 
 describe('TokenGeneratorImpl', () => {
   let tokenGenerator: TokenGeneratorImpl;
   let jwtService: jest.Mocked<JwtService>;
-  let environmentKeyFactory: jest.Mocked<EnvironmentKeyFactory>;
+  let configService: jest.Mocked<ConfigService>;
 
   beforeEach(() => {
     jwtService = {
       signAsync: jest.fn(),
     } as any;
 
-    environmentKeyFactory = {
-      getAccessTokenExpiration: jest.fn().mockReturnValue('15m'),
-      getRefreshTokenExpiration: jest.fn().mockReturnValue('7d'),
+    configService = {
+      getOrThrow: jest.fn().mockReturnValue('15m'),
     } as any;
 
-    tokenGenerator = new TokenGeneratorImpl(jwtService, environmentKeyFactory);
+    tokenGenerator = new TokenGeneratorImpl(jwtService, configService);
   });
 
   afterEach(() => {
@@ -45,7 +44,7 @@ describe('TokenGeneratorImpl', () => {
 
       expect(jwtService.signAsync).toHaveBeenCalledWith(
         { sub: 'user-id-123' },
-        { expiresIn: '7d' },
+        { expiresIn: '15m' },
       );
 
       expect(result).toEqual([

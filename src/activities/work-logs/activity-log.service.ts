@@ -3,10 +3,6 @@ import { ActivityLogRepository } from './activity-log.repository';
 import { FindLogsRequest } from '../domain/presentation/dtos/find-logs.request';
 import { format, subYears } from 'date-fns';
 import { Page } from '../../system/query-shape/dto';
-import {
-  CreateFileDTO,
-  LogDTO,
-} from '../../file-service/domain/core/dto/file.dto';
 import { ActivityRepository } from '../managements/activity.repository';
 import { LogWorkStatus } from '../domain/core/constants/log-work-status.enum';
 import { ActivityLog } from '../domain/data-access/activity-log.entity';
@@ -15,6 +11,14 @@ import {
   WorkTimeUtils,
 } from './work-status-evaluator.service';
 import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
+
+export type CreateFileDTO = Express.Multer.File;
+
+export type LogDTO = {
+  userSn: number;
+  deviceUserId: string;
+  recordTime: string;
+};
 
 class LogSegmentProcessor {
   private deviceIdMapToDateSegmentedLogs: Map<string, Map<string, LogDTO[]>> =

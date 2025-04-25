@@ -1,19 +1,19 @@
 import { compare, genSalt, hash } from 'bcryptjs';
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { EnvironmentKeyFactory } from 'src/system/services';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { SALT_ROUNDS } from '../interfaces/password-manager.interface';
 
 @Injectable()
 export class PasswordManager implements OnModuleInit {
+  @Inject(SALT_ROUNDS)
   private readonly saltRounds: number;
   private defaultPassword: string;
 
-  constructor(private configService: EnvironmentKeyFactory) {
-    this.saltRounds = configService.getSaltRounds();
-  }
+  constructor(private readonly configService: ConfigService) {}
 
   async onModuleInit() {
     this.defaultPassword = await this.generate(
-      this.configService.getDefaultPwd(),
+      this.configService.get('DEFAULT_PASSWORD'),
     );
   }
 

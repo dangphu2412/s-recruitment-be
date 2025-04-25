@@ -10,7 +10,6 @@ import {
 } from '../../../account-service/authorization/access-definition.constant';
 import { User } from '../../../account-service/shared/entities/user.entity';
 import { PasswordManager } from '../../../account-service/registration/services/password-manager';
-import { EnvironmentKeyFactory } from '../../services';
 import { ConfigService } from '@nestjs/config';
 import { Menu } from '../../../menu';
 import { MenuFactory } from '../processors/menu.factory';
@@ -144,9 +143,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       },
     });
     const passwordManager = new PasswordManager(
-      new EnvironmentKeyFactory(
-        new ConfigService<Record<string, unknown>, false>(),
-      ),
+      new ConfigService<Record<string, unknown>, false>(),
     );
     await passwordManager.onModuleInit();
     const password = passwordManager.getDefaultPassword();

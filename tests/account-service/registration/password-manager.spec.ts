@@ -1,6 +1,8 @@
-import { genSalt, hash, compare } from 'bcryptjs';
-import { EnvironmentKeyFactory } from '../../../src/system/services';
+import { compare, genSalt, hash } from 'bcryptjs';
 import { PasswordManager } from '../../../src/account-service/registration/services/password-manager';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SALT_ROUNDS } from '../../../src/account-service/registration/interfaces/password-manager.interface';
 
 jest.mock('bcryptjs', () => ({
   genSalt: jest.fn(),
@@ -10,15 +12,27 @@ jest.mock('bcryptjs', () => ({
 
 describe(PasswordManager.name, () => {
   let passwordManager: PasswordManager;
-  let configService: jest.Mocked<EnvironmentKeyFactory>;
+  let configService: jest.Mocked<ConfigService>;
 
-  beforeEach(() => {
-    configService = {
-      getSaltRounds: jest.fn().mockReturnValue(10),
-      getDefaultPwd: jest.fn().mockReturnValue('default123'),
-    } as any;
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn(),
+          },
+        },
+        PasswordManager,
+        {
+          provide: SALT_ROUNDS,
+          useValue: 10,
+        },
+      ],
+    }).compile();
 
-    passwordManager = new PasswordManager(configService);
+    passwordManager = module.get(PasswordManager);
+    configService = module.get(ConfigService);
   });
 
   afterEach(() => {
@@ -29,6 +43,7 @@ describe(PasswordManager.name, () => {
     it('should generate hashed password', async () => {
       (genSalt as jest.Mock).mockResolvedValue('mocked_salt');
       (hash as jest.Mock).mockResolvedValue('hashed_password');
+      jest.spyOn(configService, 'get').mockReturnValue('mocked_salt');
 
       const result = await passwordManager.generate('myPassword');
 
@@ -52,11 +67,12 @@ describe(PasswordManager.name, () => {
     it('should generate and cache default password if not already set', async () => {
       (genSalt as jest.Mock).mockResolvedValue('salt_default');
       (hash as jest.Mock).mockResolvedValue('hashed_default_pwd');
+      jest.spyOn(configService, 'get').mockReturnValue('default123');
 
       await passwordManager.onModuleInit();
       const result = passwordManager.getDefaultPassword();
 
-      expect(configService.getDefaultPwd).toHaveBeenCalled();
+      expect(configService.get).toHaveBeenCalled();
       expect(hash).toHaveBeenCalledWith('default123', 'salt_default');
       expect(result).toBe('hashed_default_pwd');
 

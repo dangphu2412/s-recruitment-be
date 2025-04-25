@@ -1,4 +1,4 @@
-import { createInterfaceToken } from '../../../../system/utils';
+import { createProviderToken } from '../../../../system/nestjs-extensions';
 import { CreateActivityRequestDTO } from '../dtos/create-activity-request.dto';
 import { FindRequestedMyActivitiesResponseDTO } from '../dtos/find-requested-my-acitivities.dto';
 import {
@@ -10,7 +10,7 @@ import { UpdateMyActivityRequestDTO } from '../dtos/update-my-activity-request.d
 import { UpdateApprovalActivityRequestDTO } from '../dtos/update-approval-activity-request.dto';
 import { FileActivityRequestDTO } from '../dtos/file-create-activity-request.dto';
 
-export const ActivityRequestServiceToken = createInterfaceToken(
+export const ActivityRequestServiceToken = createProviderToken(
   'ActivityRequestService',
 );
 

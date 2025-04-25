@@ -1,4 +1,4 @@
-import { createInterfaceToken } from 'src/system/utils';
+import { createProviderToken } from 'src/system/nestjs-extensions';
 import { Page } from 'src/system/query-shape/dto';
 import { CreateUsersRequestDTO } from '../dtos/presentations/create-users.request';
 import { FileCreateUsersDto } from '../dtos/presentations/file-create-users.dto';
@@ -14,7 +14,7 @@ import { GetUsersQueryDTO } from '../dtos/core/get-users-query.dto';
 import { CreatePaymentRequest } from '../dtos/presentations/create-payment.request';
 import { UserManagementViewDTO } from '../dtos/presentations/get-users-query.request';
 
-export const UserServiceToken = createInterfaceToken('UserServiceToken');
+export const UserServiceToken = createProviderToken('UserServiceToken');
 
 export interface UserService {
   findMyProfile(id: string): Promise<MyProfile>;
