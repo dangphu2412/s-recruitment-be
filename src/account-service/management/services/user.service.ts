@@ -277,7 +277,7 @@ export class UserServiceImpl implements UserService {
         email: payload.email,
       })
     ) {
-      throw new NotFoundException();
+      throw new ConflictException();
     }
 
     const newUser = this.userRepository.create({
