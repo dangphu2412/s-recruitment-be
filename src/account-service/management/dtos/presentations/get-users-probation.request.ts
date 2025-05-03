@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
-import { OffsetPagination } from '../../../../system/query-shape/dto';
+import { OffsetPaginationRequest } from '../../../../system/pagination/offset-pagination-request';
 
-export class UserProbationRequest extends OffsetPagination {
+export class UserProbationRequest extends OffsetPaginationRequest {
   @IsNotEmpty()
   periodId: string;
 

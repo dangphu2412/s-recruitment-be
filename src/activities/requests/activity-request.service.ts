@@ -14,7 +14,7 @@ import {
 } from '../domain/core/constants/request-activity-status.enum';
 import { CreateActivityRequestDTO } from '../domain/core/dtos/create-activity-request.dto';
 import { FindRequestedMyActivitiesResponseDTO } from '../domain/core/dtos/find-requested-my-acitivities.dto';
-import { Page, PageRequest } from '../../system/query-shape/dto';
+import { OffsetPaginationResponse } from '../../system/pagination';
 import {
   FindRequestedActivitiesResponseDTO,
   FindRequestedActivityQueryDTO,
@@ -37,6 +37,7 @@ import {
   UserServiceToken,
 } from '../../account-service/management/interfaces/user-service.interface';
 import { keyBy } from 'lodash';
+import { OffsetPaginationRequest } from '../../system/pagination/offset-pagination-request';
 
 type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
 
@@ -144,7 +145,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       relations: ['author', 'dayOfWeek', 'timeOfDay'],
     });
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       items,
       totalRecords: items.length,
       query: {
@@ -164,7 +165,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     status,
     requestTypes,
   }: FindRequestedActivityQueryDTO): Promise<FindRequestedActivitiesResponseDTO> {
-    const { offset } = PageRequest.of({ page, size });
+    const offset = OffsetPaginationRequest.getOffset(page, size);
 
     const queryBuilder = this.activityRequestRepository
       .createQueryBuilder('activity')
@@ -216,7 +217,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
 
     const [items, totalRecords] = await queryBuilder.getManyAndCount();
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       items,
       totalRecords,
       query: {

@@ -1,28 +1,28 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { OffsetPagination } from 'src/system/query-shape/dto/offset-pagination.request';
+import { OffsetPaginationRequest } from 'src/system/pagination/offset-pagination-request';
 import { UserStatus } from '../../user-status.constant';
-import { ToManyString } from '../../../../system/query-shape/decorators/transformer';
+import { DeserializeQueryToArray } from '../../../../system/query-params/query-param-deserializer.decorator';
 
-export class GetUsersQueryRequest extends OffsetPagination {
+export class GetUsersQueryRequest extends OffsetPaginationRequest {
   @IsOptional()
   @IsString()
   search: string;
 
   @IsOptional()
   @IsEnum(UserStatus, { each: true })
-  @ToManyString()
+  @DeserializeQueryToArray()
   userStatus?: UserStatus[];
 
   @IsOptional()
-  @ToManyString()
+  @DeserializeQueryToArray()
   departmentIds?: number[];
 
   @IsOptional()
-  @ToManyString()
+  @DeserializeQueryToArray()
   periodIds?: number[];
 
   @IsOptional()
-  @ToManyString()
+  @DeserializeQueryToArray()
   roleIds?: number[];
 }
 

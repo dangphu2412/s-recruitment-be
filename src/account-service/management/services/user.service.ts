@@ -1,13 +1,13 @@
 import {
   ConflictException,
   ForbiddenException,
-  NotFoundException,
   Inject,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
-import { Page, PageRequest } from 'src/system/query-shape/dto';
+import { OffsetPaginationResponse } from 'src/system/pagination';
 import { omit } from 'lodash';
 import { In, InsertResult, IsNull } from 'typeorm';
 import uniq from 'lodash/uniq';
@@ -47,6 +47,7 @@ import { PaymentService } from '../../../monthly-money/internal/payment.service'
 import { ResourceCRUDService } from '../../../system/resource-templates/resource-service-template';
 import { Period } from '../../../master-data-service/periods/period.entity';
 import { PeriodCRUDService } from '../../../master-data-service/periods/period.controller';
+import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -70,7 +71,7 @@ export class UserServiceImpl implements UserService {
 
   async findUsers(
     query: GetUsersQueryRequest,
-  ): Promise<Page<UserManagementViewDTO>> {
+  ): Promise<OffsetPaginationResponse<UserManagementViewDTO>> {
     const { items: data, metadata } =
       await this.userRepository.findPaginatedOverviewUsers(query);
 
@@ -118,7 +119,7 @@ export class UserServiceImpl implements UserService {
       };
     });
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       query,
       totalRecords: metadata.totalRecords,
       items,
@@ -161,8 +162,8 @@ export class UserServiceImpl implements UserService {
   async findProbationUsers(
     dto: UserProbationQueryDTO,
   ): Promise<PaginatedUserProbationDTO> {
-    const { departmentId, periodId } = dto;
-    const { offset, size } = PageRequest.of(dto);
+    const { departmentId, periodId, size } = dto;
+    const offset = OffsetPaginationRequest.getOffset(dto.page, dto.size);
 
     const [users, totalRecords] = await this.userRepository.findAndCount({
       where: {
@@ -186,7 +187,7 @@ export class UserServiceImpl implements UserService {
       };
     });
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       items,
       totalRecords,
       query: dto,

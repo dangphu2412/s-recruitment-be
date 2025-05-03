@@ -1,5 +1,5 @@
 import { createProviderToken } from 'src/system/nestjs-extensions';
-import { Page } from 'src/system/query-shape/dto';
+import { OffsetPaginationResponse } from 'src/system/pagination';
 import { CreateUsersRequestDTO } from '../dtos/presentations/create-users.request';
 import { FileCreateUsersDto } from '../dtos/presentations/file-create-users.dto';
 import { User } from '../../shared/entities/user.entity';
@@ -25,7 +25,9 @@ export interface UserService {
   findProbationUsers(
     userProbationQueryInput: UserProbationQueryDTO,
   ): Promise<PaginatedUserProbationDTO>;
-  findUsers(query: GetUsersQueryDTO): Promise<Page<UserManagementViewDTO>>;
+  findUsers(
+    query: GetUsersQueryDTO,
+  ): Promise<OffsetPaginationResponse<UserManagementViewDTO>>;
   findUsersByFullNames(fullNames: string[]): Promise<User[]>;
 
   /**

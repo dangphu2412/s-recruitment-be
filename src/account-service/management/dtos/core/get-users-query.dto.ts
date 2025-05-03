@@ -1,9 +1,9 @@
-import { OffsetPagination } from 'src/system/query-shape/dto/offset-pagination.request';
-import { DateRange } from 'src/system/query-shape/dto/date-range.query';
+import { OffsetPaginationRequest } from 'src/system/pagination/offset-pagination-request';
+import { DateRangeQuery } from 'src/system/dates/date-range.query';
 import { UserStatus } from '../../user-status.constant';
 
-export type GetUsersQueryDTO = OffsetPagination & {
-  joinedIn?: DateRange;
+export type GetUsersQueryDTO = OffsetPaginationRequest & {
+  joinedIn?: DateRangeQuery;
 
   search: string;
 

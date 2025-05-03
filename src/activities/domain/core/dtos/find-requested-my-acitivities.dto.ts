@@ -1,6 +1,6 @@
-import { Page } from '../../../../system/query-shape/types';
+import { OffsetPaginationResponse } from '../../../../system/pagination';
 
-export type FindRequestedMyActivitiesResponseDTO = Page<{
+export type FindRequestedMyActivitiesResponseDTO = OffsetPaginationResponse<{
   id: number;
   requestType: string;
   timeOfDay: {
