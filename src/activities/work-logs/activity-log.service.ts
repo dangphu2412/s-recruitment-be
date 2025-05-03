@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
 import { FindLogsRequest } from '../domain/presentation/dtos/find-logs.request';
 import { format, subYears } from 'date-fns';
-import { Page } from '../../system/query-shape/dto';
+import { OffsetPaginationResponse } from '../../system/pagination';
 import { ActivityRepository } from '../managements/activity.repository';
 import { LogWorkStatus } from '../domain/core/constants/log-work-status.enum';
 import { ActivityLog } from '../domain/data-access/activity-log.entity';
@@ -78,7 +78,7 @@ export class ActivityLogService {
     const [items, totalRecords] =
       await this.activityLogRepository.findLogs(findLogsRequest);
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       items,
       totalRecords,
       query: findLogsRequest,

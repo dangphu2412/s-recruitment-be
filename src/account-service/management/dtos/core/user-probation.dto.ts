@@ -1,4 +1,4 @@
-import { Page } from '../../../../system/query-shape/types';
+import { OffsetPaginationResponse } from '../../../../system/pagination';
 
 type UserProbation = {
   id: string;
@@ -7,4 +7,4 @@ type UserProbation = {
   createdAt: Date;
 };
 
-export type PaginatedUserProbationDTO = Page<UserProbation>;
+export type PaginatedUserProbationDTO = OffsetPaginationResponse<UserProbation>;
