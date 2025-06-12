@@ -2,6 +2,7 @@ import ZKLib from 'node-zklib';
 import { Storage } from '@google-cloud/storage';
 import * as process from 'node:process';
 import { config } from 'dotenv';
+import { Logger } from '@nestjs/common';
 
 // https://github.com/caobo171/node-zklib
 async function main() {
@@ -12,9 +13,10 @@ async function main() {
     keyFilename: `${process.cwd()}/service_account.json`,
   });
 
-  const bucket = storage.bucket('');
+  const bucket = storage.bucket('sgroup-bucket');
   const zkService = new ZKLib(process.env.ZK_IP, 4370, 10000, 4000);
 
+  Logger.log('Starting connection...');
   try {
     await zkService.createSocket();
 
@@ -27,11 +29,16 @@ async function main() {
     process.exit(1);
   }
 
+  Logger.log('Getting attendances...');
   const { data } = await zkService.getAttendances();
+  Logger.log('Saving attendances to GCS');
   await bucket.file('attendances.json').save(JSON.stringify(data));
+  Logger.log('Done saving attendances to GCS');
 
+  Logger.log('Saving users to GCS');
   const users = await zkService.getUsers();
   await bucket.file('users.json').save(JSON.stringify(users));
+  Logger.log('Done saving users to GCS');
 
   await zkService.disconnect();
   process.exit(0);
