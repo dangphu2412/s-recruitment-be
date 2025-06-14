@@ -13,6 +13,7 @@ import { Permissions } from '../../account-service/authorization/access-definiti
 import { FileInterceptor } from '../../system/file';
 import { ApiConsumes } from '@nestjs/swagger';
 import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
+import { UploadActivityLogFileValidatorPipe } from './upload-activity-log-file.pipe';
 
 @Controller('activity-logs')
 export class ActivitiesLogController {
@@ -33,7 +34,7 @@ export class ActivitiesLogController {
   @ApiConsumes('multipart/form-data')
   @Post()
   uploadTrackFile(
-    @UploadedFile()
+    @UploadedFile(new UploadActivityLogFileValidatorPipe())
     file: Express.Multer.File,
   ) {
     return this.activityLogService.uploadActivityLogs(file);

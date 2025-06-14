@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
 import { FindLogsRequest } from '../domain/presentation/dtos/find-logs.request';
-import { format, subYears } from 'date-fns';
+import { format, subMonths, subYears } from 'date-fns';
 import { OffsetPaginationResponse } from '../../system/pagination';
 import { ActivityRepository } from '../managements/activity.repository';
 import { LogWorkStatus } from '../domain/core/constants/log-work-status.enum';
@@ -101,7 +101,7 @@ export class ActivityLogService {
     const data = file.buffer.toString('utf-8');
     const fullLogs = JSON.parse(data) as LogDTO[];
 
-    const lastYearLogs = this.extractLogsFromLastYear(fullLogs);
+    const lastYearLogs = this.extractLogsFromLastHalfYear(fullLogs);
     const logSegmentProcessor = new LogSegmentProcessor(lastYearLogs);
 
     await logSegmentProcessor.onEachDeviceUserId(
@@ -167,9 +167,9 @@ export class ActivityLogService {
   /**
    * Apply binary search to find logs from the previous year
    */
-  private extractLogsFromLastYear(logs: LogDTO[]) {
+  private extractLogsFromLastHalfYear(logs: LogDTO[]) {
     const START_OF_PREVIOUS_YEAR = format(
-      subYears(new Date(), 1),
+      subMonths(new Date(), 6),
       'yyyy-MM-dd',
     );
     let left = 0;
