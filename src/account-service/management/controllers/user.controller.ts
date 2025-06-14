@@ -41,6 +41,7 @@ import { UserProbationRequest } from '../dtos/presentations/get-users-probation.
 import { UpdateUserRequest } from '../dtos/presentations/update-user.request';
 import { Identified } from '../../registration/identified.decorator';
 import { OffsetPaginationResponse } from '../../../system/pagination';
+import { UploadUserFileValidatorPipe } from '../upload-user-file.pipe';
 
 @ApiTags('users')
 @Controller({
@@ -131,7 +132,7 @@ export class UserController {
   @ApiConsumes('multipart/form-data')
   createUsersByFile(
     @Body() dto: FileCreateUsersDto,
-    @UploadedFile()
+    @UploadedFile(new UploadUserFileValidatorPipe())
     file: Express.Multer.File,
   ) {
     return this.userService.createUsersByFile({ ...dto, file });
