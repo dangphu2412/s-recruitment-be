@@ -214,6 +214,11 @@ export class SeedInitData1733908606009 implements MigrationInterface {
             accessLink: '/activities/tracking',
             code: MenuCode.ACTIVITIES_LOGS,
           },
+          {
+            name: 'Fingerprint users',
+            accessLink: '/activities/fingerprint-users',
+            code: MenuCode.FINGERPRINT_USERS,
+          },
         ],
       },
     ];
@@ -278,7 +283,10 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         MenuCode.ACTIVITY_MANAGEMENT,
         MenuCode.MY_ACTIVITY_REQUESTS,
       ],
-      [Permissions.READ_ACTIVITY_LOGS]: [MenuCode.ACTIVITIES_LOGS],
+      [Permissions.READ_ACTIVITY_LOGS]: [
+        MenuCode.ACTIVITIES_LOGS,
+        MenuCode.FINGERPRINT_USERS,
+      ],
       [Permissions.WRITE_ACTIVITIES]: [
         MenuCode.ACTIVITY_MANAGEMENT,
         MenuCode.ACTIVITY_REQUESTS,
