@@ -236,19 +236,19 @@ export class SeedInitData1733908606009 implements MigrationInterface {
     await timeOfDayRepository.insert([
       {
         id: 'SUM-MORN',
-        name: 'Morning (8:30 - 11h30)',
-        fromTime: DatabaseUtils.formatTimeToUTC('8:30'),
-        toTime: DatabaseUtils.formatTimeToUTC('11:30'),
+        name: 'Morning (08h00 - 11h00)',
+        fromTime: DatabaseUtils.formatTimeToUTC('8:00'),
+        toTime: DatabaseUtils.formatTimeToUTC('11:00'),
       },
       {
         id: 'SUM-AFT',
-        name: 'Afternoon (13:30 - 17h30)',
-        fromTime: DatabaseUtils.formatTimeToUTC('13:30'),
+        name: 'Afternoon (14h00 – 17h00)',
+        fromTime: DatabaseUtils.formatTimeToUTC('14:00'),
         toTime: DatabaseUtils.formatTimeToUTC('17:30'),
       },
       {
         id: 'SUM-EVN',
-        name: 'Evening (19:00 - 21:30)',
+        name: 'Evening (19h00 – 21h30)',
         fromTime: DatabaseUtils.formatTimeToUTC('19:00'),
         toTime: DatabaseUtils.formatTimeToUTC('21:30'),
       },
