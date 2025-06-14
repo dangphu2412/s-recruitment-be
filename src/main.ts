@@ -50,7 +50,13 @@ async function bootstrap() {
       },
     },
   });
-  app.enableCors();
+  const configService = app.get(ConfigService);
+
+  const corsOrigin = configService.get<string>('CORS');
+
+  app.enableCors({
+    origin: corsOrigin ? corsOrigin.split(',') : '*',
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -61,8 +67,6 @@ async function bootstrap() {
   const logger = new Logger();
   app.useGlobalFilters(new AppExceptionFilter(logger));
 
-  const configService = app.get(ConfigService);
-
   await app.listen(
     configService.get('PORT', 3000),
     configService.get('HOST', '127.0.0.1'),
@@ -72,6 +76,7 @@ async function bootstrap() {
         return;
       }
 
+      logger.log(`Cors enabled: ${corsOrigin}`, MAIN_CONTEXT);
       logger.log(`Server is listening on: ${address}`, MAIN_CONTEXT);
       const memUsage = Math.floor(process.memoryUsage().heapUsed / 1024 / 1024);
 
