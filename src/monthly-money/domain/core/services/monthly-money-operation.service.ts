@@ -1,11 +1,11 @@
-import { createInterfaceToken } from '../../../../system/utils';
+import { createProviderToken } from '../../../../system/nestjs-extensions';
 import {
   CreateMoneyFeeDTO,
   CreateMoneyFeeResultsDTO,
 } from '../dto/create-money-fee.dto';
 import { OperationFee } from '../../data-access/entities/operation-fee.entity';
 
-export const MonthlyMoneyOperationServiceToken = createInterfaceToken(
+export const MonthlyMoneyOperationServiceToken = createProviderToken(
   'MonthlyMoneyOperationService',
 );
 

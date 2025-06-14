@@ -1,12 +1,12 @@
-import { OffsetPagination } from '../../../../system/query-shape/dto';
+import { OffsetPaginationRequest } from '../../../../system/pagination/offset-pagination-request';
 import { IsOptional } from 'class-validator';
-import { ToManyString } from '../../../../system/query-shape/decorators/transformer';
+import { DeserializeQueryToArray } from '../../../../system/query-params/query-param-deserializer.decorator';
 
-export class FindRequestedActivityRequestDTO extends OffsetPagination {
+export class FindRequestedActivityRequestDTO extends OffsetPaginationRequest {
   query: string;
 
   @IsOptional()
-  @ToManyString()
+  @DeserializeQueryToArray()
   departmentIds?: number[];
 
   @IsOptional()
@@ -16,6 +16,10 @@ export class FindRequestedActivityRequestDTO extends OffsetPagination {
   toDate?: string;
 
   @IsOptional()
-  @ToManyString()
+  @DeserializeQueryToArray()
   status?: string[];
+
+  @IsOptional()
+  @DeserializeQueryToArray()
+  requestTypes?: string[];
 }

@@ -1,4 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { extractJwtPayload } from './jwt.utils';
 import isEmpty from 'lodash/isEmpty';
@@ -14,9 +20,6 @@ import {
   RoleServiceToken,
 } from '../../authorization/interfaces/role-service.interface';
 import { BasicLoginRequestDto } from '../dtos/presentations/basic-login.request.dto';
-import { InvalidTokenFormatException } from '../exceptions/invalid-token-format.exception';
-import { LogoutRequiredException } from '../exceptions/logout-required.exception';
-import { IncorrectUsernamePasswordException } from '../exceptions/incorrect-username-password.exception';
 import {
   TokenFactory,
   TokenFactoryToken,
@@ -57,7 +60,7 @@ export class AuthServiceImpl implements AuthService {
       isEmpty(user) ||
       !(await this.passwordManager.compare(password, user.password))
     ) {
-      throw new IncorrectUsernamePasswordException();
+      throw new NotFoundException('Incorrect username or password');
     }
 
     const [tokens] = await Promise.all([
@@ -84,12 +87,12 @@ export class AuthServiceImpl implements AuthService {
       const jwtPayload = extractJwtPayload(refreshToken);
 
       if (!jwtPayload) {
-        throw new InvalidTokenFormatException();
+        throw new InternalServerErrorException();
       }
 
       await this.roleService.clean(jwtPayload.sub);
 
-      throw new LogoutRequiredException();
+      throw new BadRequestException();
     }
   }
 }

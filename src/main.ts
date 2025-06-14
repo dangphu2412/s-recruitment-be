@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {
   FastifyAdapter,
@@ -9,11 +9,15 @@ import { fastifyHelmet } from '@fastify/helmet';
 import compression from '@fastify/compress';
 import { contentParser } from 'fastify-multer';
 import { AppModule } from './app.module';
-import { ClientExceptionFilter } from './system/exception/exception.filter';
-import { EnvironmentKeyFactory } from './system/services';
-import { createSystemClientCode } from './system/exception';
+import {
+  AppExceptionFilter,
+  exceptionFactory,
+} from './system/exception/exception.service';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import morgan from 'morgan';
+import { ConfigService } from '@nestjs/config';
+
+const MAIN_CONTEXT = 'MainContext';
 
 async function bootstrap() {
   initializeTransactionalContext();
@@ -50,41 +54,34 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-      exceptionFactory: (errors) => {
-        return new BadRequestException(
-          createSystemClientCode({
-            errorCode: 'BAD_REQUEST',
-            message: errors.toString(),
-          }),
-        );
-      },
+      exceptionFactory: exceptionFactory,
     }),
   );
 
   const logger = new Logger();
-  app.useGlobalFilters(new ClientExceptionFilter(logger));
+  app.useGlobalFilters(new AppExceptionFilter(logger));
 
-  const environmentKeyFactory = app.get(EnvironmentKeyFactory);
+  const configService = app.get(ConfigService);
 
   await app.listen(
-    environmentKeyFactory.getPort(),
-    environmentKeyFactory.getHost(),
+    configService.get('PORT', 3000),
+    configService.get('HOST', '127.0.0.1'),
     (err, address) => {
       if (err) {
-        logger.log(err);
+        logger.log(err, MAIN_CONTEXT);
         return;
       }
 
-      logger.log(`Server is listening on: ${address}`, 'AppBootstrap');
+      logger.log(`Server is listening on: ${address}`, MAIN_CONTEXT);
       const memUsage = Math.floor(process.memoryUsage().heapUsed / 1024 / 1024);
 
       logger.log(
-        `Application is running in ${environmentKeyFactory.getEnv()} mode`,
+        `Application is running in ${configService.get('NODE_ENV')} mode`,
+        MAIN_CONTEXT,
       );
       logger.log(
-        `Memory usage: ${memUsage} MB -` +
-          'CPU usage: ' +
-          process.cpuUsage().user,
+        `Memory usage: ${memUsage} MB - CPU usage: ${process.cpuUsage().user}`,
+        MAIN_CONTEXT,
       );
     },
   );

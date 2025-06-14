@@ -1,14 +1,15 @@
 import { ObjectLiteral } from 'typeorm/common/ObjectLiteral';
-import { OffsetPagination, Page, PageRequest } from '../query-shape/dto';
+import { OffsetPaginationResponse } from '../pagination';
 import { DataSource, Repository } from 'typeorm';
 import { ObjectType } from 'typeorm/common/ObjectType';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { OffsetPaginationRequest } from '../pagination/offset-pagination-request';
 
-class ResourceQuery extends OffsetPagination {}
+class ResourceQuery extends OffsetPaginationRequest {}
 
 export interface ResourceCRUDService<E extends ObjectLiteral> {
-  find(): Promise<Page<E>>;
-  find(query: ResourceQuery): Promise<Page<E>>;
+  find(): Promise<OffsetPaginationResponse<E>>;
+  find(query: OffsetPaginationRequest): Promise<OffsetPaginationResponse<E>>;
   createOne<DTO>(dto: DTO): Promise<void>;
   createMany<DTO>(dto: DTO[]): Promise<void>;
   upsertMany<DTO>(dto: DTO[]): Promise<void>;
@@ -26,27 +27,25 @@ export class ResourceCRUDServiceImpl<E> implements ResourceCRUDService<E> {
       .execute();
   }
 
-  find(): Promise<Page<E>>;
-  find(query: ResourceQuery): Promise<Page<E>>;
-  async find(query?: ResourceQuery): Promise<Page<E>> {
+  find(): Promise<OffsetPaginationResponse<E>>;
+  find(query: ResourceQuery): Promise<OffsetPaginationResponse<E>>;
+  async find(query?: ResourceQuery): Promise<OffsetPaginationResponse<E>> {
     if (!query) {
       const entities = await this.repository.find();
 
-      return Page.of({
+      return OffsetPaginationResponse.of({
         items: entities,
         totalRecords: entities.length,
         query: { page: 1, size: Infinity },
       });
     }
 
-    const { offset, size } = PageRequest.of(query);
-
     const [items, totalRecords] = await this.repository.findAndCount({
-      skip: offset,
-      take: size,
+      skip: OffsetPaginationRequest.getOffset(query.page, query.size),
+      take: query.size,
     });
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       items,
       totalRecords,
       query,

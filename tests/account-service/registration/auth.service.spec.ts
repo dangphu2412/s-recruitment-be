@@ -18,9 +18,11 @@ import {
   TokenFactory,
   TokenFactoryToken,
 } from '../../../src/account-service/registration/interfaces/token-factory.interface';
-import { IncorrectUsernamePasswordException } from '../../../src/account-service/registration/exceptions/incorrect-username-password.exception';
-import { LogoutRequiredException } from '../../../src/account-service/registration/exceptions/logout-required.exception';
-import { InvalidTokenFormatException } from '../../../src/account-service/registration/exceptions/invalid-token-format.exception';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 // Mock extractJwtPayload utility
 jest.mock(
@@ -125,14 +127,14 @@ describe('AuthServiceImpl', () => {
       expect(result).toEqual({ tokens });
     });
 
-    it('should throw IncorrectUsernamePasswordException if user not found', async () => {
+    it('should throw NotFoundException if user not found', async () => {
       userService.findOne.mockResolvedValue(null);
       await expect(
         authService.login({ username: 'john', password: 'wrong' }),
-      ).rejects.toThrow(IncorrectUsernamePasswordException);
+      ).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw IncorrectUsernamePasswordException if password is wrong', async () => {
+    it('should throw NotFoundException if password is wrong', async () => {
       const user = {
         id: 'user-id',
         password: 'hashed',
@@ -143,7 +145,7 @@ describe('AuthServiceImpl', () => {
 
       await expect(
         authService.login({ username: 'john', password: 'wrong' }),
-      ).rejects.toThrow(IncorrectUsernamePasswordException);
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -176,12 +178,12 @@ describe('AuthServiceImpl', () => {
       });
     });
 
-    it('should clean and throw LogoutRequiredException on token verification failure', async () => {
+    it('should clean and throw BadRequestException on token verification failure', async () => {
       jwtService.verifyAsync.mockRejectedValue(new Error());
       (extractJwtPayload as jest.Mock).mockReturnValue({ sub: 'user-id' });
 
       await expect(authService.renewTokens('bad_refresh')).rejects.toThrow(
-        LogoutRequiredException,
+        BadRequestException,
       );
 
       expect(roleService.clean).toHaveBeenCalledWith('user-id');
@@ -192,7 +194,7 @@ describe('AuthServiceImpl', () => {
       (extractJwtPayload as jest.Mock).mockReturnValue(null);
 
       await expect(authService.renewTokens('invalid_refresh')).rejects.toThrow(
-        InvalidTokenFormatException,
+        InternalServerErrorException,
       );
 
       expect(roleService.clean).not.toHaveBeenCalled();

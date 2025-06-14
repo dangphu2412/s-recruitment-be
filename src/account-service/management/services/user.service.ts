@@ -1,6 +1,13 @@
-import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
-import { Page, PageRequest } from 'src/system/query-shape/dto';
+import { OffsetPaginationResponse } from 'src/system/pagination';
 import { omit } from 'lodash';
 import { In, InsertResult, IsNull } from 'typeorm';
 import uniq from 'lodash/uniq';
@@ -40,9 +47,7 @@ import { PaymentService } from '../../../monthly-money/internal/payment.service'
 import { ResourceCRUDService } from '../../../system/resource-templates/resource-service-template';
 import { Period } from '../../../master-data-service/periods/period.entity';
 import { PeriodCRUDService } from '../../../master-data-service/periods/period.controller';
-import { NotFoundUserException } from '../exceptions/not-found-user.exception';
-import { InsertUserFailedException } from '../exceptions/insert-user-failed.exception';
-import { EmailExistedException } from '../exceptions/email-existed.exception';
+import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -58,15 +63,15 @@ export class UserServiceImpl implements UserService {
     private readonly periodService: ResourceCRUDService<Period>,
   ) {}
 
-  findUserByFullname(fullName: string): Promise<User | null> {
-    return this.userRepository.findOneBy({
-      fullName,
+  findUsersByFullNames(fullNames: string[]): Promise<User[]> {
+    return this.userRepository.findBy({
+      fullName: In(fullNames),
     });
   }
 
   async findUsers(
     query: GetUsersQueryRequest,
-  ): Promise<Page<UserManagementViewDTO>> {
+  ): Promise<OffsetPaginationResponse<UserManagementViewDTO>> {
     const { items: data, metadata } =
       await this.userRepository.findPaginatedOverviewUsers(query);
 
@@ -114,7 +119,7 @@ export class UserServiceImpl implements UserService {
       };
     });
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       query,
       totalRecords: metadata.totalRecords,
       items,
@@ -157,8 +162,8 @@ export class UserServiceImpl implements UserService {
   async findProbationUsers(
     dto: UserProbationQueryDTO,
   ): Promise<PaginatedUserProbationDTO> {
-    const { departmentId, periodId } = dto;
-    const { offset, size } = PageRequest.of(dto);
+    const { departmentId, periodId, size } = dto;
+    const offset = OffsetPaginationRequest.getOffset(dto.page, dto.size);
 
     const [users, totalRecords] = await this.userRepository.findAndCount({
       where: {
@@ -182,7 +187,7 @@ export class UserServiceImpl implements UserService {
       };
     });
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       items,
       totalRecords,
       query: dto,
@@ -256,7 +261,7 @@ export class UserServiceImpl implements UserService {
     }
 
     if (!user) {
-      throw new NotFoundUserException();
+      throw new NotFoundException();
     }
 
     if (user.deletedAt === null) {
@@ -273,7 +278,7 @@ export class UserServiceImpl implements UserService {
         email: payload.email,
       })
     ) {
-      throw new EmailExistedException();
+      throw new ConflictException();
     }
 
     const newUser = this.userRepository.create({
@@ -287,7 +292,7 @@ export class UserServiceImpl implements UserService {
       await this.userRepository.insert(newUser);
     } catch (error) {
       Logger.error(error.message, error.stack, UserServiceImpl.name);
-      throw new InsertUserFailedException();
+      throw new ConflictException('User existed');
     }
   }
 
@@ -452,7 +457,7 @@ export class UserServiceImpl implements UserService {
     });
 
     if (!user) {
-      throw new NotFoundUserException();
+      throw new NotFoundException();
     }
 
     if (payload.roleIds) {
@@ -469,7 +474,7 @@ export class UserServiceImpl implements UserService {
     });
 
     if (users.length !== dto.ids.length) {
-      throw new NotFoundUserException();
+      throw new NotFoundException();
     }
     const memberRole = await this.roleService.findByName(SystemRoles.MEMBER);
 
@@ -501,7 +506,7 @@ export class UserServiceImpl implements UserService {
         },
       }))
     ) {
-      throw new NotFoundUserException();
+      throw new NotFoundException();
     }
   }
 }

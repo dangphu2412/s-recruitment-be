@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MonthlyMoneyConfig } from '../domain/data-access/entities/monthly-money-config.entity';
 import { MonthlyMoneyConfigService } from '../domain/core/services/monthly-money-config.service';
-import { NoMonthlyMoneyConfigFoundException } from '../domain/core/exceptions';
+import { NotFoundException } from '@nestjs/common';
 
 export class MonthlyMoneyConfigServiceImpl
   implements MonthlyMoneyConfigService
@@ -24,7 +24,7 @@ export class MonthlyMoneyConfigServiceImpl
     });
 
     if (!monthMoneyConfig) {
-      throw new NoMonthlyMoneyConfigFoundException();
+      throw new NotFoundException();
     }
 
     return monthMoneyConfig;

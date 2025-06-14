@@ -1,5 +1,5 @@
 import { RoleRepository } from '../repositories/role.repository';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { In, Repository } from 'typeorm';
 import uniq from 'lodash/uniq';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,14 +10,13 @@ import { UpdateRoleDto } from '../dtos/core/update-role.dto';
 import { Role } from '../../shared/entities/role.entity';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
-import { EnvironmentKeyFactory } from '../../../system/services';
 import ms from 'ms';
 import { Permissions } from '../access-definition.constant';
-import { InvalidRoleUpdateException } from '../exceptions/invalid-role-update.exception';
 import { CreateRoleRequestDTO } from 'src/account-service/authorization/dtos/presentation/create-role-request.dto';
 import { UpdateAssignedPersonsRequestDTO } from 'src/account-service/authorization/dtos/presentation/update-assigned-persons.request';
 import { UserRepository } from '../../management/repositories/user.repository';
 import { GetAccessControlRequestDTO } from '../dtos/presentation/get-access-control.request';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RoleServiceImpl implements RoleService {
@@ -39,12 +38,10 @@ export class RoleServiceImpl implements RoleService {
     private readonly permissionRepository: Repository<Permission>,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    environmentKeyFactory: EnvironmentKeyFactory,
+    configService: ConfigService,
     private userRepository: UserRepository,
   ) {
-    const refreshTokenExpiration =
-      environmentKeyFactory.getRefreshTokenExpiration();
-    this.ttl = ms(refreshTokenExpiration);
+    this.ttl = ms(configService.getOrThrow<string>('REFRESH_TOKEN_EXPIRATION'));
   }
 
   async updateAssignedPersonsToRole(
@@ -59,7 +56,7 @@ export class RoleServiceImpl implements RoleService {
     });
 
     if (users.length !== dto.userIds.length) {
-      throw new InvalidRoleUpdateException();
+      throw new NotFoundException();
     }
 
     await this.roleRepository.updateAssignedPerson(id, dto.userIds);
@@ -127,7 +124,7 @@ export class RoleServiceImpl implements RoleService {
     ]);
 
     if (!role || !role?.isEditable || permissions.length !== uniqueIds.length) {
-      throw new InvalidRoleUpdateException();
+      throw new NotFoundException();
     }
 
     role.permissions = permissions;

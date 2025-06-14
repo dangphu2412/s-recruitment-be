@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Inject,
@@ -13,6 +14,7 @@ import {
 import { DeviceUser } from '../domain/data-access/user-log.entity';
 import { FileInterceptor } from '../../system/file';
 import { ApiConsumes } from '@nestjs/swagger';
+import { DeviceUserFileValidatorPipe } from './device-user-file.pipe';
 
 export const DeviceUserCRUDService = createCRUDService(DeviceUser);
 
@@ -32,10 +34,20 @@ export class DeviceUserController {
   @ApiConsumes('multipart/form-data')
   @Post()
   uploadTrackFile(
-    @UploadedFile()
+    @UploadedFile(new DeviceUserFileValidatorPipe())
     file: Express.Multer.File,
   ) {
     const data = JSON.parse(file.buffer.toString('utf-8'));
+
+    if (!data.data) {
+      throw new BadRequestException('Invalid data format');
+    }
+
+    const firstItem = data.data[0];
+
+    if (firstItem.userId === undefined || firstItem.name === undefined) {
+      throw new BadRequestException('Invalid data format');
+    }
 
     const entities = data.data.map((item) => {
       const deviceUserLog = new DeviceUser();

@@ -1,7 +1,7 @@
-import { createInterfaceToken } from '../../../system/utils';
+import { createProviderToken } from '../../../system/nestjs-extensions';
 import { TokenDTO } from '../dtos/core/login-credentials.dto';
 
-export const TokenFactoryToken = createInterfaceToken('TokenFactoryToken');
+export const TokenFactoryToken = createProviderToken('TokenFactoryToken');
 
 export interface TokenFactory {
   create(userId: string): Promise<TokenDTO[]>;

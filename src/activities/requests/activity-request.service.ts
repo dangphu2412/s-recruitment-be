@@ -14,7 +14,7 @@ import {
 } from '../domain/core/constants/request-activity-status.enum';
 import { CreateActivityRequestDTO } from '../domain/core/dtos/create-activity-request.dto';
 import { FindRequestedMyActivitiesResponseDTO } from '../domain/core/dtos/find-requested-my-acitivities.dto';
-import { Page, PageRequest } from '../../system/query-shape/dto';
+import { OffsetPaginationResponse } from '../../system/pagination';
 import {
   FindRequestedActivitiesResponseDTO,
   FindRequestedActivityQueryDTO,
@@ -36,6 +36,15 @@ import {
   UserService,
   UserServiceToken,
 } from '../../account-service/management/interfaces/user-service.interface';
+import { keyBy } from 'lodash';
+import { OffsetPaginationRequest } from '../../system/pagination/offset-pagination-request';
+
+type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
+
+type UserActivityRequest = {
+  name: string;
+  activitySheetRequests: ActivitySheetRequest[];
+};
 
 @Injectable()
 export class ActivityRequestServiceImpl implements ActivityRequestService {
@@ -51,76 +60,81 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   async createRequestActivityByFile({
     file,
   }: FileActivityRequestDTO): Promise<void> {
-    type UserRequest = {
-      name: string;
-      department: string;
-      registered: { dayOfWeekId: number; timeOfDayId: string }[];
-    };
-    const workbook = read(file.buffer, { type: 'buffer', cellDates: true });
+    const workbook = read(file.buffer, { type: 'buffer' });
 
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = utils
+
+    const HEADER_ROW_COUNT = 2;
+    const dataRows = utils
       .sheet_to_json<FileActivityRequestRow>(sheet, {
         header: 1,
         defval: '',
       })
-      .slice(2);
-    const results: UserRequest[] = [];
-
-    rows.forEach((row) => {
-      const user = {
-        name: row[1],
-        department: row[2],
-        registered: [],
-      };
-
-      for (let i = 3; i < row.length; i++) {
-        if ('x' === row[i]) {
-          const dayOfWeek = Math.ceil((i - 2) / 3);
-          const timeOfDayMap = {
-            0: 'SUM-MORN',
-            1: 'SUM-AFT',
-            2: 'SUM-EVN',
-          };
-          user.registered.push({
-            // Start from 1 -> 7
-            dayOfWeekId: dayOfWeek === 7 ? 0 : dayOfWeek,
-            // Start from 0,1,2
-            timeOfDayId: timeOfDayMap[Math.ceil((i - 3) % 3)],
-          });
-        }
-      }
-
-      results.push(user);
-    });
-
-    await Promise.all(
-      results
-        .map(async (result) => {
-          const user = await this.userService.findUserByFullname(result.name);
-
-          if (!user) {
-            // Return the list of unmatch users
-            return null;
-          }
-
-          await Promise.all(
-            result.registered.map(async (registered) => {
-              const entity = new ActivityRequest();
-              entity.authorId = user.id;
-              entity.requestType = RequestTypes.WORKING;
-              entity.timeOfDayId = registered.timeOfDayId;
-              entity.dayOfWeekId = registered.dayOfWeekId.toString();
-              entity.approvalStatus = RequestActivityStatus.PENDING;
-
-              await this.activityRequestRepository.insert(entity);
-            }),
-          );
-        })
-        .flat(),
+      .slice(HEADER_ROW_COUNT);
+    const results: UserActivityRequest[] = dataRows.map(
+      ActivityRequestServiceImpl.createUserActivityRequestByRow,
     );
 
+    const users = await this.userService.findUsersByFullNames([
+      ...new Set(results.map((result) => result.name)),
+    ]);
+    const fullNameMapToUser = keyBy(users, 'fullName');
+
+    const entities = results
+      .map((result) => {
+        const user = fullNameMapToUser[result.name];
+
+        if (!user) {
+          // Return the list of unmatch users
+          return null;
+        }
+
+        return result.activitySheetRequests.map((registered) => {
+          const entity = new ActivityRequest();
+          entity.authorId = user.id;
+          entity.requestType = RequestTypes.WORKING;
+          entity.timeOfDayId = registered.timeOfDayId;
+          entity.dayOfWeekId = registered.dayOfWeekId.toString();
+          entity.approvalStatus = RequestActivityStatus.PENDING;
+
+          return entity;
+        });
+      })
+      .filter(Boolean)
+      .flat();
+
+    await this.activityRequestRepository.insert(entities);
+
     return;
+  }
+
+  static createUserActivityRequestByRow(row: string[]): UserActivityRequest {
+    const user: UserActivityRequest = {
+      name: row[1],
+      activitySheetRequests: [],
+    };
+    const ACTIVITY_CELL_START_INDEX = 3;
+    const TIME_SLOTS = ['SUM-MORN', 'SUM-AFT', 'SUM-EVN'] as const;
+    const TIME_SLOTS_PER_DAY = TIME_SLOTS.length;
+
+    for (let i = ACTIVITY_CELL_START_INDEX; i < row.length; i++) {
+      const cell = row[i];
+      if (['x', 'X'].includes(cell)) {
+        const offset = i - ACTIVITY_CELL_START_INDEX;
+
+        const dayIndexMondayBased = Math.floor(offset / TIME_SLOTS_PER_DAY); // 0 = Monday, 6 = Sunday
+        const timeSlotIndex = offset % TIME_SLOTS_PER_DAY;
+
+        // Convert to JS Date.getDay format: 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const dayOfWeekId = (dayIndexMondayBased + 1) % 7;
+
+        user.activitySheetRequests.push({
+          dayOfWeekId,
+          timeOfDayId: TIME_SLOTS[timeSlotIndex],
+        });
+      }
+    }
+    return user;
   }
 
   async findMyRequestedActivities(
@@ -131,7 +145,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       relations: ['author', 'dayOfWeek', 'timeOfDay'],
     });
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       items,
       totalRecords: items.length,
       query: {
@@ -149,8 +163,9 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     fromDate,
     toDate,
     status,
+    requestTypes,
   }: FindRequestedActivityQueryDTO): Promise<FindRequestedActivitiesResponseDTO> {
-    const { offset } = PageRequest.of({ page, size });
+    const offset = OffsetPaginationRequest.getOffset(page, size);
 
     const queryBuilder = this.activityRequestRepository
       .createQueryBuilder('activity')
@@ -177,6 +192,12 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       });
     }
 
+    if (requestTypes) {
+      queryBuilder.andWhere('activity.requestType IN (:...requestTypes)', {
+        requestTypes,
+      });
+    }
+
     if (fromDate) {
       queryBuilder.andWhere('activity.updatedAt >= :fromDate', {
         fromDate,
@@ -196,7 +217,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
 
     const [items, totalRecords] = await queryBuilder.getManyAndCount();
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       items,
       totalRecords,
       query: {
@@ -266,6 +287,9 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     throw new InternalServerErrorException('Invalid request type');
   }
 
+  /**
+   * TODO: Batch update instead of single update
+   */
   @Transactional()
   async updateApprovalRequestActivity(
     dto: UpdateApprovalActivityRequestDTO,

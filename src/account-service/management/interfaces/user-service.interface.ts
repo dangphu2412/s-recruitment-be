@@ -1,5 +1,5 @@
-import { createInterfaceToken } from 'src/system/utils';
-import { Page } from 'src/system/query-shape/dto';
+import { createProviderToken } from 'src/system/nestjs-extensions';
+import { OffsetPaginationResponse } from 'src/system/pagination';
 import { CreateUsersRequestDTO } from '../dtos/presentations/create-users.request';
 import { FileCreateUsersDto } from '../dtos/presentations/file-create-users.dto';
 import { User } from '../../shared/entities/user.entity';
@@ -14,7 +14,7 @@ import { GetUsersQueryDTO } from '../dtos/core/get-users-query.dto';
 import { CreatePaymentRequest } from '../dtos/presentations/create-payment.request';
 import { UserManagementViewDTO } from '../dtos/presentations/get-users-query.request';
 
-export const UserServiceToken = createInterfaceToken('UserServiceToken');
+export const UserServiceToken = createProviderToken('UserServiceToken');
 
 export interface UserService {
   findMyProfile(id: string): Promise<MyProfile>;
@@ -25,16 +25,18 @@ export interface UserService {
   findProbationUsers(
     userProbationQueryInput: UserProbationQueryDTO,
   ): Promise<PaginatedUserProbationDTO>;
-  findUsers(query: GetUsersQueryDTO): Promise<Page<UserManagementViewDTO>>;
-  findUserByFullname(fullName: string): Promise<User | null>;
+  findUsers(
+    query: GetUsersQueryDTO,
+  ): Promise<OffsetPaginationResponse<UserManagementViewDTO>>;
+  findUsersByFullNames(fullNames: string[]): Promise<User[]>;
 
   /**
-   * @throws {NotFoundUserException}
+   * @throws {NotFoundException}
    */
   assertIdExist(id: string): Promise<void>;
 
   /**
-   * @throws {InsertUserFailedException}
+   * @throws {ConflictException}
    */
   createUser(dto: CreateUsersRequestDTO): Promise<void>;
   createUsersByFile(

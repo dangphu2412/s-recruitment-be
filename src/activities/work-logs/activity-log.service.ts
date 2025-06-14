@@ -1,12 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
 import { FindLogsRequest } from '../domain/presentation/dtos/find-logs.request';
-import { format, subYears } from 'date-fns';
-import { Page } from '../../system/query-shape/dto';
-import {
-  CreateFileDTO,
-  LogDTO,
-} from '../../file-service/domain/core/dto/file.dto';
+import { format, subMonths, subYears } from 'date-fns';
+import { OffsetPaginationResponse } from '../../system/pagination';
 import { ActivityRepository } from '../managements/activity.repository';
 import { LogWorkStatus } from '../domain/core/constants/log-work-status.enum';
 import { ActivityLog } from '../domain/data-access/activity-log.entity';
@@ -15,6 +11,14 @@ import {
   WorkTimeUtils,
 } from './work-status-evaluator.service';
 import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
+
+export type CreateFileDTO = Express.Multer.File;
+
+export type LogDTO = {
+  userSn: number;
+  deviceUserId: string;
+  recordTime: string;
+};
 
 class LogSegmentProcessor {
   private deviceIdMapToDateSegmentedLogs: Map<string, Map<string, LogDTO[]>> =
@@ -74,7 +78,7 @@ export class ActivityLogService {
     const [items, totalRecords] =
       await this.activityLogRepository.findLogs(findLogsRequest);
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       items,
       totalRecords,
       query: findLogsRequest,
@@ -97,7 +101,7 @@ export class ActivityLogService {
     const data = file.buffer.toString('utf-8');
     const fullLogs = JSON.parse(data) as LogDTO[];
 
-    const lastYearLogs = this.extractLogsFromLastYear(fullLogs);
+    const lastYearLogs = this.extractLogsFromLastHalfYear(fullLogs);
     const logSegmentProcessor = new LogSegmentProcessor(lastYearLogs);
 
     await logSegmentProcessor.onEachDeviceUserId(
@@ -163,9 +167,9 @@ export class ActivityLogService {
   /**
    * Apply binary search to find logs from the previous year
    */
-  private extractLogsFromLastYear(logs: LogDTO[]) {
+  private extractLogsFromLastHalfYear(logs: LogDTO[]) {
     const START_OF_PREVIOUS_YEAR = format(
-      subYears(new Date(), 1),
+      subMonths(new Date(), 6),
       'yyyy-MM-dd',
     );
     let left = 0;

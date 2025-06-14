@@ -3,9 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../shared/entities/user.entity';
 import { UserStatus } from '../user-status.constant';
-import { Page, PageRequest } from '../../../system/query-shape/dto';
+import { OffsetPaginationResponse } from '../../../system/pagination';
 import { GetUsersQueryRequest } from '../dtos/presentations/get-users-query.request';
 import { UserOverviewAggregate } from '../dtos/aggregates/user-overview.aggregate';
+import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -18,15 +19,16 @@ export class UserRepository extends Repository<User> {
 
   async findPaginatedOverviewUsers(
     query: GetUsersQueryRequest,
-  ): Promise<Page<UserOverviewAggregate>> {
+  ): Promise<OffsetPaginationResponse<UserOverviewAggregate>> {
     const {
       userStatus,
       search = '',
       departmentIds,
       periodIds,
       roleIds,
+      size,
     } = query;
-    const { offset, size } = PageRequest.of(query);
+    const offset = OffsetPaginationRequest.getOffset(query.page, query.size);
 
     const qb = this.createQueryBuilder('users')
       .select([
@@ -89,7 +91,7 @@ export class UserRepository extends Repository<User> {
 
     const [data, totalRecords] = await qb.getManyAndCount();
 
-    return Page.of({
+    return OffsetPaginationResponse.of({
       query,
       items: data as UserOverviewAggregate[],
       totalRecords,

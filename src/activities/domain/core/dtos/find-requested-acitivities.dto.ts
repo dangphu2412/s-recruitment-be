@@ -1,15 +1,16 @@
-import { Page } from '../../../../system/query-shape/types';
-import { OffsetPagination } from '../../../../system/query-shape/dto';
+import { OffsetPaginationResponse } from '../../../../system/pagination';
+import { OffsetPaginationRequest } from '../../../../system/pagination/offset-pagination-request';
 
-export type FindRequestedActivityQueryDTO = OffsetPagination & {
+export type FindRequestedActivityQueryDTO = OffsetPaginationRequest & {
   query: string;
   departmentIds?: number[];
   fromDate?: string;
   toDate?: string;
   status?: string[];
+  requestTypes?: string[];
 };
 
-export type FindRequestedActivitiesResponseDTO = Page<{
+export type FindRequestedActivitiesResponseDTO = OffsetPaginationResponse<{
   id: number;
   requestType: string;
   timeOfDay: {

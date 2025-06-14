@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { EnvironmentKeyFactory } from 'src/system/services';
 import { TokenDTO } from '../dtos/core/login-credentials.dto';
 import { JwtPayload } from '../jwt-payload';
 import { TokenFactory } from '../interfaces/token-factory.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TokenGeneratorImpl implements TokenFactory {
@@ -12,12 +12,14 @@ export class TokenGeneratorImpl implements TokenFactory {
 
   constructor(
     private readonly jwtService: JwtService,
-    environmentKeyFactory: EnvironmentKeyFactory,
+    private configService: ConfigService,
   ) {
-    this.accessTokenExpiration =
-      environmentKeyFactory.getAccessTokenExpiration();
-    this.refreshTokenExpiration =
-      environmentKeyFactory.getRefreshTokenExpiration();
+    this.accessTokenExpiration = this.configService.getOrThrow(
+      'ACCESS_TOKEN_EXPIRATION',
+    );
+    this.refreshTokenExpiration = this.configService.getOrThrow(
+      'REFRESH_TOKEN_EXPIRATION',
+    );
   }
 
   create(userId: string): Promise<TokenDTO[]>;

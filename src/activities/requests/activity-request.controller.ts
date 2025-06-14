@@ -27,6 +27,7 @@ import { Identified } from '../../account-service/registration/identified.decora
 import { FileInterceptor } from '../../system/file';
 import { ApiConsumes } from '@nestjs/swagger';
 import { FileActivityRequestDTO } from '../domain/core/dtos/file-create-activity-request.dto';
+import { UploadRequestActivityFileValidatorPipe } from './upload-activity-request-file.pipe';
 
 @Controller('activity-requests')
 export class ActivityRequestController {
@@ -73,7 +74,7 @@ export class ActivityRequestController {
   @ApiConsumes('multipart/form-data')
   createActivityRequestByFile(
     @Body() dto: FileActivityRequestDTO,
-    @UploadedFile()
+    @UploadedFile(new UploadRequestActivityFileValidatorPipe())
     file: Express.Multer.File,
   ) {
     return this.activityRequestService.createRequestActivityByFile({

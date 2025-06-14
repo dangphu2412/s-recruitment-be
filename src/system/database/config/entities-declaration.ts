@@ -3,8 +3,6 @@ import { join } from 'path';
 import { User } from '../../../account-service/shared/entities/user.entity';
 import { Role } from '../../../account-service/shared/entities/role.entity';
 import { Permission } from '../../../account-service/shared/entities/permission.entity';
-import { Post } from '../../../posts-service/domain/data-access/entities/posts.entity';
-import { Category } from '../../../posts-service/domain/data-access/entities/category.entity';
 import { Payment } from '../../../monthly-money/domain/data-access/entities/payment.entity';
 import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
 import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
@@ -24,8 +22,6 @@ export const APP_ENTITIES = [
   MonthlyMoneyConfig,
   OperationFee,
   Permission,
-  Post,
-  Category,
   Payment,
   Period,
   Department,

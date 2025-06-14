@@ -20,7 +20,6 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser } from '../user.decorator';
 import { CanAccessBy } from '../../authorization/can-access-by.decorator';
-import { Page } from '../../../system/query-shape/types';
 import { UpdateUserRolesDto } from '../dtos/presentations/update-user-roles.dto';
 import { FileInterceptor } from '../../../system/file';
 import { FileCreateUsersDto } from '../dtos/presentations/file-create-users.dto';
@@ -41,6 +40,8 @@ import { UpgradeUserMemberRequest } from '../dtos/presentations/upgrade-user-mem
 import { UserProbationRequest } from '../dtos/presentations/get-users-probation.request';
 import { UpdateUserRequest } from '../dtos/presentations/update-user.request';
 import { Identified } from '../../registration/identified.decorator';
+import { OffsetPaginationResponse } from '../../../system/pagination';
+import { UploadUserFileValidatorPipe } from '../upload-user-file.pipe';
 
 @ApiTags('users')
 @Controller({
@@ -74,7 +75,7 @@ export class UserController {
   @ApiOkResponse()
   async findUsers(
     @Query() query: GetUsersQueryRequest,
-  ): Promise<Page<UserManagementViewDTO>> {
+  ): Promise<OffsetPaginationResponse<UserManagementViewDTO>> {
     return this.userService.findUsers(query);
   }
 
@@ -131,7 +132,7 @@ export class UserController {
   @ApiConsumes('multipart/form-data')
   createUsersByFile(
     @Body() dto: FileCreateUsersDto,
-    @UploadedFile()
+    @UploadedFile(new UploadUserFileValidatorPipe())
     file: Express.Multer.File,
   ) {
     return this.userService.createUsersByFile({ ...dto, file });

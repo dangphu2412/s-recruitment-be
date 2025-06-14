@@ -1,11 +1,11 @@
-import { OffsetPagination } from '../../../../system/query-shape/dto';
+import { OffsetPaginationRequest } from '../../../../system/pagination/offset-pagination-request';
 import { IsDateString, IsEnum, IsOptional } from 'class-validator';
 import { LogWorkStatus } from '../../core/constants/log-work-status.enum';
-import { ToManyString } from '../../../../system/query-shape/decorators/transformer';
+import { DeserializeQueryToArray } from '../../../../system/query-params/query-param-deserializer.decorator';
 
-export class FindLogsRequest extends OffsetPagination {
+export class FindLogsRequest extends OffsetPaginationRequest {
   @IsOptional()
-  @ToManyString()
+  @DeserializeQueryToArray()
   @IsEnum(LogWorkStatus, { each: true })
   workStatus?: LogWorkStatus[];
 
@@ -17,7 +17,7 @@ export class FindLogsRequest extends OffsetPagination {
   @IsDateString()
   toDate?: string;
 
-  @ToManyString()
+  @DeserializeQueryToArray()
   @IsOptional()
   authors?: string[];
 }

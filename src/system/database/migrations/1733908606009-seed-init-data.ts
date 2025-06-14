@@ -10,13 +10,11 @@ import {
 } from '../../../account-service/authorization/access-definition.constant';
 import { User } from '../../../account-service/shared/entities/user.entity';
 import { PasswordManager } from '../../../account-service/registration/services/password-manager';
-import { EnvironmentKeyFactory } from '../../services';
 import { ConfigService } from '@nestjs/config';
 import { Menu } from '../../../menu';
 import { MenuFactory } from '../processors/menu.factory';
 import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
 import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
-import { Category } from '../../../posts-service/domain/data-access/entities/category.entity';
 import { Department } from '../../../master-data-service/departments/department.entity';
 import { MenuCode } from '../../../menu/client/menu-code.constant';
 import { DatabaseUtils } from '../utils/database.utils';
@@ -85,14 +83,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         description: 'Edit roles of system',
       },
       {
-        name: Permissions.MANAGE_RECRUITMENT,
-        description: 'Manage recruitment',
-      },
-      {
-        name: Permissions.MANAGE_POSTS,
-        description: 'Manage public posts of S-Group',
-      },
-      {
         name: Permissions.MANAGE_MASTER_DATA,
         description: 'Manage master data',
       },
@@ -153,9 +143,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       },
     });
     const passwordManager = new PasswordManager(
-      new EnvironmentKeyFactory(
-        new ConfigService<Record<string, unknown>, false>(),
-      ),
+      new ConfigService<Record<string, unknown>, false>(),
     );
     await passwordManager.onModuleInit();
     const password = passwordManager.getDefaultPassword();
@@ -202,18 +190,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         ],
       },
       {
-        name: 'Posts',
-        iconCode: 'POST_ICON',
-        code: MenuCode.POST,
-        subMenus: [
-          {
-            name: 'Post management',
-            accessLink: '/posts/overview',
-            code: MenuCode.POSTS_OVERVIEW,
-          },
-        ],
-      },
-      {
         name: 'Activities',
         iconCode: 'ACTIVITY_MANAGEMENT_ICON',
         code: MenuCode.ACTIVITY_MANAGEMENT,
@@ -238,6 +214,11 @@ export class SeedInitData1733908606009 implements MigrationInterface {
             accessLink: '/activities/tracking',
             code: MenuCode.ACTIVITIES_LOGS,
           },
+          {
+            name: 'Fingerprint users',
+            accessLink: '/activities/fingerprint-users',
+            code: MenuCode.FINGERPRINT_USERS,
+          },
         ],
       },
     ];
@@ -260,19 +241,19 @@ export class SeedInitData1733908606009 implements MigrationInterface {
     await timeOfDayRepository.insert([
       {
         id: 'SUM-MORN',
-        name: 'Morning (8:30 - 11h30)',
-        fromTime: DatabaseUtils.formatTimeToUTC('8:30'),
-        toTime: DatabaseUtils.formatTimeToUTC('11:30'),
+        name: 'Morning (08h00 - 11h00)',
+        fromTime: DatabaseUtils.formatTimeToUTC('8:00'),
+        toTime: DatabaseUtils.formatTimeToUTC('11:00'),
       },
       {
         id: 'SUM-AFT',
-        name: 'Afternoon (13:30 - 17h30)',
-        fromTime: DatabaseUtils.formatTimeToUTC('13:30'),
+        name: 'Afternoon (14h00 – 17h00)',
+        fromTime: DatabaseUtils.formatTimeToUTC('14:00'),
         toTime: DatabaseUtils.formatTimeToUTC('17:30'),
       },
       {
         id: 'SUM-EVN',
-        name: 'Evening (19:00 - 21:30)',
+        name: 'Evening (19h00 – 21h30)',
         fromTime: DatabaseUtils.formatTimeToUTC('19:00'),
         toTime: DatabaseUtils.formatTimeToUTC('21:30'),
       },
@@ -298,16 +279,14 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       [Permissions.EDIT_MEMBER_USER]: [MenuCode.USER_OVERVIEW],
       [Permissions.VIEW_ACCESS_RIGHTS]: [MenuCode.IDENTITY_ACCESS_MANAGEMENT],
       [Permissions.EDIT_ACCESS_RIGHTS]: [MenuCode.IDENTITY_ACCESS_MANAGEMENT],
-      [Permissions.MANAGE_RECRUITMENT]: [
-        MenuCode.RECRUITMENT,
-        MenuCode.RECRUITMENT_OVERVIEW,
-      ],
-      [Permissions.MANAGE_POSTS]: [MenuCode.POST, MenuCode.POSTS_OVERVIEW],
       [Permissions.READ_ACTIVITIES]: [
         MenuCode.ACTIVITY_MANAGEMENT,
         MenuCode.MY_ACTIVITY_REQUESTS,
       ],
-      [Permissions.READ_ACTIVITY_LOGS]: [MenuCode.ACTIVITIES_LOGS],
+      [Permissions.READ_ACTIVITY_LOGS]: [
+        MenuCode.ACTIVITIES_LOGS,
+        MenuCode.FINGERPRINT_USERS,
+      ],
       [Permissions.WRITE_ACTIVITIES]: [
         MenuCode.ACTIVITY_MANAGEMENT,
         MenuCode.ACTIVITY_REQUESTS,
@@ -327,30 +306,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       }),
     );
 
-    const categoryRepository = queryRunner.manager.getRepository(Category);
-
-    await categoryRepository.insert([
-      {
-        id: 'cong-nghe',
-        name: 'Công nghệ',
-        summary: 'Đây là nơi đăng các nội dung về Công Nghệ',
-      },
-      {
-        id: 'thiet-ke',
-        name: 'Thiết Kế',
-        summary: 'Đây là nơi đăng các nội dung về Thiết Kế',
-      },
-      {
-        id: 'marketing-online',
-        name: 'Marketing Online',
-        summary: 'Đây là nơi đăng các nội dung về Marketing Online',
-      },
-      {
-        id: 'noi-bo',
-        name: 'Nội bộ',
-        summary: 'Đây là nơi đăng các nội dung về nội bộ',
-      },
-    ]);
     const departmentRepository = queryRunner.manager.getRepository(Department);
 
     await departmentRepository.insert([
