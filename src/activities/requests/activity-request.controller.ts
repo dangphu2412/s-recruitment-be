@@ -36,12 +36,13 @@ export class ActivityRequestController {
     private readonly activityRequestService: ActivityRequestService,
   ) {}
 
-  @CanAccessBy(Permissions.WRITE_ACTIVITIES)
+  @CanAccessBy(Permissions.READ_ACTIVITY_REQUESTS)
   @Get()
   findRequestedActivities(@Query() query: FindRequestedActivityRequestDTO) {
     return this.activityRequestService.findRequestedActivities(query);
   }
 
+  @CanAccessBy(Permissions.READ_MY_ACTIVITY_REQUESTS)
   @Identified
   @Get('my')
   findMyRequestedActivities(@CurrentUser() user: JwtPayload) {
@@ -49,6 +50,7 @@ export class ActivityRequestController {
   }
 
   @Identified
+  @CanAccessBy(Permissions.READ_MY_ACTIVITY_REQUESTS)
   @Get('my/:id')
   findMyRequestedActivity(
     @Param('id', ParseIntPipe) id: number,
@@ -57,7 +59,7 @@ export class ActivityRequestController {
     return this.activityRequestService.findMyRequestedActivity(id, user.sub);
   }
 
-  @CanAccessBy(Permissions.READ_ACTIVITIES)
+  @CanAccessBy(Permissions.WRITE_MY_ACTIVITY_REQUESTS)
   @Post()
   createRequestedActivity(
     @Body() dto: CreateActivityRequestRequest,
@@ -69,6 +71,7 @@ export class ActivityRequestController {
     });
   }
 
+  @CanAccessBy(Permissions.WRITE_ACTIVITY_REQUESTS)
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
@@ -83,6 +86,7 @@ export class ActivityRequestController {
     });
   }
 
+  @CanAccessBy(Permissions.WRITE_MY_ACTIVITY_REQUESTS)
   @Identified
   @Patch('my/:id')
   updateRequestedActivity(

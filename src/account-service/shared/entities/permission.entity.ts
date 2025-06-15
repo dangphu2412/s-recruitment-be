@@ -12,14 +12,21 @@ import { Menu } from '../../../menu';
   name: 'permissions',
 })
 export class Permission {
-  @PrimaryGeneratedColumn('increment')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({
+    name: 'code',
+    type: 'varchar',
+    nullable: false,
+    unique: true,
+  })
+  code: string;
 
   @Column({
     name: 'name',
     type: 'varchar',
     nullable: false,
-    unique: true,
   })
   name: string;
 

@@ -5,6 +5,9 @@ import {
 } from '../../system/resource-templates/resource-service-template';
 import { Department } from './department.entity';
 import { IsString } from 'class-validator';
+import { Identified } from '../../account-service/registration/identified.decorator';
+import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../../account-service/authorization/access-definition.constant';
 
 export const DepartmentCRUDService = createCRUDService(Department);
 
@@ -24,11 +27,13 @@ export class DepartmentsController {
     private readonly departmentService: ResourceCRUDService<Department>,
   ) {}
 
+  @Identified
   @Get()
   async find() {
     return this.departmentService.find();
   }
 
+  @CanAccessBy(Permissions.WRITE_DEPARTMENTS)
   @Post()
   async createOne(@Body() dto: CreateDepartmentDTO) {
     return this.departmentService.createOne(dto);

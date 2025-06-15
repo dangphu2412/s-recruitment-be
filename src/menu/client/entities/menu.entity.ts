@@ -3,7 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToMany,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Tree,
   TreeChildren,
   TreeParent,
@@ -15,8 +15,8 @@ import { Permission } from '../../../account-service/shared/entities/permission.
 })
 @Tree('materialized-path')
 export class Menu {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+  @PrimaryColumn('varchar')
+  id: string;
 
   @Column({
     name: 'name',
@@ -24,13 +24,6 @@ export class Menu {
     type: 'varchar',
   })
   name: string;
-
-  @Column({
-    name: 'code',
-    nullable: false,
-    type: 'varchar',
-  })
-  code: string;
 
   @Column({
     name: 'icon_code',
