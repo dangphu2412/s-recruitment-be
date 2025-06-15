@@ -1,7 +1,6 @@
 import { MenuRepository } from './menu.repositoryt';
 import { Inject, Injectable } from '@nestjs/common';
 import { Menu, MenuService } from '../client';
-import keyBy from 'lodash/keyBy';
 import {
   RoleService,
   RoleServiceToken,
@@ -16,39 +15,11 @@ export class MenuServiceImpl implements MenuService {
   ) {}
 
   async findMenusByUserId(userId: string): Promise<Menu[]> {
-    const rights = await this.roleService.findPermissionsByUserId(userId);
+    const permissionIds =
+      await this.roleService.findPermissionsByUserId(userId);
 
-    if (!rights.length) return [];
+    if (!permissionIds.length) return [];
 
-    const [allMenus, permittedMenus] = await Promise.all([
-      this.menuRepository.findTrees(),
-      this.menuRepository.findByPermissionNames(rights),
-    ]);
-    const permittedMenusKeyByCode = keyBy(permittedMenus, 'code');
-
-    return this.filterMenus(allMenus, permittedMenusKeyByCode);
+    return this.menuRepository.findByPermissionCodes(permissionIds);
   }
-
-  private filterMenus = (
-    menus: Menu[],
-    permittedMenusKeyByCode: Record<string, Menu>,
-  ) => {
-    return menus.filter((menu) => {
-      if (!permittedMenusKeyByCode[menu.code]) {
-        return false;
-      }
-
-      const subMenus = menu?.subMenus;
-
-      if (subMenus?.length) {
-        if (!permittedMenusKeyByCode[menu.code]) {
-          throw new Error(`No menu found: ${menu.code}`);
-        }
-
-        menu.subMenus = this.filterMenus(subMenus, permittedMenusKeyByCode);
-      }
-
-      return true;
-    });
-  };
 }

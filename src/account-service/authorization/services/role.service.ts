@@ -28,7 +28,7 @@ export class RoleServiceImpl implements RoleService {
 
   private static toRights(roles: Role[]): string[] {
     return roles
-      .map((role) => role.permissions.map((permission) => permission.name))
+      .map((role) => role.permissions.map((permission) => permission.code))
       .flat();
   }
 
@@ -151,14 +151,14 @@ export class RoleServiceImpl implements RoleService {
 
       if (
         roles.some((role) =>
-          role.permissions.some((p) => p.name === Permissions.OWNER),
+          role.permissions.some((p) => p.code === Permissions.OWNER),
         )
       ) {
         const permissions = await this.permissionRepository.find();
 
         return await this.cacheManager.set(
           RoleServiceImpl.genKey(userId),
-          permissions.map((permission) => permission.name),
+          permissions.map((permission) => permission.code),
           this.ttl,
         );
       }

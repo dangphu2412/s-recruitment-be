@@ -7,16 +7,29 @@ export enum SystemRoles {
   MEMBER = 'Member',
 }
 
+/**
+ * Permission should follow pattern:
+ * {action}_{resource}
+ */
 export enum Permissions {
-  OWNER = 'Owner',
-  VIEW_USERS = 'View users',
-  EDIT_MEMBER_USER = 'Edit member user',
-  VIEW_ACCESS_RIGHTS = 'View access rights',
-  EDIT_ACCESS_RIGHTS = 'Edit access rights',
-  MANAGE_MASTER_DATA = 'Manage master data',
-  READ_ACTIVITIES = 'Read activities',
-  WRITE_ACTIVITIES = 'Write activities',
-  READ_ACTIVITY_LOGS = 'Read activity logs',
-  WRITE_PERIODS = 'Write periods',
-  WRITE_DEPARTMENTS = 'Write departments',
+  /**
+   * @description This is the super admin permission, system bypass all permission check
+   */
+  OWNER = 'OWNER',
+  READ_USERS = 'READ_USERS',
+  WRITE_USERS = 'WRITE_USERS',
+  READ_IAM = 'READ_IAM',
+  EDIT_IAM = 'EDIT_IAM',
+  READ_ACTIVITY_REQUESTS = 'READ_ACTIVITY_REQUESTS',
+  WRITE_ACTIVITY_REQUESTS = 'WRITE_ACTIVITY_REQUESTS',
+  READ_MY_ACTIVITY_REQUESTS = 'READ_MY_ACTIVITY_REQUESTS',
+  WRITE_MY_ACTIVITY_REQUESTS = 'WRITE_MY_ACTIVITY_REQUESTS',
+  READ_ACTIVITIES = 'READ_ACTIVITIES',
+  WRITE_ACTIVITIES = 'WRITE_ACTIVITIES',
+  READ_ACTIVITY_LOGS = 'READ_ACTIVITY_LOGS',
+  WRITE_ACTIVITY_LOGS = 'WRITE_ACTIVITY_LOGS',
+  READ_FINGERPRINT_USERS = 'READ_FINGERPRINT_USERS',
+  WRITE_FINGERPRINT_USERS = 'WRITE_FINGERPRINT_USERS',
+  WRITE_PERIODS = 'WRITE_PERIODS',
+  WRITE_DEPARTMENTS = 'WRITE_DEPARTMENTS',
 }

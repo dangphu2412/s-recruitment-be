@@ -5,7 +5,6 @@ import { Role } from '../../shared/entities/role.entity';
 import { AccessControlList } from '../dtos/aggregates/access-control-list.aggregate';
 import { GetAccessControlRequestDTO } from '../dtos/presentation/get-access-control.request';
 import keyBy from 'lodash/keyBy';
-import * as console from 'node:console';
 
 @Injectable()
 export class RoleRepository extends Repository<Role> {
@@ -35,7 +34,6 @@ export class RoleRepository extends Repository<Role> {
     const { entities, raw } = await qb.getRawAndEntities();
 
     const idMapToRaw = keyBy(raw, 'roles_id');
-    console.log(idMapToRaw);
 
     return entities.map((entity) => {
       return {

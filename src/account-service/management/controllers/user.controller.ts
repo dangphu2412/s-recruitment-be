@@ -62,7 +62,7 @@ export class UserController {
     return this.userService.findMyProfile(user.sub);
   }
 
-  @CanAccessBy(Permissions.VIEW_USERS, Permissions.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.READ_USERS, Permissions.WRITE_USERS)
   @Get('/:id')
   findUserDetail(
     @Param('id', new ParseUUIDPipe({ version: '4' })) userId: string,
@@ -70,7 +70,7 @@ export class UserController {
     return this.userService.findUserDetail(userId);
   }
 
-  @CanAccessBy(Permissions.VIEW_USERS, Permissions.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.READ_USERS, Permissions.WRITE_USERS)
   @Get('/')
   @ApiOkResponse()
   async findUsers(
@@ -79,14 +79,14 @@ export class UserController {
     return this.userService.findUsers(query);
   }
 
-  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.WRITE_USERS)
   @Patch('/:id/active')
   @ApiNoContentResponse()
   async toggleIsActive(@Param('id') id: string) {
     await this.userService.toggleUserIsActive(id);
   }
 
-  @CanAccessBy(Permissions.EDIT_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.EDIT_IAM)
   @Get('/:id/roles')
   @ApiOkResponse()
   findUserWithRoles(@Param('id') userId: string) {
@@ -96,7 +96,7 @@ export class UserController {
     });
   }
 
-  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.WRITE_USERS)
   @Patch('/:id')
   @ApiNoContentResponse()
   async updateUser(
@@ -109,7 +109,7 @@ export class UserController {
     });
   }
 
-  @CanAccessBy(Permissions.EDIT_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.EDIT_IAM)
   @Patch('/:id/roles')
   @ApiNoContentResponse()
   async updateUserRoles(
@@ -119,14 +119,14 @@ export class UserController {
     await this.userService.updateUserRoles(userId, dto);
   }
 
-  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.WRITE_USERS)
   @Post('/')
   @ApiCreatedResponse()
   async createUsers(@Body() createUsersDto: CreateUsersRequestDTO) {
     await this.userService.createUser(createUsersDto);
   }
 
-  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.WRITE_USERS)
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
@@ -138,7 +138,7 @@ export class UserController {
     return this.userService.createUsersByFile({ ...dto, file });
   }
 
-  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.WRITE_USERS)
   @Post('/:userId/payments')
   async createUserPayment(
     @Body() createPaymentDto: CreatePaymentRequest,
@@ -147,19 +147,19 @@ export class UserController {
     await this.userService.createUserPayment(userId, createPaymentDto);
   }
 
-  @CanAccessBy(Permissions.VIEW_USERS)
+  @CanAccessBy(Permissions.READ_USERS)
   @Get('/:userId/payments')
   async findUserPayments(@Param('userId') userId: string) {
     return this.paymentService.findUserPaymentsByUserId(userId);
   }
 
-  @CanAccessBy(Permissions.VIEW_USERS)
+  @CanAccessBy(Permissions.READ_USERS)
   @Get('/probation')
   findProbationUsers(@Query() userProbationRequest: UserProbationRequest) {
     return this.userService.findProbationUsers(userProbationRequest);
   }
 
-  @CanAccessBy(Permissions.EDIT_MEMBER_USER)
+  @CanAccessBy(Permissions.WRITE_USERS)
   @Patch('/members')
   upgradeToMembers(
     @Body() upgradeUserMemberInputDto: UpgradeUserMemberRequest,

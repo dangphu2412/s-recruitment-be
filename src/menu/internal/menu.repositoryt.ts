@@ -1,4 +1,4 @@
-import { In, Repository, TreeRepository } from 'typeorm';
+import { Repository, TreeRepository } from 'typeorm';
 import { Menu } from '../client';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
@@ -12,16 +12,21 @@ export class MenuRepository extends TreeRepository<Menu> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  findByPermissionNames(names: string[]): Promise<Menu[]> {
-    return this.find({
-      relations: {
-        permissionSettings: true,
-      },
-      where: {
-        permissionSettings: {
-          name: In(names),
-        },
-      },
+  async findByPermissionCodes(permissionCode: string[]): Promise<Menu[]> {
+    const trees = await this.findTrees({
+      relations: ['permissionSettings'],
+    });
+
+    return trees.filter((tree) => {
+      tree.subMenus = tree.subMenus.filter((leaf) => {
+        return permissionCode.some((permissionCode) =>
+          leaf.permissionSettings.some(
+            (setting) => setting.code === permissionCode,
+          ),
+        );
+      });
+
+      return tree.subMenus.length > 0;
     });
   }
 }

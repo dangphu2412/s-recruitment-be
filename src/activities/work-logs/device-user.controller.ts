@@ -15,6 +15,8 @@ import { DeviceUser } from '../domain/data-access/user-log.entity';
 import { FileInterceptor } from '../../system/file';
 import { ApiConsumes } from '@nestjs/swagger';
 import { DeviceUserFileValidatorPipe } from './device-user-file.pipe';
+import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../../account-service/authorization/access-definition.constant';
 
 export const DeviceUserCRUDService = createCRUDService(DeviceUser);
 
@@ -25,11 +27,13 @@ export class DeviceUserController {
     private readonly deviceUserService: ResourceCRUDService<DeviceUser>,
   ) {}
 
+  @CanAccessBy(Permissions.READ_FINGERPRINT_USERS)
   @Get()
   async findDeviceUsers() {
     return this.deviceUserService.find();
   }
 
+  @CanAccessBy(Permissions.WRITE_FINGERPRINT_USERS)
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @Post()

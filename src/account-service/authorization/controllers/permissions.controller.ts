@@ -18,7 +18,7 @@ export class PermissionController {
     private readonly permissionService: PermissionService,
   ) {}
 
-  @CanAccessBy(Permissions.VIEW_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.READ_IAM)
   @Get()
   findAll() {
     return this.permissionService.findAll();
