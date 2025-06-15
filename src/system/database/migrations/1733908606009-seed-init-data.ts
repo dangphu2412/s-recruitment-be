@@ -19,7 +19,7 @@ import { Department } from '../../../master-data-service/departments/department.
 import { MenuCode } from '../../../menu/client/menu-code.constant';
 import { DatabaseUtils } from '../utils/database.utils';
 
-type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
+type InsertMenu = Omit<Menu, 'parent' | 'subMenus' | 'parentId'> & {
   subMenus?: InsertMenu[];
 };
 
@@ -27,7 +27,6 @@ export class SeedInitData1733908606009 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const roleRepository = queryRunner.manager.getRepository(Role);
     const permissionRepository = queryRunner.manager.getRepository(Permission);
-
     const rolePermissionConnector = new RolePermissionConnector(
       roleRepository,
       permissionRepository,
@@ -63,74 +62,106 @@ export class SeedInitData1733908606009 implements MigrationInterface {
     ]);
     await permissionRepository.insert([
       {
-        name: Permissions.OWNER,
+        name: 'Owner',
+        code: Permissions.OWNER,
         description: 'Owner of system',
       },
       {
-        name: Permissions.VIEW_ACCESS_RIGHTS,
-        description: 'View access rights of system',
+        name: 'Write users',
+        code: Permissions.WRITE_USERS,
+        description: 'Modify user',
       },
       {
-        name: Permissions.EDIT_MEMBER_USER,
-        description: 'Modify member user',
-      },
-      {
-        name: Permissions.VIEW_USERS,
+        name: 'Read users',
+        code: Permissions.READ_USERS,
         description: 'View users of system',
       },
       {
-        name: Permissions.EDIT_ACCESS_RIGHTS,
+        name: 'Read identity access management',
+        code: Permissions.READ_IAM,
+        description: 'Read access rights of system',
+      },
+      {
+        name: 'Edit identity access management',
+        code: Permissions.EDIT_IAM,
         description: 'Edit roles of system',
       },
       {
-        name: Permissions.MANAGE_MASTER_DATA,
-        description: 'Manage master data',
-      },
-      {
-        name: Permissions.READ_ACTIVITIES,
+        name: 'Read activities',
+        code: Permissions.READ_ACTIVITIES,
         description: 'Read working',
       },
       {
-        name: Permissions.WRITE_ACTIVITIES,
+        name: 'Write activities',
+        code: Permissions.WRITE_ACTIVITIES,
         description: 'Write working',
       },
       {
-        name: Permissions.WRITE_PERIODS,
+        name: 'Read activity logs',
+        code: Permissions.READ_ACTIVITY_LOGS,
+        description: 'Read activity logs',
+      },
+      {
+        name: 'Write activity logs',
+        code: Permissions.WRITE_ACTIVITY_LOGS,
+        description: 'Write activity logs',
+      },
+      {
+        name: 'Read activity requests',
+        code: Permissions.READ_ACTIVITY_REQUESTS,
+        description: 'Read activity requests',
+      },
+      {
+        name: 'Write activity requests',
+        code: Permissions.WRITE_ACTIVITY_REQUESTS,
+        description: 'Write activity requests',
+      },
+      {
+        name: 'Read my activity requests',
+        code: Permissions.READ_MY_ACTIVITY_REQUESTS,
+        description: 'Read my activity requests',
+      },
+      {
+        name: 'Write my activity requests',
+        code: Permissions.WRITE_MY_ACTIVITY_REQUESTS,
+        description: 'Write my activity requests',
+      },
+      {
+        name: 'Read fingerprint users',
+        code: Permissions.READ_FINGERPRINT_USERS,
+        description: 'Read fingerprint users',
+      },
+      {
+        name: 'Write fingerprint users',
+        code: Permissions.WRITE_FINGERPRINT_USERS,
+        description: 'Write fingerprint users',
+      },
+      {
+        name: 'Write periods',
+        code: Permissions.WRITE_PERIODS,
         description: 'Write periods',
       },
       {
-        name: Permissions.WRITE_DEPARTMENTS,
+        name: 'Write departments',
+        code: Permissions.WRITE_DEPARTMENTS,
         description: 'Write departments',
-      },
-      {
-        name: Permissions.READ_ACTIVITY_LOGS,
-        description: 'Read activity logs',
       },
     ]);
 
-    const roleNameMapToPermissionNames = {
+    const roleNameMapToPermissionCodes = {
       [SystemRoles.SUPER_ADMIN]: [Permissions.OWNER],
-      [SystemRoles.LEADER]: [
-        Permissions.VIEW_USERS,
-        Permissions.EDIT_MEMBER_USER,
-      ],
-      [SystemRoles.TRAINER]: [
-        Permissions.VIEW_USERS,
-        Permissions.EDIT_MEMBER_USER,
-      ],
-      [SystemRoles.MEDIA]: [
-        Permissions.VIEW_USERS,
-        Permissions.EDIT_MEMBER_USER,
-      ],
-      [SystemRoles.HR]: [Permissions.VIEW_USERS, Permissions.EDIT_MEMBER_USER],
+      [SystemRoles.LEADER]: [Permissions.READ_USERS],
+      [SystemRoles.HR]: [Permissions.READ_USERS, Permissions.WRITE_USERS],
+      [SystemRoles.TRAINER]: [],
+      [SystemRoles.MEDIA]: [],
       [SystemRoles.MEMBER]: [],
     };
 
     await Promise.all(
-      Object.keys(roleNameMapToPermissionNames).map((roleName) => {
+      Object.keys(roleNameMapToPermissionCodes).map((roleName) => {
         rolePermissionConnector.process({
           roleName: roleName,
-          permissionCodes: roleNameMapToPermissionNames[roleName],
+          permissionCodes: roleNameMapToPermissionCodes[roleName],
         });
       }),
     );
@@ -165,59 +196,59 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       {
         name: 'User Management',
         iconCode: 'USER_MANAGEMENT_ICON',
-        code: MenuCode.USER_MANAGEMENT,
+        id: MenuCode.USER_MANAGEMENT,
         subMenus: [
           {
             name: 'User Overview',
             accessLink: '/users',
-            code: MenuCode.USER_OVERVIEW,
+            id: MenuCode.USER_OVERVIEW,
           },
           {
             name: 'IAM',
             accessLink: '/users/iam',
-            code: MenuCode.IDENTITY_ACCESS_MANAGEMENT,
+            id: MenuCode.IDENTITY_ACCESS_MANAGEMENT,
           },
           {
             name: 'Departments',
             accessLink: '/users/departments',
-            code: MenuCode.USER_DEPARTMENTS,
+            id: MenuCode.USER_DEPARTMENTS,
           },
           {
             name: 'Periods',
             accessLink: '/users/periods',
-            code: MenuCode.USER_PERIODS,
+            id: MenuCode.USER_PERIODS,
           },
         ],
       },
       {
         name: 'Activities',
         iconCode: 'ACTIVITY_MANAGEMENT_ICON',
-        code: MenuCode.ACTIVITY_MANAGEMENT,
+        id: MenuCode.ACTIVITY_MANAGEMENT,
         subMenus: [
           {
             name: 'Requests',
             accessLink: '/activities/requests',
-            code: MenuCode.ACTIVITY_REQUESTS,
+            id: MenuCode.ACTIVITY_REQUESTS,
           },
           {
             name: 'My requests',
             accessLink: '/activities/requests/my',
-            code: MenuCode.MY_ACTIVITY_REQUESTS,
+            id: MenuCode.MY_ACTIVITY_REQUESTS,
           },
           {
             name: 'Activities',
             accessLink: '/activities',
-            code: MenuCode.ACTIVITIES,
+            id: MenuCode.ACTIVITIES,
           },
           {
             name: 'Activities logs',
             accessLink: '/activities/tracking',
-            code: MenuCode.ACTIVITIES_LOGS,
+            id: MenuCode.ACTIVITIES_LOGS,
           },
           {
             name: 'Fingerprint users',
             accessLink: '/activities/fingerprint-users',
-            code: MenuCode.FINGERPRINT_USERS,
+            id: MenuCode.FINGERPRINT_USERS,
           },
         ],
       },
@@ -268,43 +299,24 @@ export class SeedInitData1733908606009 implements MigrationInterface {
 
     const menuSettingsProcessor = new PermissionMenuSettingsConnector(
       permissionRepository,
-      menuRepository,
+      queryRunner.manager,
     );
-
-    const permissionDefineMenus: Record<string, Array<string>> = {
-      [Permissions.VIEW_USERS]: [
-        MenuCode.USER_OVERVIEW,
-        MenuCode.USER_MANAGEMENT,
-      ],
-      [Permissions.EDIT_MEMBER_USER]: [MenuCode.USER_OVERVIEW],
-      [Permissions.VIEW_ACCESS_RIGHTS]: [MenuCode.IDENTITY_ACCESS_MANAGEMENT],
-      [Permissions.EDIT_ACCESS_RIGHTS]: [MenuCode.IDENTITY_ACCESS_MANAGEMENT],
-      [Permissions.READ_ACTIVITIES]: [
-        MenuCode.ACTIVITY_MANAGEMENT,
-        MenuCode.MY_ACTIVITY_REQUESTS,
-      ],
-      [Permissions.READ_ACTIVITY_LOGS]: [
-        MenuCode.ACTIVITIES_LOGS,
-        MenuCode.FINGERPRINT_USERS,
-      ],
-      [Permissions.WRITE_ACTIVITIES]: [
-        MenuCode.ACTIVITY_MANAGEMENT,
-        MenuCode.ACTIVITY_REQUESTS,
-        MenuCode.ACTIVITIES,
-        MenuCode.ACTIVITY_REQUESTS,
-      ],
-      [Permissions.WRITE_PERIODS]: [MenuCode.USER_PERIODS],
-      [Permissions.WRITE_DEPARTMENTS]: [MenuCode.USER_DEPARTMENTS],
+    const ROOT_MENU_CONFIG = [];
+    const menuDefinePermissions: Record<string, Array<string>> = {
+      [MenuCode.USER_MANAGEMENT]: ROOT_MENU_CONFIG,
+      [MenuCode.USER_OVERVIEW]: [Permissions.READ_USERS],
+      [MenuCode.IDENTITY_ACCESS_MANAGEMENT]: [Permissions.READ_IAM],
+      [MenuCode.USER_DEPARTMENTS]: [Permissions.WRITE_DEPARTMENTS],
+      [MenuCode.USER_PERIODS]: [Permissions.WRITE_PERIODS],
+      [MenuCode.ACTIVITY_MANAGEMENT]: ROOT_MENU_CONFIG,
+      [MenuCode.ACTIVITY_REQUESTS]: [Permissions.READ_ACTIVITY_REQUESTS],
+      [MenuCode.MY_ACTIVITY_REQUESTS]: [Permissions.READ_MY_ACTIVITY_REQUESTS],
+      [MenuCode.ACTIVITIES]: [Permissions.READ_ACTIVITIES],
+      [MenuCode.ACTIVITIES_LOGS]: [Permissions.READ_ACTIVITY_LOGS],
+      [MenuCode.FINGERPRINT_USERS]: [Permissions.READ_FINGERPRINT_USERS],
     };
 
-    await Promise.all(
-      Object.keys(permissionDefineMenus).map((permission) => {
-        return menuSettingsProcessor.process({
-          permissionCode: permission,
-          menuCodes: permissionDefineMenus[permission],
-        });
-      }),
-    );
+    await menuSettingsProcessor.process(menuDefinePermissions);
 
     const departmentRepository = queryRunner.manager.getRepository(Department);
 

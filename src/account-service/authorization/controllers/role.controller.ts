@@ -32,7 +32,7 @@ export class RoleController {
     private readonly roleService: RoleService,
   ) {}
 
-  @CanAccessBy(Permissions.VIEW_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.READ_IAM)
   @Get()
   getRoles(
     @Query() query: GetAccessControlRequestDTO,
@@ -40,7 +40,7 @@ export class RoleController {
     return this.roleService.findAccessControlView(query);
   }
 
-  @CanAccessBy(Permissions.EDIT_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.EDIT_IAM)
   @Put('/:id')
   @ApiNoContentResponse()
   async updateRole(
@@ -50,7 +50,7 @@ export class RoleController {
     await this.roleService.updateRole(roleId, updateRoleDto);
   }
 
-  @CanAccessBy(Permissions.EDIT_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.EDIT_IAM)
   @Put('/:id/users')
   @ApiNoContentResponse()
   async updateAssignedPersonsToRole(
@@ -63,7 +63,7 @@ export class RoleController {
     );
   }
 
-  @CanAccessBy(Permissions.EDIT_ACCESS_RIGHTS)
+  @CanAccessBy(Permissions.EDIT_IAM)
   @Post()
   @ApiNoContentResponse()
   async createRole(@Body() createRoleRequestDTO: CreateRoleRequestDTO) {

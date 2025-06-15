@@ -16,7 +16,7 @@ export class TableSetup1720749365859 implements MigrationInterface {
   private INDEX_USER_KEY = 'IDX_FK_users_roles_users_key';
   private INDEX_ROLE_KEY = 'IDX_FK_users_roles_roles_key';
   private FK_MENU_PARENT_KEY = 'FK_menus_parent_id_key';
-  private UNIQUE_PERMISSION_NAME_KEY = 'UQ_permissions_name_key';
+  private UNIQUE_PERMISSION_CODE_KEY = 'UQ_permissions_code_key';
   private INDEX_MENU_SETTING_MENU_KEY = 'IDX_FK_menus_settings_menus_key';
   private INDEX_MENU_SETTING_PERMISSION_KEY =
     'IDX_FK_menus_settings_permissions_key';
@@ -209,18 +209,11 @@ export class TableSetup1720749365859 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'int',
-            generationStrategy: 'increment',
-            isGenerated: true,
+            type: 'varchar',
             isPrimary: true,
           },
           {
             name: 'name',
-            type: 'varchar',
-            isNullable: false,
-          },
-          {
-            name: 'code',
             type: 'varchar',
             isNullable: false,
           },
@@ -242,7 +235,7 @@ export class TableSetup1720749365859 implements MigrationInterface {
           },
           {
             name: 'parent_id',
-            type: 'int',
+            type: 'varchar',
             isNullable: true,
           },
         ],
@@ -359,15 +352,20 @@ export class TableSetup1720749365859 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'int',
-            generationStrategy: 'increment',
-            isGenerated: true,
+            type: 'uuid',
+            generationStrategy: 'uuid',
             isPrimary: true,
+            default: 'uuid_generate_v4()',
           },
           {
             name: 'name',
             type: 'varchar',
             isNullable: true,
+          },
+          {
+            name: 'code',
+            type: 'varchar',
+            isNullable: false,
           },
           {
             name: 'description',
@@ -380,8 +378,8 @@ export class TableSetup1720749365859 implements MigrationInterface {
 
     await queryRunner.createUniqueConstraints('permissions', [
       new TableUnique({
-        name: this.UNIQUE_PERMISSION_NAME_KEY,
-        columnNames: ['name'],
+        name: this.UNIQUE_PERMISSION_CODE_KEY,
+        columnNames: ['code'],
       }),
     ]);
 
@@ -401,7 +399,7 @@ export class TableSetup1720749365859 implements MigrationInterface {
           },
           {
             name: 'permission_id',
-            type: 'int',
+            type: 'uuid',
           },
         ],
       }),
@@ -432,11 +430,11 @@ export class TableSetup1720749365859 implements MigrationInterface {
           },
           {
             name: 'permission_id',
-            type: 'int',
+            type: 'uuid',
           },
           {
             name: 'menu_id',
-            type: 'int',
+            type: 'varchar',
           },
         ],
       }),
@@ -465,135 +463,6 @@ export class TableSetup1720749365859 implements MigrationInterface {
       new TableIndex({
         name: this.INDEX_MENU_SETTING_MENU_KEY,
         columnNames: ['menu_id'],
-      }),
-    ]);
-
-    await queryRunner.createTable(
-      new Table({
-        name: 'posts',
-        columns: [
-          {
-            name: 'id',
-            type: 'int',
-            generationStrategy: 'increment',
-            isGenerated: true,
-            isPrimary: true,
-          },
-          {
-            name: 'slug',
-            type: 'varchar',
-            isNullable: false,
-          },
-          {
-            name: 'title',
-            type: 'varchar',
-            isNullable: false,
-          },
-          {
-            name: 'content',
-            type: 'text',
-            isNullable: false,
-          },
-          {
-            name: 'author_id',
-            type: 'uuid',
-          },
-          {
-            name: 'created_at',
-            type: 'timestamp',
-            default: 'now()',
-          },
-          {
-            name: 'updated_at',
-            type: 'timestamp',
-            default: 'now()',
-          },
-          {
-            name: 'deleted_at',
-            type: 'timestamp',
-            isNullable: true,
-          },
-        ],
-      }),
-    );
-
-    await queryRunner.createForeignKeys('posts', [
-      new TableForeignKey({
-        columnNames: ['author_id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'users',
-      }),
-    ]);
-
-    await queryRunner.addColumns('posts', [
-      new TableColumn({
-        name: 'preview_image',
-        type: 'varchar',
-        isNullable: true,
-      }),
-      new TableColumn({
-        name: 'summary',
-        type: 'varchar',
-        isNullable: false,
-        default: `''`,
-      }),
-    ]);
-
-    await queryRunner.createTable(
-      new Table({
-        name: 'categories',
-        columns: [
-          {
-            name: 'id',
-            type: 'varchar',
-            isPrimary: true,
-          },
-          {
-            name: 'name',
-            type: 'varchar',
-            isNullable: false,
-          },
-          {
-            name: 'summary',
-            type: 'varchar',
-            isNullable: false,
-          },
-        ],
-      }),
-    );
-
-    await queryRunner.createTable(
-      new Table({
-        name: 'posts_categories',
-        columns: [
-          {
-            name: 'id',
-            type: 'int',
-            generationStrategy: 'increment',
-            isGenerated: true,
-          },
-          {
-            name: 'post_id',
-            type: 'int',
-          },
-          {
-            name: 'category_id',
-            type: 'varchar',
-          },
-        ],
-      }),
-    );
-
-    await queryRunner.createForeignKeys('posts_categories', [
-      new TableForeignKey({
-        columnNames: ['post_id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'posts',
-      }),
-      new TableForeignKey({
-        columnNames: ['category_id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'categories',
       }),
     ]);
 

@@ -22,7 +22,7 @@ export class RolePermissionConnector {
     });
 
     const newPermission = await this.permissionRepository.findBy({
-      name: In(permissionCodes),
+      code: In(permissionCodes),
     });
     role.permissions = role.permissions.concat(newPermission);
 

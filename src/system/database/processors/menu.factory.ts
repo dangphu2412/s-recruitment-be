@@ -1,8 +1,8 @@
 import { Menu } from '../../../menu';
-import { In, TreeRepository } from 'typeorm';
+import { TreeRepository } from 'typeorm';
 import { keyBy, omit } from 'lodash';
 
-type InsertMenu = Omit<Menu, 'id' | 'parent' | 'subMenus' | 'parentId'> & {
+type InsertMenu = Omit<Menu, 'parent' | 'subMenus' | 'parentId'> & {
   subMenus?: InsertMenu[];
 };
 
@@ -34,34 +34,19 @@ export class MenuFactory {
         .flat(),
     );
 
-    const parentKeyByCode = keyBy(createdParent, 'code');
-    const childMenuKeyByCode = keyBy(childMenu, 'code');
+    const parentKeyByCode = keyBy(createdParent, 'id');
+    const childMenuKeyByCode = keyBy(childMenu, 'id');
 
     await this.menuRepository.save(
       menus.map((menu) => {
-        const menuEntity = parentKeyByCode[menu.code];
+        const menuEntity = parentKeyByCode[menu.id];
         if (menu.subMenus) {
           menuEntity.subMenus = menu.subMenus.map((subMenu) => {
-            return childMenuKeyByCode[subMenu.code];
+            return childMenuKeyByCode[subMenu.id];
           });
         }
         return menuEntity;
       }),
     );
-  }
-
-  async terminate(menus: InsertMenu[]) {
-    const codes = menus
-      .map((menu) => {
-        if (menu.subMenus) {
-          return menu.subMenus.map((sub) => sub.code);
-        }
-
-        return [menu.code];
-      })
-      .flat();
-    await this.menuRepository.delete({
-      code: In(codes),
-    });
   }
 }
