@@ -21,6 +21,7 @@ import { MasterDataServiceModule } from '../master-data-service/master-data-serv
 import { ActivityRequestController } from './requests/activity-request.controller';
 import { AccountServiceModule } from '../account-service/account-service.module';
 import { DeviceUser } from './domain/data-access/user-log.entity';
+import { LogFileService } from './work-logs/log-file.service';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { DeviceUser } from './domain/data-access/user-log.entity';
     ActivityLogRepository,
     ActivityLogService,
     ActivityMatcher,
+    LogFileService,
   ],
 })
 export class ActivityModule {}
