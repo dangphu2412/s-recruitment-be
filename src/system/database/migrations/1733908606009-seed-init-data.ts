@@ -146,6 +146,16 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         code: Permissions.WRITE_DEPARTMENTS,
         description: 'Write departments',
       },
+      {
+        name: 'Read payments',
+        code: Permissions.READ_PAYMENTS,
+        description: 'Read payments',
+      },
+      {
+        name: 'Write payments',
+        code: Permissions.WRITE_PAYMENTS,
+        description: 'Write payments',
+      },
     ]);
 
     const roleNameMapToPermissionCodes = {

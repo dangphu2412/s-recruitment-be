@@ -38,3 +38,6 @@ lerna-debug.log*
 .env
 service_account.json
 upload/
+
+logs.json
+logs.meta.json
