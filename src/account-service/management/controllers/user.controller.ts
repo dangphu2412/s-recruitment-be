@@ -138,7 +138,7 @@ export class UserController {
     return this.userService.createUsersByFile({ ...dto, file });
   }
 
-  @CanAccessBy(Permissions.WRITE_USERS)
+  @CanAccessBy(Permissions.WRITE_PAYMENTS)
   @Post('/:userId/payments')
   async createUserPayment(
     @Body() createPaymentDto: CreatePaymentRequest,
@@ -147,7 +147,7 @@ export class UserController {
     await this.userService.createUserPayment(userId, createPaymentDto);
   }
 
-  @CanAccessBy(Permissions.READ_USERS)
+  @CanAccessBy(Permissions.READ_PAYMENTS)
   @Get('/:userId/payments')
   async findUserPayments(@Param('userId') userId: string) {
     return this.paymentService.findUserPaymentsByUserId(userId);

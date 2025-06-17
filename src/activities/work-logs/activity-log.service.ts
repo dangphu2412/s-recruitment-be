@@ -11,8 +11,7 @@ import {
   WorkTimeUtils,
 } from './work-status-evaluator.service';
 import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
-
-export type CreateFileDTO = Express.Multer.File;
+import { LogFileService } from './log-file.service';
 
 export type LogDTO = {
   userSn: number;
@@ -47,21 +46,16 @@ class LogSegmentProcessor {
   async onEachDeviceUserId(
     callback: (deviceId: string, logs: Map<string, LogDTO[]>) => Promise<void>,
   ) {
-    Logger.log(
-      `Proces logs for users size of ${this.deviceIdMapToDateSegmentedLogs.size}`,
-      LogSegmentProcessor.name,
-    );
+    // Logger.log(
+    //   `Proces logs for users size of ${this.deviceIdMapToDateSegmentedLogs.size}`,
+    //   LogSegmentProcessor.name,
+    // );
 
     for (const [
       deviceId,
       logs,
     ] of this.deviceIdMapToDateSegmentedLogs.entries()) {
-      Logger.log(
-        `Process on user ${deviceId} with logs size of ${logs.size}`,
-        LogSegmentProcessor.name,
-      );
       await callback(deviceId, logs);
-      Logger.log(`Finished on user ${deviceId}`, LogSegmentProcessor.name);
     }
   }
 }
@@ -72,6 +66,7 @@ export class ActivityLogService {
     private readonly activityLogRepository: ActivityLogRepository,
     private readonly activityRepository: ActivityRepository,
     private readonly workStatusEvaluator: ActivityMatcher,
+    private readonly logFileService: LogFileService,
   ) {}
 
   async findLogs(findLogsRequest: FindLogsRequest) {
@@ -97,8 +92,8 @@ export class ActivityLogService {
     });
   }
 
-  async uploadActivityLogs(file: CreateFileDTO) {
-    const data = file.buffer.toString('utf-8');
+  async uploadActivityLogs() {
+    const data = (await this.logFileService.getLogs()).toString('utf-8');
     const fullLogs = JSON.parse(data) as LogDTO[];
 
     const lastYearLogs = this.extractLogsFromLastHalfYear(fullLogs);
