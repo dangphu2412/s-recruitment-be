@@ -63,4 +63,11 @@ export class LogFileService implements OnModuleInit {
       };
     }
   }
+
+  async getUsers(): Promise<Buffer> {
+    const bucket = this.storage.bucket('sgroup-bucket');
+    const file = bucket.file('users.json');
+
+    return (await file.download())[0];
+  }
 }

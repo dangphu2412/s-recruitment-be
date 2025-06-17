@@ -4,19 +4,15 @@ import {
   Get,
   Inject,
   Post,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   createCRUDService,
   ResourceCRUDService,
 } from '../../system/resource-templates/resource-service-template';
 import { DeviceUser } from '../domain/data-access/user-log.entity';
-import { FileInterceptor } from '../../system/file';
-import { ApiConsumes } from '@nestjs/swagger';
-import { DeviceUserFileValidatorPipe } from './device-user-file.pipe';
 import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
 import { Permissions } from '../../account-service/authorization/access-definition.constant';
+import { LogFileService } from './log-file.service';
 
 export const DeviceUserCRUDService = createCRUDService(DeviceUser);
 
@@ -25,6 +21,7 @@ export class DeviceUserController {
   constructor(
     @Inject(DeviceUserCRUDService.token)
     private readonly deviceUserService: ResourceCRUDService<DeviceUser>,
+    private readonly logFileService: LogFileService,
   ) {}
 
   @CanAccessBy(Permissions.READ_FINGERPRINT_USERS)
@@ -34,14 +31,11 @@ export class DeviceUserController {
   }
 
   @CanAccessBy(Permissions.WRITE_FINGERPRINT_USERS)
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiConsumes('multipart/form-data')
   @Post()
-  uploadTrackFile(
-    @UploadedFile(new DeviceUserFileValidatorPipe())
-    file: Express.Multer.File,
-  ) {
-    const data = JSON.parse(file.buffer.toString('utf-8'));
+  async uploadTrackFile() {
+    const data = JSON.parse(
+      (await this.logFileService.getUsers()).toString('utf-8'),
+    );
 
     if (!data.data) {
       throw new BadRequestException('Invalid data format');
@@ -62,6 +56,6 @@ export class DeviceUserController {
       return deviceUserLog;
     });
 
-    return this.deviceUserService.createMany(entities);
+    return this.deviceUserService.upsertMany(entities);
   }
 }
