@@ -27,6 +27,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
       toDate = new Date().toISOString(),
       authors,
       size,
+      query,
     } = findLogsRequest;
     const offset = OffsetPaginationRequest.getOffset(
       findLogsRequest.page,
@@ -58,6 +59,15 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
       queryBuilder.andWhere('author.id IN (:...authors)', {
         authors: authors,
       });
+    }
+
+    if (query) {
+      queryBuilder.andWhere(
+        '(author.username LIKE :query OR deviceAuthor.name = :query)',
+        {
+          query: `%${query}%`,
+        },
+      );
     }
 
     return queryBuilder
