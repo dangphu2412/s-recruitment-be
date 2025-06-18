@@ -1,5 +1,5 @@
 import { OffsetPaginationRequest } from '../../../../system/pagination/offset-pagination-request';
-import { IsDateString, IsEnum, IsOptional } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 import { LogWorkStatus } from '../../core/constants/log-work-status.enum';
 import { DeserializeQueryToArray } from '../../../../system/query-params/query-param-deserializer.decorator';
 
@@ -20,4 +20,7 @@ export class FindLogsRequest extends OffsetPaginationRequest {
   @DeserializeQueryToArray()
   @IsOptional()
   authors?: string[];
+
+  @IsString()
+  query: string;
 }
