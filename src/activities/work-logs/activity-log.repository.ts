@@ -63,9 +63,10 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
 
     if (query) {
       queryBuilder.andWhere(
-        '(author.username LIKE :query OR deviceAuthor.name = :query)',
+        '(author.username LIKE :usernameQuery OR deviceAuthor.name LIKE :nameQuery)',
         {
-          query: `%${query}%`,
+          usernameQuery: `${query}%`,
+          nameQuery: `${query}%`,
         },
       );
     }
