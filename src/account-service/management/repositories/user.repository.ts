@@ -97,4 +97,13 @@ export class UserRepository extends Repository<User> {
       totalRecords,
     });
   }
+
+  saveUsersIgnoreConflict(entities: User[]) {
+    return this.createQueryBuilder('users')
+      .insert()
+      .values(entities)
+      .orUpdate(['full_name', 'birthday', 'phone_number'], ['username'])
+      .returning('')
+      .execute();
+  }
 }
