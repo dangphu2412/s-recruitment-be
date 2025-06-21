@@ -28,6 +28,7 @@ import { FileInterceptor } from '../../system/file';
 import { ApiConsumes } from '@nestjs/swagger';
 import { FileActivityRequestDTO } from '../domain/core/dtos/file-create-activity-request.dto';
 import { UploadRequestActivityFileValidatorPipe } from './upload-activity-request-file.pipe';
+import { FindMyRequestedActivitiesRequest } from '../domain/presentation/dtos/find-my-requested-activities.request';
 
 @Controller('activity-requests')
 export class ActivityRequestController {
@@ -45,8 +46,14 @@ export class ActivityRequestController {
   @CanAccessBy(Permissions.READ_MY_ACTIVITY_REQUESTS)
   @Identified
   @Get('my')
-  findMyRequestedActivities(@CurrentUser() user: JwtPayload) {
-    return this.activityRequestService.findMyRequestedActivities(user.sub);
+  findMyRequestedActivities(
+    @CurrentUser() user: JwtPayload,
+    @Query() query: FindMyRequestedActivitiesRequest,
+  ) {
+    return this.activityRequestService.findMyRequestedActivities({
+      userId: user.sub,
+      ...query,
+    });
   }
 
   @Identified
