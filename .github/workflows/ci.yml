@@ -16,11 +16,7 @@ jobs:
     needs: [setups]
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    uses: ./.github/workflows/unit-test-job.yml
-
-  lint-check:
-    needs: [setups]
-    uses: ./.github/workflows/lint-job.yml
+    uses: ./.github/workflows/quality-check-job.yml
 
   build:
     needs: [setups]
