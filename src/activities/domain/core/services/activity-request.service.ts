@@ -1,6 +1,5 @@
 import { createProviderToken } from '../../../../system/nestjs-extensions';
 import { CreateActivityRequestDTO } from '../dtos/create-activity-request.dto';
-import { FindRequestedMyActivitiesResponseDTO } from '../dtos/find-requested-my-acitivities.dto';
 import {
   FindRequestedActivitiesResponseDTO,
   FindRequestedActivityQueryDTO,
@@ -9,6 +8,10 @@ import { FindRequestedMyActivityResponseDTO } from '../dtos/find-requested-my-ac
 import { UpdateMyActivityRequestDTO } from '../dtos/update-my-activity-request.dto';
 import { UpdateApprovalActivityRequestDTO } from '../dtos/update-approval-activity-request.dto';
 import { FileActivityRequestDTO } from '../dtos/file-create-activity-request.dto';
+import {
+  FindMyRequestedActivityQueryDTO,
+  FindRequestedMyActivitiesResponseDTO,
+} from '../dtos/find-my-requested-acitivities.dto';
 
 export const ActivityRequestServiceToken = createProviderToken(
   'ActivityRequestService',
@@ -19,7 +22,7 @@ export interface ActivityRequestService {
     findRequestedActivityQueryDTO: FindRequestedActivityQueryDTO,
   ): Promise<FindRequestedActivitiesResponseDTO>;
   findMyRequestedActivities(
-    userId: string,
+    findMyRequestedActivitiesRequest: FindMyRequestedActivityQueryDTO,
   ): Promise<FindRequestedMyActivitiesResponseDTO>;
   findMyRequestedActivity(
     id: number,
