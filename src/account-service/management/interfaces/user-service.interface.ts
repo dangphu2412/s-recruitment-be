@@ -8,7 +8,7 @@ import { UpdateUserRolesDto } from '../dtos/presentations/update-user-roles.dto'
 import { PaginatedUserProbationDTO } from '../dtos/core/user-probation.dto';
 import { UserProbationQueryDTO } from '../dtos/core/user-probation-query.dto';
 import { UpgradeUserMemberDTO } from '../dtos/core/upgrade-user-member.dto';
-import { GetUserDTO, GetUsersDTO } from '../dtos/core/get-users.dto';
+import { GetUserDTO } from '../dtos/core/get-users.dto';
 import { UpdateUserDTO } from '../dtos/core/update-user.dto';
 import { GetUsersQueryDTO } from '../dtos/core/get-users-query.dto';
 import { CreatePaymentRequest } from '../dtos/presentations/create-payment.request';
@@ -19,8 +19,9 @@ export const UserServiceToken = createProviderToken('UserServiceToken');
 export interface UserService {
   findMyProfile(id: string): Promise<MyProfile>;
   findUserDetail(id: string): Promise<UserDetail>;
-  find(query: GetUsersDTO): Promise<User[]>;
-  find(ids: string[]): Promise<User[]>;
+  /**
+   * @deprecated This API too abstract and not correctly used
+   */
   findOne(query: GetUserDTO): Promise<User>;
   findProbationUsers(
     userProbationQueryInput: UserProbationQueryDTO,
@@ -31,17 +32,10 @@ export interface UserService {
   findUsersByFullNames(fullNames: string[]): Promise<User[]>;
 
   /**
-   * @throws {NotFoundException}
-   */
-  assertIdExist(id: string): Promise<void>;
-
-  /**
    * @throws {ConflictException}
    */
   createUser(dto: CreateUsersRequestDTO): Promise<void>;
-  createUsersByFile(
-    dto: FileCreateUsersDto,
-  ): Promise<{ duplicatedEmails: string[] }[]>;
+  createUsersByFile(dto: FileCreateUsersDto): Promise<void>;
   createUserPayment(id: string, dto: CreatePaymentRequest): Promise<void>;
 
   updateUserRoles(id: string, payload: UpdateUserRolesDto): Promise<void>;
