@@ -6,6 +6,7 @@ import {
 import { TimeOfDay } from '../../../src/master-data-service/time-of-days/time-of-day.entity';
 import { DayOfWeek } from '../../../src/master-data-service/day-of-weeks/day-of-week';
 import { User } from '../../../src/account-service/shared/entities/user.entity';
+import { parseISO } from 'date-fns';
 
 describe('WorkStatusPolicy', () => {
   let workStatusPolicy: ActivityMatcher;
@@ -26,7 +27,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:29:00.000Z',
           toDateTime: '2025-03-10T04:31:00.000Z',
         }),
-      ).toEqual({ activityId: null, status: 'N' });
+      ).toEqual({
+        activityId: null,
+        status: 'N',
+        auditedFromDateTime: null,
+        auditedToDateTime: null,
+      });
     });
   });
 
@@ -57,7 +63,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-06-23T01:29:00.000Z',
             toDateTime: '2025-06-23T04:31:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'O' });
+        ).toEqual({
+          activityId: 1,
+          status: 'O',
+          auditedFromDateTime: null,
+          auditedToDateTime: null,
+        });
       });
 
       it('[from, to] equals timeOfDay', async () => {
@@ -85,7 +96,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-06-23T01:30:00.000Z',
             toDateTime: '2025-06-23T04:30:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'O' });
+        ).toEqual({
+          activityId: 1,
+          status: 'O',
+          auditedFromDateTime: null,
+          auditedToDateTime: null,
+        });
       });
 
       it('[from, to] equals timeOfDay from 1 of activities.timeOfDay', async () => {
@@ -147,7 +163,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-06-23T01:30:00.000Z',
             toDateTime: '2025-06-23T04:30:00.000Z',
           }),
-        ).toEqual({ activityId: 3, status: 'O' });
+        ).toEqual({
+          activityId: 3,
+          status: 'O',
+          auditedFromDateTime: null,
+          auditedToDateTime: null,
+        });
       });
     });
 
@@ -177,7 +198,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:14:59.000Z',
             toDateTime: '2025-03-10T04:24:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'O' });
+        ).toEqual({
+          activityId: 1,
+          status: 'O',
+          auditedFromDateTime: parseISO('2025-03-10T01:29:59.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:39:00.000Z'),
+        });
       });
 
       it('[from, to] equals timeOfDay', async () => {
@@ -205,7 +231,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:15:00.000Z',
             toDateTime: '2025-03-10T04:15:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'O' });
+        ).toEqual({
+          activityId: 1,
+          status: 'O',
+          auditedFromDateTime: parseISO('2025-03-10T01:30:00.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:30:00.000Z'),
+        });
       });
 
       it('[from, to] equals timeOfDay from 1 of activities.timeOfDay', async () => {
@@ -267,7 +298,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:14:00.000Z',
             toDateTime: '2025-03-10T04:16:00.000Z',
           }),
-        ).toEqual({ activityId: 3, status: 'O' });
+        ).toEqual({
+          activityId: 3,
+          status: 'O',
+          auditedFromDateTime: parseISO('2025-03-10T01:29:00.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:31:00.000Z'),
+        });
       });
     });
   });
@@ -299,7 +335,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:31:00.000Z',
             toDateTime: '2025-03-10T04:29:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'L' });
+        ).toEqual({
+          activityId: 1,
+          status: 'L',
+          auditedFromDateTime: parseISO('2025-03-10T01:46:00.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:44:00.000Z'),
+        });
       });
 
       it('from < activities.timeOfDay.fromTime', async () => {
@@ -327,7 +368,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:31:00.000Z',
             toDateTime: '2025-03-10T04:31:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'L' });
+        ).toEqual({
+          activityId: 1,
+          status: 'L',
+          auditedFromDateTime: parseISO('2025-03-10T01:46:00.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:46:00.000Z'),
+        });
       });
 
       it('to < activities.timeOfDay.toTime', async () => {
@@ -355,7 +401,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:30:00.000Z',
             toDateTime: '2025-03-10T04:29:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'L' });
+        ).toEqual({
+          activityId: 1,
+          status: 'L',
+          auditedFromDateTime: parseISO('2025-03-10T01:45:00.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:44:00.000Z'),
+        });
       });
     });
 
@@ -385,7 +436,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:16:00.000Z',
             toDateTime: '2025-03-10T04:14:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'L' });
+        ).toEqual({
+          activityId: 1,
+          status: 'L',
+          auditedFromDateTime: parseISO('2025-03-10T01:31:00.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:29:00.000Z'),
+        });
 
         // At seconds
         expect(
@@ -412,7 +468,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:15:01.000Z',
             toDateTime: '2025-03-10T04:14:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'L' });
+        ).toEqual({
+          activityId: 1,
+          status: 'L',
+          auditedFromDateTime: parseISO('2025-03-10T01:30:01.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:29:00.000Z'),
+        });
       });
 
       it('from < activities.timeOfDay.fromTime', async () => {
@@ -440,7 +501,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:16:00.000Z',
             toDateTime: '2025-03-10T04:31:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'L' });
+        ).toEqual({
+          activityId: 1,
+          status: 'L',
+          auditedFromDateTime: parseISO('2025-03-10T01:31:00.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:46:00.000Z'),
+        });
 
         expect(
           workStatusPolicy.match({
@@ -466,7 +532,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:16:00.000Z',
             toDateTime: '2025-03-10T04:29:59.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'L' });
+        ).toEqual({
+          activityId: 1,
+          status: 'L',
+          auditedFromDateTime: parseISO('2025-03-10T01:31:00.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:44:59.000Z'),
+        });
       });
 
       it('to < activities.timeOfDay.toTime', async () => {
@@ -494,7 +565,12 @@ describe('WorkStatusPolicy', () => {
             fromDateTime: '2025-03-10T01:15:00.000Z',
             toDateTime: '2025-03-10T04:14:00.000Z',
           }),
-        ).toEqual({ activityId: 1, status: 'L' });
+        ).toEqual({
+          activityId: 1,
+          status: 'L',
+          auditedFromDateTime: parseISO('2025-03-10T01:30:00.000Z'),
+          auditedToDateTime: parseISO('2025-03-10T04:29:00.000Z'),
+        });
       });
     });
   });
@@ -525,7 +601,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:44:00.000Z',
           toDateTime: '2025-03-10T04:31:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'O' });
+      ).toEqual({
+        activityId: 1,
+        status: 'O',
+        auditedFromDateTime: parseISO('2025-03-10T01:59:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:46:00.000Z'),
+      });
     });
 
     it('[from, to] equals timeOfDay', async () => {
@@ -553,7 +634,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:45:00.000Z',
           toDateTime: '2025-03-10T04:30:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'O' });
+      ).toEqual({
+        activityId: 1,
+        status: 'O',
+        auditedFromDateTime: parseISO('2025-03-10T02:00:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:45:00.000Z'),
+      });
     });
 
     it('[from, to] equals 1 of activities.timeOfDay', async () => {
@@ -615,7 +701,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:45:00.000Z',
           toDateTime: '2025-03-10T04:30:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'O' });
+      ).toEqual({
+        activityId: 1,
+        status: 'O',
+        auditedFromDateTime: parseISO('2025-03-10T02:00:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:45:00.000Z'),
+      });
     });
   });
 
@@ -645,7 +736,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:46:00.000Z',
           toDateTime: '2025-03-10T04:29:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'L' });
+      ).toEqual({
+        activityId: 1,
+        status: 'L',
+        auditedFromDateTime: parseISO('2025-03-10T02:01:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:44:00.000Z'),
+      });
     });
 
     it('from < activities.timeOfDay.fromTime', async () => {
@@ -673,7 +769,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:46:00.000Z',
           toDateTime: '2025-03-10T04:31:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'L' });
+      ).toEqual({
+        activityId: 1,
+        status: 'L',
+        auditedFromDateTime: parseISO('2025-03-10T02:01:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:46:00.000Z'),
+      });
     });
 
     it('to < activities.timeOfDay.toTime', async () => {
@@ -701,7 +802,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:44:00.000Z',
           toDateTime: '2025-03-10T04:29:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'L' });
+      ).toEqual({
+        activityId: 1,
+        status: 'L',
+        auditedFromDateTime: parseISO('2025-03-10T01:59:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:44:00.000Z'),
+      });
     });
   });
 
@@ -731,7 +837,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:29:00.000Z',
           toDateTime: '2025-03-10T04:31:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'O' });
+      ).toEqual({
+        activityId: 1,
+        status: 'O',
+        auditedFromDateTime: parseISO('2025-03-10T01:44:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:46:00.000Z'),
+      });
     });
 
     it('[from, to] equals timeOfDay', async () => {
@@ -759,7 +870,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:30:00.000Z',
           toDateTime: '2025-03-10T04:30:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'O' });
+      ).toEqual({
+        activityId: 1,
+        status: 'O',
+        auditedFromDateTime: parseISO('2025-03-10T01:45:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:45:00.000Z'),
+      });
     });
 
     it('[from, to] equals 1 of activities.timeOfDay', async () => {
@@ -821,7 +937,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:30:00.000Z',
           toDateTime: '2025-03-10T04:30:00.000Z',
         }),
-      ).toEqual({ activityId: 2, status: 'O' });
+      ).toEqual({
+        activityId: 2,
+        status: 'O',
+        auditedFromDateTime: parseISO('2025-03-10T01:45:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:45:00.000Z'),
+      });
     });
   });
 
@@ -851,7 +972,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:31:00.000Z',
           toDateTime: '2025-03-10T04:29:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'L' });
+      ).toEqual({
+        activityId: 1,
+        status: 'L',
+        auditedFromDateTime: parseISO('2025-03-10T01:46:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:44:00.000Z'),
+      });
     });
 
     it('from < activities.timeOfDay.fromTime', async () => {
@@ -879,7 +1005,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:46:00.000Z',
           toDateTime: '2025-03-10T04:31:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'L' });
+      ).toEqual({
+        activityId: 1,
+        status: 'L',
+        auditedFromDateTime: parseISO('2025-03-10T02:01:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:46:00.000Z'),
+      });
     });
 
     it('to < activities.timeOfDay.toTime', async () => {
@@ -907,7 +1038,12 @@ describe('WorkStatusPolicy', () => {
           fromDateTime: '2025-03-10T01:44:00.000Z',
           toDateTime: '2025-03-10T04:29:00.000Z',
         }),
-      ).toEqual({ activityId: 1, status: 'L' });
+      ).toEqual({
+        activityId: 1,
+        status: 'L',
+        auditedFromDateTime: parseISO('2025-03-10T01:59:00.000Z'),
+        auditedToDateTime: parseISO('2025-03-10T04:44:00.000Z'),
+      });
     });
   });
 });
