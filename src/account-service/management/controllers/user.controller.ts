@@ -86,6 +86,9 @@ export class UserController {
     await this.userService.toggleUserIsActive(id);
   }
 
+  /**
+   * @deprecated API Design is not correctly implemented, should return Role model instead of User
+   */
   @CanAccessBy(Permissions.EDIT_IAM)
   @Get('/:id/roles')
   @ApiOkResponse()

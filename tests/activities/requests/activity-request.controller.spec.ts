@@ -10,9 +10,9 @@ import { CreateActivityRequestRequest } from '../../../src/activities/domain/pre
 import { UpdateMyActivityRequestRequest } from '../../../src/activities/domain/presentation/dtos/update-my-activity.request';
 import { UpdateApprovalActivityRequestRequest } from '../../../src/activities/domain/presentation/dtos/update-approval-activity-request.request';
 import { FindRequestedActivitiesResponseDTO } from '../../../src/activities/domain/core/dtos/find-requested-acitivities.dto';
-import { FindRequestedMyActivitiesResponseDTO } from '../../../src/activities/domain/core/dtos/find-requested-my-acitivities.dto';
 import { FindRequestedMyActivityResponseDTO } from '../../../src/activities/domain/core/dtos/find-requested-my-acitivity.dto';
 import { ApprovalRequestAction } from '../../../src/activities/domain/core/constants/request-activity-status.enum';
+import { FindRequestedMyActivitiesResponseDTO } from '../../../src/activities/domain/core/dtos/find-my-requested-acitivities.dto';
 
 describe('ActivityRequestController', () => {
   let controller: ActivityRequestController;
@@ -93,9 +93,14 @@ describe('ActivityRequestController', () => {
         .spyOn(service, 'findMyRequestedActivities')
         .mockResolvedValue(expectedResponse);
 
-      const result = await controller.findMyRequestedActivities(user);
+      const result = await controller.findMyRequestedActivities(user, {
+        status: [],
+      });
 
-      expect(service.findMyRequestedActivities).toHaveBeenCalledWith(user.sub);
+      expect(service.findMyRequestedActivities).toHaveBeenCalledWith({
+        status: [],
+        userId: user.sub,
+      });
       expect(result).toEqual(expectedResponse);
     });
   });

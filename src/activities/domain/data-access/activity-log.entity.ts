@@ -29,6 +29,20 @@ export class ActivityLog {
   workStatus: LogWorkStatus;
 
   @Column({
+    name: 'audited_from_time',
+    nullable: true,
+    type: 'timestamp',
+  })
+  auditedFromTime: string | null;
+
+  @Column({
+    name: 'audited_to_time',
+    nullable: true,
+    type: 'timestamp',
+  })
+  auditedToTime: string | null;
+
+  @Column({
     name: 'activity_id',
     type: 'int',
   })

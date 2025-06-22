@@ -7,6 +7,7 @@ export type FileRow = {
   Tracking: string;
   'Ngày sinh': string;
   Khóa: string;
+  SĐT: string;
 };
 
 export class FileCreateUsersDto {

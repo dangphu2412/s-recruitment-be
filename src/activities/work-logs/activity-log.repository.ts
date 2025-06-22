@@ -42,6 +42,8 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
         'activityLog.toTime',
         'activityLog.deviceUserId',
         'activityLog.workStatus',
+        'activityLog.auditedFromTime',
+        'activityLog.auditedToTime',
         'author.email',
         'author.id',
         'deviceAuthor.name',
@@ -102,7 +104,10 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
     return this.createQueryBuilder()
       .insert()
       .values(activityLogs)
-      .orUpdate(['work_status'], ['from_time', 'to_time', 'track_id'])
+      .orUpdate(
+        ['work_status', 'audited_from_time', 'audited_to_time'],
+        ['from_time', 'to_time', 'track_id'],
+      )
       .execute();
   }
 }

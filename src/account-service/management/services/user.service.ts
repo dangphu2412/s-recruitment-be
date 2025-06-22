@@ -10,7 +10,6 @@ import { UserRepository } from '../repositories/user.repository';
 import { OffsetPaginationResponse } from 'src/system/pagination';
 import { omit } from 'lodash';
 import { In, InsertResult, IsNull } from 'typeorm';
-import uniq from 'lodash/uniq';
 import { PasswordManager } from '../../registration/services/password-manager';
 import {
   FileCreateUsersDto,
@@ -126,39 +125,6 @@ export class UserServiceImpl implements UserService {
     });
   }
 
-  find(query: GetUserDTO | string[]): Promise<User[]> {
-    if (Array.isArray(query)) {
-      return this.userRepository.findBy({
-        id: In(query),
-      });
-    }
-
-    const {
-      withDeleted,
-      withRoles = false,
-      withRights = false,
-      ...userFields
-    } = query;
-
-    const relations = [];
-
-    if (withRoles) {
-      relations.push('roles');
-    }
-
-    if (withRights) {
-      relations.push('roles', 'roles.permissions');
-    }
-
-    return this.userRepository.find({
-      where: {
-        ...userFields,
-      },
-      relations: uniq(relations),
-      withDeleted,
-    });
-  }
-
   async findProbationUsers(
     dto: UserProbationQueryDTO,
   ): Promise<PaginatedUserProbationDTO> {
@@ -233,14 +199,17 @@ export class UserServiceImpl implements UserService {
     return omit(user, 'password');
   }
 
-  async findOne(query: GetUserDTO): Promise<User> {
-    const records = await this.find(query);
+  async findOne({ withRoles, ...query }: GetUserDTO): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: query,
+      relations: withRoles ? ['roles'] : undefined,
+    });
 
-    if (!records.length) {
+    if (!user) {
       return {} as User;
     }
 
-    return records[0];
+    return user;
   }
 
   async toggleUserIsActive(id: string): Promise<void> {
@@ -299,45 +268,27 @@ export class UserServiceImpl implements UserService {
   @Transactional()
   async createUsersByFile(dto: FileCreateUsersDto) {
     const workbook = read(dto.file.buffer, { type: 'buffer', cellDates: true });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rows = utils.sheet_to_json<FileRow>(sheet);
 
-    return Promise.all(
-      workbook.SheetNames.map(async (name) => {
-        const sheet = workbook.Sheets[name];
-
-        const rows = utils.sheet_to_json<FileRow>(sheet);
-        const usernames = rows.map((row) => row['Email']);
-        await this.periodService.upsertMany(
-          rows.map((row) => ({
-            id: row['Khóa'],
-            name: row['Khóa'],
-            description: row['Khóa'],
-          })),
-        );
-
-        const existedUsers = await this.userRepository.find({
-          where: {
-            username: In(usernames),
-          },
-        });
-        if (existedUsers.length) {
-          return {
-            duplicatedEmails: existedUsers.map((user) => user.email),
-          };
-        }
-
-        const insertResult = await this.createUsersBySheetRow(rows);
-
-        if (dto.monthlyConfigId !== undefined) {
-          await this.upgradeToMembers({
-            ids: insertResult.identifiers.map((item) => item.id),
-            monthlyConfigId: dto.monthlyConfigId,
-          });
-        }
-      }),
-    );
+    await Promise.all([
+      this.upsertPeriodsByFileRows(rows),
+      this.upsertUsersByFileRows(rows),
+    ]);
   }
 
-  private async createUsersBySheetRow(rows: FileRow[]): Promise<InsertResult> {
+  private upsertPeriodsByFileRows(rows: FileRow[]) {
+    const periods = rows.map((row) => ({
+      id: row['Khóa'],
+      name: row['Khóa'],
+      description: row['Khóa'],
+    }));
+
+    return this.periodService.upsertMany(periods);
+  }
+
+  private async upsertUsersByFileRows(rows: FileRow[]): Promise<InsertResult> {
     const defaultPwd = this.passwordManager.getDefaultPassword();
 
     const entities = rows.map((row) => {
@@ -351,16 +302,17 @@ export class UserServiceImpl implements UserService {
         : this.calculateJoinDate(row['Khóa']);
       user.periodId = row['Khóa'];
       user.departmentId = row['Chuyên môn'];
-      user.trackingId = row['Tracking'];
+      user.trackingId = row['Tracking'] ? row['Tracking'] : user.trackingId;
       user.birthday = row['Ngày sinh']
         ? new Date(row['Ngày sinh'])
         : new Date();
       user.password = defaultPwd;
+      user.phoneNumber = row['SĐT'];
 
       return user;
     });
 
-    return this.userRepository.insert(entities);
+    return this.userRepository.saveUsersIgnoreConflict(entities);
   }
 
   /**
@@ -398,11 +350,6 @@ export class UserServiceImpl implements UserService {
       Logger.error(`Invalid year: "${yearString}". Expected a 4-digit year.`);
       return null;
     }
-    // Optional: Add reasonable year range check if needed
-    // if (year < 1900 || year > 2100) {
-    //   console.error(`Year out of reasonable range: ${year}`);
-    //   return null;
-    // }
 
     // 4. Map Season to End Date (DD/MM) - Map remains the same
     const seasonEndDateMap = {
@@ -496,17 +443,5 @@ export class UserServiceImpl implements UserService {
     await this.userRepository.save(users, {
       chunk: 10,
     });
-  }
-
-  async assertIdExist(id: string): Promise<void> {
-    if (
-      !(await this.userRepository.exists({
-        where: {
-          id,
-        },
-      }))
-    ) {
-      throw new NotFoundException();
-    }
   }
 }

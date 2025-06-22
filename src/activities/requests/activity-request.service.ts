@@ -13,7 +13,6 @@ import {
   RequestTypes,
 } from '../domain/core/constants/request-activity-status.enum';
 import { CreateActivityRequestDTO } from '../domain/core/dtos/create-activity-request.dto';
-import { FindRequestedMyActivitiesResponseDTO } from '../domain/core/dtos/find-requested-my-acitivities.dto';
 import { OffsetPaginationResponse } from '../../system/pagination';
 import {
   FindRequestedActivitiesResponseDTO,
@@ -38,6 +37,10 @@ import {
 } from '../../account-service/management/interfaces/user-service.interface';
 import { keyBy } from 'lodash';
 import { OffsetPaginationRequest } from '../../system/pagination/offset-pagination-request';
+import {
+  FindMyRequestedActivityQueryDTO,
+  FindRequestedMyActivitiesResponseDTO,
+} from '../domain/core/dtos/find-my-requested-acitivities.dto';
 
 type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
 
@@ -137,11 +140,15 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     return user;
   }
 
-  async findMyRequestedActivities(
-    userId: string,
-  ): Promise<FindRequestedMyActivitiesResponseDTO> {
+  async findMyRequestedActivities({
+    userId,
+    status,
+  }: FindMyRequestedActivityQueryDTO): Promise<FindRequestedMyActivitiesResponseDTO> {
     const items = await this.activityRequestRepository.find({
-      where: { authorId: userId },
+      where: {
+        authorId: userId,
+        ...(status ? { approvalStatus: In(status) } : {}),
+      },
       relations: ['author', 'dayOfWeek', 'timeOfDay'],
     });
 
