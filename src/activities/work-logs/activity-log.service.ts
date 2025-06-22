@@ -46,11 +46,6 @@ class LogSegmentProcessor {
   async onEachDeviceUserId(
     callback: (deviceId: string, logs: Map<string, LogDTO[]>) => Promise<void>,
   ) {
-    // Logger.log(
-    //   `Proces logs for users size of ${this.deviceIdMapToDateSegmentedLogs.size}`,
-    //   LogSegmentProcessor.name,
-    // );
-
     for (const [
       deviceId,
       logs,
@@ -58,10 +53,16 @@ class LogSegmentProcessor {
       await callback(deviceId, logs);
     }
   }
+
+  getDeviceIds(): string[] {
+    return [...this.deviceIdMapToDateSegmentedLogs.keys()];
+  }
 }
 
 @Injectable()
 export class ActivityLogService {
+  private logger = new Logger(ActivityLogService.name);
+
   constructor(
     private readonly activityLogRepository: ActivityLogRepository,
     private readonly activityRepository: ActivityRepository,
@@ -120,9 +121,12 @@ export class ActivityLogService {
           }
 
           if (userLogs.length === 2) {
-            // Logs keep order so we do not care about from Time and to Time
-            // TODO: We need to reference the related registered work
-            const { status, activityId } = this.workStatusEvaluator.match({
+            const {
+              status,
+              activityId,
+              auditedToDateTime,
+              auditedFromDateTime,
+            } = this.workStatusEvaluator.match({
               activities: activities,
               fromDateTime: userLogs[0].recordTime,
               toDateTime: userLogs[1].recordTime,
@@ -132,15 +136,18 @@ export class ActivityLogService {
             log.workStatus = status;
             log.deviceUserId = deviceUserId;
             log.activityId = activityId;
+            log.auditedFromTime = auditedFromDateTime?.toISOString();
+            log.auditedToTime = auditedToDateTime?.toISOString();
             logEntities.push(log);
             return;
           }
 
-          const { status, activityId } = this.workStatusEvaluator.match({
-            activities: activities,
-            fromDateTime: userLogs[0].recordTime,
-            toDateTime: userLogs[1].recordTime,
-          });
+          const { status, activityId, auditedToDateTime, auditedFromDateTime } =
+            this.workStatusEvaluator.match({
+              activities: activities,
+              fromDateTime: userLogs[0].recordTime,
+              toDateTime: userLogs[1].recordTime,
+            });
 
           // More than 2 logsByUserDeviceId
           log.fromTime = userLogs[0].recordTime;
@@ -148,14 +155,16 @@ export class ActivityLogService {
           log.toTime = userLogs[userLogs.length - 1].recordTime;
           log.workStatus = status;
           log.deviceUserId = deviceUserId;
+          log.auditedFromTime = auditedFromDateTime?.toISOString();
+          log.auditedToTime = auditedToDateTime?.toISOString();
         });
 
-        Logger.log(
-          `Update logs for user ${deviceUserId} with size ${logEntities.length}`,
-          ActivityLogService.name,
-        );
         await this.activityLogRepository.updateLogs(logEntities);
       },
+    );
+
+    this.logger.log(
+      `Finished process: ${logSegmentProcessor.getDeviceIds().toString()}`,
     );
   }
 

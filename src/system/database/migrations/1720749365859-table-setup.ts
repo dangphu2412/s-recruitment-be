@@ -812,6 +812,16 @@ export class TableSetup1720749365859 implements MigrationInterface {
             isPrimary: true,
           },
           {
+            name: 'audited_from_time',
+            type: 'timestamp',
+            isNullable: true,
+          },
+          {
+            name: 'audited_to_time',
+            type: 'timestamp',
+            isNullable: true,
+          },
+          {
             name: 'work_status',
             type: 'varchar',
           },

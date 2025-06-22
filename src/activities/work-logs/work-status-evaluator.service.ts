@@ -1,8 +1,8 @@
 import { Activity } from '../domain/data-access/activity.entity';
-import { compareAsc, format, parse, subMinutes } from 'date-fns';
+import { addMinutes, compareAsc, format, parseISO, subMinutes } from 'date-fns';
 import { LogWorkStatus } from '../domain/core/constants/log-work-status.enum';
 import { RequestTypes } from '../domain/core/constants/request-activity-status.enum';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 type WorkEvaluateDTO = {
   activities: Activity[];
@@ -13,29 +13,47 @@ type WorkEvaluateDTO = {
 type WorkEvaluateResult = {
   status: LogWorkStatus;
   activityId: Activity['id'] | null;
+  auditedFromDateTime: Date | null;
+  auditedToDateTime: Date | null;
 };
 
 export class WorkTimeUtils {
-  static parseTime(time: string): Date {
-    return parse(time, 'HH:mm:ss', new Date());
+  static formatTimeToDateByDateTime(time: string, logDate: string) {
+    const [hours, minutes] = time.split(':').map(Number);
+
+    const date = parseISO(logDate);
+
+    date.setUTCHours(hours);
+    date.setUTCMinutes(minutes);
+
+    return date;
   }
 
   static formatDate(date: string): string {
     return format(new Date(date), 'yyyy-MM-dd');
   }
 
-  static getHHMMSS(time: string): Date {
-    return WorkTimeUtils.parseTime(
-      `${new Date(time).getUTCHours().toString().padStart(2, '0')}:` +
-        `${new Date(time).getUTCMinutes().toString().padStart(2, '0')}:` +
-        `${new Date(time).getUTCSeconds().toString().padStart(2, '0')}`,
-    );
-  }
-
+  /**
+   * compareAsc: left > right = 1
+   */
   static areIntervalsBounded(small: [Date, Date], big: [Date, Date]): boolean {
     return (
       compareAsc(small[0], big[0]) >= 0 && compareAsc(small[1], big[1]) <= 0
     );
+  }
+
+  static getAuditTimeLogBefore18062025(timeLog: Date): Date | null {
+    // 18-6-2025 S-Group audit the log to correct time
+    if (compareAsc(timeLog, new Date('06-18-2025')) > 0) {
+      return null;
+    }
+
+    Logger.log('AuditTime Log Before18062025', timeLog);
+    /**
+     * Previously, config time was early 15 mins.
+     * Ex: Log: 8:30 but fingerprint store 8:15 which causes incorrect matching
+     */
+    return addMinutes(timeLog, 15);
   }
 }
 
@@ -60,14 +78,20 @@ class AbsenceHandler implements WorkStatusHandler {
       return null;
     }
 
-    const workStart = WorkTimeUtils.parseTime(activity.timeOfDay.fromTime);
-    const workEnd = WorkTimeUtils.parseTime(activity.timeOfDay.toTime);
-    const logStart = WorkTimeUtils.getHHMMSS(fromDateTime);
-    const logEnd = WorkTimeUtils.getHHMMSS(toDateTime);
+    const logStart = parseISO(fromDateTime);
+    const logEnd = parseISO(toDateTime);
+    const registeredFromTimeDate = WorkTimeUtils.formatTimeToDateByDateTime(
+      activity.timeOfDay.fromTime,
+      fromDateTime || toDateTime,
+    );
+    const registeredToTimeDate = WorkTimeUtils.formatTimeToDateByDateTime(
+      activity.timeOfDay.toTime,
+      fromDateTime || toDateTime,
+    );
 
     if (
       WorkTimeUtils.areIntervalsBounded(
-        [workStart, workEnd],
+        [registeredFromTimeDate, registeredToTimeDate],
         [logStart, logEnd],
       )
     ) {
@@ -91,14 +115,20 @@ class LateHandler implements WorkStatusHandler {
       return null;
     }
 
-    const workStart = WorkTimeUtils.parseTime(activity.timeOfDay.fromTime);
-    const workEnd = WorkTimeUtils.parseTime(activity.timeOfDay.toTime);
-    const logStart = subMinutes(WorkTimeUtils.getHHMMSS(fromDateTime), 15);
-    const logEnd = WorkTimeUtils.getHHMMSS(toDateTime);
+    const logStart = subMinutes(parseISO(fromDateTime), 15);
+    const logEnd = parseISO(toDateTime);
+    const registeredFromTimeDate = WorkTimeUtils.formatTimeToDateByDateTime(
+      activity.timeOfDay.fromTime,
+      fromDateTime || toDateTime,
+    );
+    const registeredToTimeDate = WorkTimeUtils.formatTimeToDateByDateTime(
+      activity.timeOfDay.toTime,
+      fromDateTime || toDateTime,
+    );
 
     if (
       WorkTimeUtils.areIntervalsBounded(
-        [workStart, workEnd],
+        [registeredFromTimeDate, registeredToTimeDate],
         [logStart, logEnd],
       )
     ) {
@@ -121,15 +151,26 @@ class WorkingHandler implements WorkStatusHandler {
       return null;
     }
 
-    const workStart = WorkTimeUtils.parseTime(activity.timeOfDay.fromTime);
-    const workEnd = WorkTimeUtils.parseTime(activity.timeOfDay.toTime);
-    const logStart = WorkTimeUtils.getHHMMSS(fromDateTime);
-    const logEnd = WorkTimeUtils.getHHMMSS(toDateTime);
+    const logStart = parseISO(fromDateTime);
+    const logEnd = parseISO(toDateTime);
+    const auditLogStart =
+      WorkTimeUtils.getAuditTimeLogBefore18062025(logStart) ?? logStart;
+    const auditLogEnd =
+      WorkTimeUtils.getAuditTimeLogBefore18062025(logEnd) ?? logEnd;
+
+    const registeredFromTimeDate = WorkTimeUtils.formatTimeToDateByDateTime(
+      activity.timeOfDay.fromTime,
+      fromDateTime || toDateTime,
+    );
+    const registeredToTimeDate = WorkTimeUtils.formatTimeToDateByDateTime(
+      activity.timeOfDay.toTime,
+      fromDateTime || toDateTime,
+    );
 
     if (
       WorkTimeUtils.areIntervalsBounded(
-        [workStart, workEnd],
-        [logStart, logEnd],
+        [registeredFromTimeDate, registeredToTimeDate],
+        [auditLogStart, auditLogEnd],
       )
     ) {
       return LogWorkStatus.ON_TIME;
@@ -156,6 +197,8 @@ export class ActivityMatcher {
       return {
         status: LogWorkStatus.NOT_FINISHED,
         activityId: null,
+        auditedFromDateTime: null,
+        auditedToDateTime: null,
       };
     }
 
@@ -172,6 +215,12 @@ export class ActivityMatcher {
           return {
             status,
             activityId: activity.id,
+            auditedFromDateTime: WorkTimeUtils.getAuditTimeLogBefore18062025(
+              parseISO(fromDateTime),
+            ),
+            auditedToDateTime: WorkTimeUtils.getAuditTimeLogBefore18062025(
+              parseISO(toDateTime),
+            ),
           };
         }
       }
@@ -180,6 +229,8 @@ export class ActivityMatcher {
     return {
       status: LogWorkStatus.NOT_FINISHED,
       activityId: null,
+      auditedFromDateTime: null,
+      auditedToDateTime: null,
     };
   }
 }
