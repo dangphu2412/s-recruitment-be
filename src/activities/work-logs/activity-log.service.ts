@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
-import { FindLogsRequest } from '../domain/presentation/dtos/find-logs.request';
+import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { format, subMonths, subYears } from 'date-fns';
 import { OffsetPaginationResponse } from '../../system/pagination';
 import { ActivityRepository } from '../managements/activity.repository';
-import { LogWorkStatus } from '../domain/core/constants/log-work-status.enum';
-import { ActivityLog } from '../domain/data-access/activity-log.entity';
+import { LogWorkStatus } from './log-work-status.enum';
+import { ActivityLog } from '../shared/entities/activity-log.entity';
 import {
   ActivityMatcher,
   WorkTimeUtils,

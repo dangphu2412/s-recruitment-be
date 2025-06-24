@@ -1,5 +1,5 @@
 import { IsEnum, IsNumber } from 'class-validator';
-import { ApprovalRequestAction } from '../../core/constants/request-activity-status.enum';
+import { ApprovalRequestAction } from '../../../shared/request-activity-status.enum';
 
 export class UpdateApprovalActivityRequestRequest {
   @IsEnum(ApprovalRequestAction)

@@ -2,11 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import {
   ActivityRequestService,
   ActivityRequestServiceToken,
-} from '../../../src/activities/domain/core/services/activity-request.service';
+} from '../../../src/activities/requests/interfaces/activity-request.service';
 import { ActivityRequestServiceImpl } from '../../../src/activities/requests/activity-request.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ActivityRequest } from '../../../src/activities/domain/data-access/activity-request.entity';
-import { ActivityServiceToken } from '../../../src/activities/domain/core/services/activity.service';
+import { ActivityRequest } from '../../../src/activities/shared/entities/activity-request.entity';
+import { ActivityServiceToken } from '../../../src/activities/managements/interfaces/activity.service';
 import { UserServiceToken } from '../../../src/account-service/management/interfaces/user-service.interface';
 
 describe(ActivityRequestServiceImpl.name, () => {

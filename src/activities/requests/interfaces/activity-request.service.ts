@@ -1,17 +1,17 @@
-import { createProviderToken } from '../../../../system/nestjs-extensions';
-import { CreateActivityRequestDTO } from '../dtos/create-activity-request.dto';
+import { createProviderToken } from '../../../system/nestjs-extensions';
+import { CreateActivityRequestDTO } from '../dtos/core/create-activity-request.dto';
 import {
   FindRequestedActivitiesResponseDTO,
   FindRequestedActivityQueryDTO,
-} from '../dtos/find-requested-acitivities.dto';
-import { FindRequestedMyActivityResponseDTO } from '../dtos/find-requested-my-acitivity.dto';
-import { UpdateMyActivityRequestDTO } from '../dtos/update-my-activity-request.dto';
-import { UpdateApprovalActivityRequestDTO } from '../dtos/update-approval-activity-request.dto';
-import { FileActivityRequestDTO } from '../dtos/file-create-activity-request.dto';
+} from '../dtos/core/find-requested-acitivities.dto';
+import { FindRequestedMyActivityResponseDTO } from '../dtos/core/find-requested-my-acitivity.dto';
+import { UpdateMyActivityRequestDTO } from '../dtos/core/update-my-activity-request.dto';
+import { UpdateApprovalActivityRequestDTO } from '../dtos/core/update-approval-activity-request.dto';
+import { FileActivityRequestDTO } from '../dtos/core/file-create-activity-request.dto';
 import {
   FindMyRequestedActivityQueryDTO,
   FindRequestedMyActivitiesResponseDTO,
-} from '../dtos/find-my-requested-acitivities.dto';
+} from '../dtos/core/find-my-requested-acitivities.dto';
 
 export const ActivityRequestServiceToken = createProviderToken(
   'ActivityRequestService',

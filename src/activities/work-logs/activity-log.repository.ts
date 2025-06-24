@@ -1,14 +1,14 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { ActivityLog } from '../domain/data-access/activity-log.entity';
-import { FindLogsRequest } from '../domain/presentation/dtos/find-logs.request';
+import { ActivityLog } from '../shared/entities/activity-log.entity';
+import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { subWeeks } from 'date-fns';
 import {
   AnalyticLogsAggregate,
   AnalyticLogsAggregateDTO,
-} from '../domain/data-access/aggregates/analytic-logs.aggregate';
-import { LogWorkStatus } from '../domain/core/constants/log-work-status.enum';
+} from '../shared/aggregates/analytic-logs.aggregate';
+import { LogWorkStatus } from './log-work-status.enum';
 import { OffsetPaginationRequest } from '../../system/pagination/offset-pagination-request';
 
 @Injectable()
