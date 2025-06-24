@@ -2,7 +2,7 @@ import { Activity } from '../shared/entities/activity.entity';
 import { addMinutes, compareAsc, format, parseISO, subMinutes } from 'date-fns';
 import { LogWorkStatus } from './log-work-status.enum';
 import { RequestTypes } from '../shared/request-activity-status.enum';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 type WorkEvaluateDTO = {
   activities: Activity[];
@@ -25,6 +25,7 @@ export class WorkTimeUtils {
 
     date.setUTCHours(hours);
     date.setUTCMinutes(minutes);
+    date.setUTCSeconds(0);
 
     return date;
   }
@@ -48,7 +49,6 @@ export class WorkTimeUtils {
       return null;
     }
 
-    Logger.log('AuditTime Log Before18062025', timeLog);
     /**
      * Previously, config time was early 15 mins.
      * Ex: Log: 8:30 but fingerprint store 8:15 which causes incorrect matching
