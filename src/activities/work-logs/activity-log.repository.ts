@@ -90,7 +90,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
     const [sql, params] = this.createQueryBuilder('activityLog')
       .leftJoinAndSelect('activityLog.author', 'author')
       .leftJoinAndSelect('activityLog.deviceAuthor', 'deviceAuthor')
-      .select(['author.email', 'author.id'])
+      .select(['author.email', 'author.id', 'author.fullName'])
       .addSelect('COUNT(author.id) as late_count')
       .andWhere('activityLog.fromTime >= :fromDate', {
         fromDate: subMonths(new Date(), 6),
@@ -101,8 +101,8 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
       })
       .orderBy('late_count', 'DESC')
       .addGroupBy('author.id')
-      .addGroupBy('author.id')
       .addGroupBy('author.email')
+      .addGroupBy('author.fullName')
       .getQueryAndParameters();
 
     const rawItems = await this.manager.query<ReportLogQueryResult[]>(
@@ -114,6 +114,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
       return {
         id: item.author_id,
         email: item.author_email,
+        fullName: item.author_full_name,
         lateCount: +item.late_count,
       };
     });

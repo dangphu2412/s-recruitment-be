@@ -201,6 +201,7 @@ export class ActivityLogService {
     const data = reportLogs.map((log) => {
       return {
         email: log.email,
+        fullName: log.fullName,
         lateCount: log.lateCount,
       };
     });
