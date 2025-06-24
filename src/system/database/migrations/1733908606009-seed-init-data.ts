@@ -290,7 +290,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
         id: 'SUM-AFT',
         name: 'Afternoon (14h00 – 17h00)',
         fromTime: DatabaseUtils.formatTimeToUTC('14:00'),
-        toTime: DatabaseUtils.formatTimeToUTC('17:30'),
+        toTime: DatabaseUtils.formatTimeToUTC('17:00'),
       },
       {
         id: 'SUM-EVN',
