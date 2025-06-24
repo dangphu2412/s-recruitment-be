@@ -9,7 +9,7 @@ import {
   createCRUDService,
   ResourceCRUDService,
 } from '../../system/resource-templates/resource-service-template';
-import { DeviceUser } from '../domain/data-access/user-log.entity';
+import { DeviceUser } from '../shared/entities/user-log.entity';
 import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
 import { Permissions } from '../../account-service/authorization/access-definition.constant';
 import { LogFileService } from './log-file.service';

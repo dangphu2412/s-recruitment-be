@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import { ActivityRequest } from '../../activities/domain/data-access/activity-request.entity';
-import { Activity } from '../../activities/domain/data-access/activity.entity';
+import { ActivityRequest } from '../../activities/shared/entities/activity-request.entity';
+import { Activity } from '../../activities/shared/entities/activity.entity';
 
 @Entity({
   name: 'mdm_time_of_days',

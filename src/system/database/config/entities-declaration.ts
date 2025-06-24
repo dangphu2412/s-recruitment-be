@@ -8,12 +8,12 @@ import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/en
 import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
 import { Period } from '../../../master-data-service/periods/period.entity';
 import { Department } from '../../../master-data-service/departments/department.entity';
-import { ActivityRequest } from '../../../activities/domain/data-access/activity-request.entity';
-import { Activity } from '../../../activities/domain/data-access/activity.entity';
+import { ActivityRequest } from '../../../activities/shared/entities/activity-request.entity';
+import { Activity } from '../../../activities/shared/entities/activity.entity';
 import { DayOfWeek } from '../../../master-data-service/day-of-weeks/day-of-week';
 import { TimeOfDay } from '../../../master-data-service/time-of-days/time-of-day.entity';
-import { ActivityLog } from '../../../activities/domain/data-access/activity-log.entity';
-import { DeviceUser } from '../../../activities/domain/data-access/user-log.entity';
+import { ActivityLog } from '../../../activities/shared/entities/activity-log.entity';
+import { DeviceUser } from '../../../activities/shared/entities/user-log.entity';
 
 export const APP_ENTITIES = [
   User,

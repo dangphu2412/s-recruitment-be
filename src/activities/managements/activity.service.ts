@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { ActivityService } from '../domain/core/services/activity.service';
-import { CreateActivityDTO } from '../domain/core/dtos/create-activity.dto';
+import { ActivityService } from './interfaces/activity.service';
+import { CreateActivityDTO } from './dtos/core/create-activity.dto';
 import {
   FindActivitiesDTO,
   FindActivitiesResponseDTO,
-} from '../domain/core/dtos/find-activities.dto';
+} from './dtos/core/find-activities.dto';
 import { ActivityRepository } from './activity.repository';
 
 @Injectable()

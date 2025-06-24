@@ -14,21 +14,21 @@ import {
 import {
   ActivityRequestService,
   ActivityRequestServiceToken,
-} from '../domain/core/services/activity-request.service';
-import { CreateActivityRequestRequest } from '../domain/presentation/dtos/create-activity-request.request';
+} from './interfaces/activity-request.service';
+import { CreateActivityRequestRequest } from './dtos/presentation/create-activity-request.request';
 import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
 import { Permissions } from '../../account-service/authorization/access-definition.constant';
 import { CurrentUser } from '../../account-service/management/user.decorator';
 import { JwtPayload } from '../../account-service/registration/jwt-payload';
-import { UpdateApprovalActivityRequestRequest } from '../domain/presentation/dtos/update-approval-activity-request.request';
-import { UpdateMyActivityRequestRequest } from '../domain/presentation/dtos/update-my-activity.request';
-import { FindRequestedActivityRequestDTO } from '../domain/presentation/dtos/find-requested-activity-request.dto';
+import { UpdateApprovalActivityRequestRequest } from './dtos/presentation/update-approval-activity-request.request';
+import { UpdateMyActivityRequestRequest } from './dtos/presentation/update-my-activity.request';
+import { FindRequestedActivityRequestDTO } from './dtos/presentation/find-requested-activity-request.dto';
 import { Identified } from '../../account-service/registration/identified.decorator';
 import { FileInterceptor } from '../../system/file';
 import { ApiConsumes } from '@nestjs/swagger';
-import { FileActivityRequestDTO } from '../domain/core/dtos/file-create-activity-request.dto';
+import { FileActivityRequestDTO } from './dtos/core/file-create-activity-request.dto';
 import { UploadRequestActivityFileValidatorPipe } from './upload-activity-request-file.pipe';
-import { FindMyRequestedActivitiesRequest } from '../domain/presentation/dtos/find-my-requested-activities.request';
+import { FindMyRequestedActivitiesRequest } from './dtos/presentation/find-my-requested-activities.request';
 
 @Controller('activity-requests')
 export class ActivityRequestController {

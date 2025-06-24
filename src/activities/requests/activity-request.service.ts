@@ -5,31 +5,31 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { ActivityRequestService } from '../domain/core/services/activity-request.service';
-import { ActivityRequest } from '../domain/data-access/activity-request.entity';
+import { ActivityRequestService } from './interfaces/activity-request.service';
+import { ActivityRequest } from '../shared/entities/activity-request.entity';
 import {
   ApprovalRequestAction,
   RequestActivityStatus,
   RequestTypes,
-} from '../domain/core/constants/request-activity-status.enum';
-import { CreateActivityRequestDTO } from '../domain/core/dtos/create-activity-request.dto';
+} from '../shared/request-activity-status.enum';
+import { CreateActivityRequestDTO } from './dtos/core/create-activity-request.dto';
 import { OffsetPaginationResponse } from '../../system/pagination';
 import {
   FindRequestedActivitiesResponseDTO,
   FindRequestedActivityQueryDTO,
-} from '../domain/core/dtos/find-requested-acitivities.dto';
-import { UpdateApprovalActivityRequestDTO } from '../domain/core/dtos/update-approval-activity-request.dto';
+} from './dtos/core/find-requested-acitivities.dto';
+import { UpdateApprovalActivityRequestDTO } from './dtos/core/update-approval-activity-request.dto';
 import { Transactional } from 'typeorm-transactional';
 import {
   ActivityService,
   ActivityServiceToken,
-} from '../domain/core/services/activity.service';
-import { FindRequestedMyActivityResponseDTO } from '../domain/core/dtos/find-requested-my-acitivity.dto';
-import { UpdateMyActivityRequestDTO } from '../domain/core/dtos/update-my-activity-request.dto';
+} from '../managements/interfaces/activity.service';
+import { FindRequestedMyActivityResponseDTO } from './dtos/core/find-requested-my-acitivity.dto';
+import { UpdateMyActivityRequestDTO } from './dtos/core/update-my-activity-request.dto';
 import {
   FileActivityRequestDTO,
   FileActivityRequestRow,
-} from '../domain/core/dtos/file-create-activity-request.dto';
+} from './dtos/core/file-create-activity-request.dto';
 import { read, utils } from 'xlsx';
 import {
   UserService,
@@ -40,7 +40,7 @@ import { OffsetPaginationRequest } from '../../system/pagination/offset-paginati
 import {
   FindMyRequestedActivityQueryDTO,
   FindRequestedMyActivitiesResponseDTO,
-} from '../domain/core/dtos/find-my-requested-acitivities.dto';
+} from './dtos/core/find-my-requested-acitivities.dto';
 
 type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
 

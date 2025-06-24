@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, ValidateIf } from 'class-validator';
-import { RequestTypes } from '../../core/constants/request-activity-status.enum';
+import { RequestTypes } from '../../../shared/request-activity-status.enum';
 
 export class UpdateMyActivityRequestRequest {
   @IsNotEmpty()

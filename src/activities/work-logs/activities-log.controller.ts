@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Query } from '@nestjs/common';
 import { ActivityLogService } from './activity-log.service';
-import { FindLogsRequest } from '../domain/presentation/dtos/find-logs.request';
+import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
 import { Permissions } from '../../account-service/authorization/access-definition.constant';
 import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
