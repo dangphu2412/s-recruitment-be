@@ -3,13 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { ActivityLog } from '../shared/entities/activity-log.entity';
 import { FindLogsRequest } from './dtos/presentation/find-logs.request';
-import { subWeeks } from 'date-fns';
+import { subMonths, subWeeks } from 'date-fns';
 import {
   AnalyticLogsAggregate,
   AnalyticLogsAggregateDTO,
 } from '../shared/aggregates/analytic-logs.aggregate';
 import { LogWorkStatus } from './log-work-status.enum';
 import { OffsetPaginationRequest } from '../../system/pagination/offset-pagination-request';
+import {
+  ReportLogAggregate,
+  ReportLogQueryResult,
+} from '../shared/aggregates/report-log.aggregate';
 
 @Injectable()
 export class ActivityLogRepository extends Repository<ActivityLog> {
@@ -80,6 +84,39 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
       .skip(offset)
       .take(size)
       .getManyAndCount();
+  }
+
+  async findLateReportLogs(): Promise<ReportLogAggregate[]> {
+    const [sql, params] = this.createQueryBuilder('activityLog')
+      .leftJoinAndSelect('activityLog.author', 'author')
+      .leftJoinAndSelect('activityLog.deviceAuthor', 'deviceAuthor')
+      .select(['author.email', 'author.id'])
+      .addSelect('COUNT(author.id) as late_count')
+      .andWhere('activityLog.fromTime >= :fromDate', {
+        fromDate: subMonths(new Date(), 6),
+      })
+      .andWhere('activityLog.toTime <= :toDate', { toDate: new Date() })
+      .andWhere('activityLog.workStatus = :status', {
+        status: LogWorkStatus.LATE,
+      })
+      .orderBy('late_count', 'DESC')
+      .addGroupBy('author.id')
+      .addGroupBy('author.id')
+      .addGroupBy('author.email')
+      .getQueryAndParameters();
+
+    const rawItems = await this.manager.query<ReportLogQueryResult[]>(
+      sql,
+      params,
+    );
+
+    return rawItems.map<ReportLogAggregate>((item) => {
+      return {
+        id: item.author_id,
+        email: item.author_email,
+        lateCount: +item.late_count,
+      };
+    });
   }
 
   async findAnalyticLogs({
