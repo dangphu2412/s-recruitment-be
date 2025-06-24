@@ -1,4 +1,4 @@
-import { ApprovalRequestAction } from '../constants/request-activity-status.enum';
+import { ApprovalRequestAction } from '../../../shared/request-activity-status.enum';
 
 export type UpdateApprovalActivityRequestDTO = {
   ids: number[];

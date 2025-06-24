@@ -18,8 +18,8 @@ import { Payment } from '../../../monthly-money/domain/data-access/entities/paym
 import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
 import { Department } from '../../../master-data-service/departments/department.entity';
 import { Period } from '../../../master-data-service/periods/period.entity';
-import { ActivityRequest } from '../../../activities/domain/data-access/activity-request.entity';
-import { ActivityLog } from '../../../activities/domain/data-access/activity-log.entity';
+import { ActivityRequest } from '../../../activities/shared/entities/activity-request.entity';
+import { ActivityLog } from '../../../activities/shared/entities/activity-log.entity';
 
 @Entity({
   name: 'users',

@@ -1,17 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
-import { FindLogsRequest } from '../domain/presentation/dtos/find-logs.request';
+import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { format, subMonths, subYears } from 'date-fns';
 import { OffsetPaginationResponse } from '../../system/pagination';
 import { ActivityRepository } from '../managements/activity.repository';
-import { LogWorkStatus } from '../domain/core/constants/log-work-status.enum';
-import { ActivityLog } from '../domain/data-access/activity-log.entity';
+import { LogWorkStatus } from './log-work-status.enum';
+import { ActivityLog } from '../shared/entities/activity-log.entity';
 import {
   ActivityMatcher,
   WorkTimeUtils,
 } from './work-status-evaluator.service';
 import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
 import { LogFileService } from './log-file.service';
+import { utils, write } from 'xlsx';
 
 export type LogDTO = {
   userSn: number;
@@ -192,5 +193,22 @@ export class ActivityLogService {
     }
 
     return logs.slice(result);
+  }
+
+  async downloadReportFile(): Promise<Buffer> {
+    const reportLogs = await this.activityLogRepository.findLateReportLogs();
+
+    const data = reportLogs.map((log) => {
+      return {
+        email: log.email,
+        lateCount: log.lateCount,
+      };
+    });
+    const worksheet = utils.json_to_sheet(data);
+
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Reports');
+
+    return write(workbook, { type: 'buffer', bookType: 'xlsx' });
   }
 }

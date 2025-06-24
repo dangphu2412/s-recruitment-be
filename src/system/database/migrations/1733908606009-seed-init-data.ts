@@ -44,7 +44,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       },
       {
         name: SystemRoles.LEADER,
-        description: 'User who is the leader of a dtos or group',
+        description: 'User who is the leader of a presentation or group',
       },
       {
         name: SystemRoles.MEDIA,
@@ -53,7 +53,7 @@ export class SeedInitData1733908606009 implements MigrationInterface {
       {
         name: SystemRoles.TRAINER,
         description:
-          'User who is the trainer of a dtos or group, can view and edit users',
+          'User who is the trainer of a presentation or group, can view and edit users',
       },
       {
         name: SystemRoles.MEMBER,

@@ -3,9 +3,9 @@ import { ActivityController } from 'src/activities/managements/activity.controll
 import {
   ActivityService,
   ActivityServiceToken,
-} from '../../../src/activities/domain/core/services/activity.service';
-import { FindActivitiesRequest } from '../../../src/activities/domain/presentation/dtos/find-activities.request';
-import { FindActivitiesResponseDTO } from '../../../src/activities/domain/core/dtos/find-activities.dto';
+} from '../../../src/activities/managements/interfaces/activity.service';
+import { FindActivitiesRequest } from '../../../src/activities/managements/dtos/presentation/find-activities.request';
+import { FindActivitiesResponseDTO } from '../../../src/activities/managements/dtos/core/find-activities.dto';
 
 describe(ActivityController.name, () => {
   let activityController: ActivityController;

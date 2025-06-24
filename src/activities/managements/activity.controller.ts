@@ -4,8 +4,8 @@ import { Permissions } from '../../account-service/authorization/access-definiti
 import {
   ActivityService,
   ActivityServiceToken,
-} from '../domain/core/services/activity.service';
-import { FindActivitiesRequest } from '../domain/presentation/dtos/find-activities.request';
+} from './interfaces/activity.service';
+import { FindActivitiesRequest } from './dtos/presentation/find-activities.request';
 
 @Controller('activities')
 export class ActivityController {
