@@ -12,6 +12,7 @@ import {
 } from './work-status-evaluator.service';
 import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
 import { LogFileService } from './log-file.service';
+import { utils, write } from 'xlsx';
 
 export type LogDTO = {
   userSn: number;
@@ -192,5 +193,18 @@ export class ActivityLogService {
     }
 
     return logs.slice(result);
+  }
+
+  async downloadReportFile(): Promise<Buffer> {
+    const data = [
+      { id: 1, name: 'John Doe', email: 'john@example.com' },
+      { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
+    ];
+    const worksheet = utils.json_to_sheet(data);
+
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Reports');
+
+    return write(workbook, { type: 'buffer', bookType: 'xlsx' });
   }
 }

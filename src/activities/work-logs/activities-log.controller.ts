@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Controller, Get, Post, Query, StreamableFile } from '@nestjs/common';
 import { ActivityLogService } from './activity-log.service';
 import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
@@ -24,5 +24,16 @@ export class ActivitiesLogController {
   @Post()
   syncFile() {
     return this.activityLogService.uploadActivityLogs();
+  }
+
+  @CanAccessBy(Permissions.WRITE_ACTIVITY_LOGS)
+  @Post('/reports')
+  async downloadReportFile() {
+    const fileStream = await this.activityLogService.downloadReportFile();
+
+    return new StreamableFile(fileStream, {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      disposition: 'attachment; filename=report.xlsx',
+    });
   }
 }
