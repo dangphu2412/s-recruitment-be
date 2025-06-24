@@ -196,10 +196,14 @@ export class ActivityLogService {
   }
 
   async downloadReportFile(): Promise<Buffer> {
-    const data = [
-      { id: 1, name: 'John Doe', email: 'john@example.com' },
-      { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-    ];
+    const reportLogs = await this.activityLogRepository.findLateReportLogs();
+
+    const data = reportLogs.map((log) => {
+      return {
+        email: log.email,
+        lateCount: log.lateCount,
+      };
+    });
     const worksheet = utils.json_to_sheet(data);
 
     const workbook = utils.book_new();
