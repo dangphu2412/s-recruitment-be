@@ -1,7 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
 import { FindLogsRequest } from './dtos/presentation/find-logs.request';
-import { format, subMonths, subYears } from 'date-fns';
+import {
+  format,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  subMonths,
+  subWeeks,
+} from 'date-fns';
 import { OffsetPaginationResponse } from '../../system/pagination';
 import { ActivityRepository } from '../managements/activity.repository';
 import { LogWorkStatus } from './log-work-status.enum';
@@ -10,7 +17,12 @@ import {
   ActivityMatcher,
   WorkTimeUtils,
 } from './work-status-evaluator.service';
-import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
+import {
+  FindAnalyticLogRequest,
+  FindV2AnalyticLogRequest,
+  FindV2AnalyticLogResponse,
+  GroupType,
+} from './dtos/presentation/find-analytic-log.request';
 import { LogFileService } from './log-file.service';
 import { utils, write } from 'xlsx';
 
@@ -84,7 +96,7 @@ export class ActivityLogService {
 
   findAnalyticLogs(findAnalyticLogRequest: FindAnalyticLogRequest) {
     const {
-      fromDate = subYears(new Date(), 1).toISOString(),
+      fromDate = subWeeks(new Date(), 1).toISOString(),
       toDate = new Date().toISOString(),
     } = findAnalyticLogRequest;
 
@@ -92,6 +104,40 @@ export class ActivityLogService {
       fromDate,
       toDate,
     });
+  }
+
+  async findV2AnalyticLogs({
+    groupType,
+  }: FindV2AnalyticLogRequest): Promise<FindV2AnalyticLogResponse> {
+    function getTimeSeriesFilter() {
+      if (groupType === GroupType.MONTHLY) {
+        return {
+          fromDate: startOfMonth(new Date()).toISOString(),
+          toDate: new Date().toISOString(),
+        };
+      }
+
+      if (groupType === GroupType.YEARLY) {
+        return {
+          fromDate: startOfYear(new Date()).toISOString(),
+          toDate: new Date().toISOString(),
+        };
+      }
+
+      return {
+        fromDate: startOfWeek(subWeeks(new Date(), 1)).toISOString(),
+        toDate: new Date().toISOString(),
+      };
+    }
+
+    const items = await this.activityLogRepository.findV2AnalyticLogs({
+      ...getTimeSeriesFilter(),
+      groupType,
+    });
+
+    return {
+      items,
+    };
   }
 
   async uploadActivityLogs() {
