@@ -6,7 +6,7 @@ import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { subMonths, subWeeks } from 'date-fns';
 import {
   AnalyticLogsAggregate,
-  AnalyticLogsAggregateDTO,
+  AnalyticLogsAggregateQuery,
 } from '../shared/aggregates/analytic-logs.aggregate';
 import { LogWorkStatus } from './log-work-status.enum';
 import { OffsetPaginationRequest } from '../../system/pagination/offset-pagination-request';
@@ -14,6 +14,7 @@ import {
   ReportLogAggregate,
   ReportLogQueryResult,
 } from '../shared/aggregates/report-log.aggregate';
+import { GroupType } from './dtos/presentation/find-analytic-log.request';
 
 @Injectable()
 export class ActivityLogRepository extends Repository<ActivityLog> {
@@ -123,7 +124,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
   async findAnalyticLogs({
     fromDate,
     toDate,
-  }: AnalyticLogsAggregateDTO): Promise<AnalyticLogsAggregate> {
+  }: AnalyticLogsAggregateQuery): Promise<AnalyticLogsAggregate> {
     const items = await this.query(
       `SELECT
         SUM(CASE WHEN activity_logs.work_status = '${LogWorkStatus.LATE}' THEN 1 ELSE 0 END) AS "lateCount",
@@ -136,6 +137,37 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
     );
 
     return items[0] ?? {};
+  }
+
+  async findV2AnalyticLogs({
+    fromDate,
+    toDate,
+    groupType,
+  }: AnalyticLogsAggregateQuery): Promise<AnalyticLogsAggregate[]> {
+    function getDate() {
+      if (groupType === GroupType.MONTHLY) {
+        return `DATE_TRUNC('week', activity_logs.from_time) AS "date"`;
+      }
+
+      if (groupType === GroupType.YEARLY) {
+        return `DATE_TRUNC('month', activity_logs.from_time) AS "date"`;
+      }
+
+      return `DATE(activity_logs.from_time) AS "date"`;
+    }
+
+    return this.query(
+      `SELECT
+        ${getDate()},
+        SUM(CASE WHEN activity_logs.work_status = '${LogWorkStatus.LATE}' THEN 1 ELSE 0 END) AS "lateCount",
+        SUM(CASE WHEN activity_logs.work_status = '${LogWorkStatus.NOT_FINISHED}' THEN 1 ELSE 0 END) AS "notFinishedCount",
+        SUM(CASE WHEN activity_logs.work_status = '${LogWorkStatus.ON_TIME}' THEN 1 ELSE 0 END) as "onTimeCount"
+      FROM activity_logs
+      LEFT JOIN users ON activity_logs.track_id = users.tracking_id
+      WHERE activity_logs.from_time >= $1 AND activity_logs.to_time <= $2
+      GROUP BY "date" ORDER BY "date" DESC`,
+      [fromDate, toDate],
+    );
   }
 
   updateLogs(activityLogs: ActivityLog[]) {
