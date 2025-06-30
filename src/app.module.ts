@@ -5,6 +5,7 @@ import { MenuModule } from './menu/internal/menu.module';
 import { MonthlyMoneyModule } from './monthly-money/internal/monthly-money.module';
 import { ActivityModule } from './activities/activity.module';
 import { MasterDataServiceModule } from './master-data-service/master-data-service.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MasterDataServiceModule } from './master-data-service/master-data-servi
     MonthlyMoneyModule,
     ActivityModule,
     MasterDataServiceModule,
+    DashboardModule,
   ],
 })
 export class AppModule {}
