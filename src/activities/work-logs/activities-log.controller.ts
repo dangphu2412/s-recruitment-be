@@ -32,7 +32,7 @@ export class ActivitiesLogController {
 
   @CanAccessBy(Permissions.WRITE_ACTIVITY_LOGS)
   @Post()
-  syncFile() {
+  uploadActivityLogs() {
     return this.activityLogService.uploadActivityLogs();
   }
 
