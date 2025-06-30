@@ -3,6 +3,7 @@ import { Storage } from '@google-cloud/storage';
 import * as process from 'node:process';
 import { config } from 'dotenv';
 import { Logger } from '@nestjs/common';
+import { WorkLogExtractor } from './activities/work-logs/work-log-extractor';
 
 // https://github.com/caobo171/node-zklib
 async function main() {
@@ -31,9 +32,13 @@ async function main() {
 
   Logger.log('Getting attendances...');
   const { data } = await zkService.getAttendances();
+
+  Logger.log('Extracting attendances');
+  const extractedLogs = WorkLogExtractor.extractLogsFromLastHalfYear(data);
+
   Logger.log('Saving attendances to GCS');
-  await bucket.file('attendances.json').save(JSON.stringify(data));
-  Logger.log('Done saving attendances to GCS');
+  await bucket.file('attendances.json').save(JSON.stringify(extractedLogs));
+  Logger.log('Saved attendances to GCS');
 
   Logger.log('Saving users to GCS');
   const users = await zkService.getUsers();
