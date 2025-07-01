@@ -14,12 +14,3 @@ export class FindV2AnalyticLogRequest {
   toDate?: string;
   groupType?: GroupType;
 }
-
-export type FindV2AnalyticLogResponse = {
-  items: {
-    lateCount: number;
-    onTimeCount: number;
-    notFinishedCount: number;
-    date?: string;
-  }[];
-};
