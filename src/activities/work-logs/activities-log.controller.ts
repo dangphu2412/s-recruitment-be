@@ -3,8 +3,6 @@ import { ActivityLogService } from './activity-log.service';
 import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
 import { Permissions } from '../../account-service/authorization/access-definition.constant';
-import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
-import { Identified } from '../../account-service/account-service.package';
 
 @Controller('activity-logs')
 export class ActivitiesLogController {
@@ -14,12 +12,6 @@ export class ActivitiesLogController {
   @Get()
   findLogs(@Query() findLogsRequest: FindLogsRequest) {
     return this.activityLogService.findLogs(findLogsRequest);
-  }
-
-  @Identified
-  @Get('analytics')
-  findAnalyticLogs(@Query() findAnalyticLogRequest: FindAnalyticLogRequest) {
-    return this.activityLogService.findAnalyticLogs(findAnalyticLogRequest);
   }
 
   @CanAccessBy(Permissions.WRITE_ACTIVITY_LOGS)

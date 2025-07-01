@@ -10,11 +10,11 @@ import {
   subWeeks,
 } from 'date-fns';
 import {
+  GroupType,
   UserActivityTrend,
   UserActivityTrendRequest,
   UserActivityTrendResponse,
 } from './user-trend.dto';
-import { GroupType } from '../activities/work-logs/dtos/presentation/find-analytic-log.request';
 import { LogWorkStatus } from '../activities/work-logs/log-work-status.enum';
 
 @Injectable()

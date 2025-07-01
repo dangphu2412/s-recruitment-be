@@ -4,10 +4,6 @@ import { Injectable } from '@nestjs/common';
 import { ActivityLog } from '../shared/entities/activity-log.entity';
 import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { subMonths, subWeeks } from 'date-fns';
-import {
-  AnalyticLogsAggregate,
-  AnalyticLogsAggregateQuery,
-} from '../shared/aggregates/analytic-logs.aggregate';
 import { LogWorkStatus } from './log-work-status.enum';
 import { OffsetPaginationRequest } from '../../system/pagination/offset-pagination-request';
 import {
@@ -118,24 +114,6 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
         lateCount: +item.late_count,
       };
     });
-  }
-
-  async findAnalyticLogs({
-    fromDate,
-    toDate,
-  }: AnalyticLogsAggregateQuery): Promise<AnalyticLogsAggregate> {
-    const items = await this.query(
-      `SELECT
-        SUM(CASE WHEN activity_logs.work_status = '${LogWorkStatus.LATE}' THEN 1 ELSE 0 END) AS "lateCount",
-        SUM(CASE WHEN activity_logs.work_status = '${LogWorkStatus.NOT_FINISHED}' THEN 1 ELSE 0 END) AS "notFinishedCount",
-        SUM(CASE WHEN activity_logs.work_status = '${LogWorkStatus.ON_TIME}' THEN 1 ELSE 0 END) as "onTimeCount"
-      FROM activity_logs
-      LEFT JOIN users ON activity_logs.track_id = users.tracking_id
-      WHERE activity_logs.from_time >= $1 AND activity_logs.to_time <= $2`,
-      [fromDate, toDate],
-    );
-
-    return items[0] ?? {};
   }
 
   updateLogs(activityLogs: ActivityLog[]) {

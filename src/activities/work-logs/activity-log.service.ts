@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
 import { FindLogsRequest } from './dtos/presentation/find-logs.request';
-import { subWeeks } from 'date-fns';
 import { OffsetPaginationResponse } from '../../system/pagination';
 import { ActivityRepository } from '../managements/activity.repository';
 import { LogWorkStatus } from './log-work-status.enum';
@@ -10,7 +9,6 @@ import {
   ActivityMatcher,
   WorkTimeUtils,
 } from './work-status-evaluator.service';
-import { FindAnalyticLogRequest } from './dtos/presentation/find-analytic-log.request';
 import { LogFileService } from './log-file.service';
 import { utils, write } from 'xlsx';
 import { WorkLogExtractor } from './work-log-extractor';
@@ -80,18 +78,6 @@ export class ActivityLogService {
       items,
       totalRecords,
       query: findLogsRequest,
-    });
-  }
-
-  findAnalyticLogs(findAnalyticLogRequest: FindAnalyticLogRequest) {
-    const {
-      fromDate = subWeeks(new Date(), 1).toISOString(),
-      toDate = new Date().toISOString(),
-    } = findAnalyticLogRequest;
-
-    return this.activityLogRepository.findAnalyticLogs({
-      fromDate,
-      toDate,
     });
   }
 
