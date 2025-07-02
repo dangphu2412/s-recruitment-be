@@ -20,6 +20,8 @@ import { CreateRoleRequestDTO } from '../dtos/presentation/create-role-request.d
 import { UpdateAssignedPersonsRequestDTO } from '../dtos/presentation/update-assigned-persons.request';
 import { GetAccessControlRequestDTO } from '../dtos/presentation/get-access-control.request';
 import { AccessControlView } from '../dtos/core/role-list.dto';
+import { Identified } from '../../account-service.package';
+import { CurrentUser } from '../../management/user.decorator';
 
 @ApiTags('roles')
 @Controller({
@@ -38,6 +40,12 @@ export class RoleController {
     @Query() query: GetAccessControlRequestDTO,
   ): Promise<AccessControlView> {
     return this.roleService.findAccessControlView(query);
+  }
+
+  @Identified
+  @Get('/me')
+  getMyRoles(@CurrentUser('sub') userId: string) {
+    return this.roleService.findMyRoles(userId);
   }
 
   @CanAccessBy(Permissions.EDIT_IAM)

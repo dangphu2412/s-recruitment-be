@@ -12,6 +12,7 @@ export interface RoleService {
   findAccessControlView(
     dto: GetAccessControlRequestDTO,
   ): Promise<AccessControlView>;
+  findMyRoles(userId: string): Promise<Role[]>;
   findByIds(ids: number[]): Promise<Role[]>;
   findPermissionsByUserId(userId: string): Promise<string[]>;
   findByName(name: string): Promise<Role>;

@@ -1,14 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from './activity-log.repository';
 import { FindLogsRequest } from './dtos/presentation/find-logs.request';
-import {
-  format,
-  startOfMonth,
-  startOfWeek,
-  startOfYear,
-  subMonths,
-  subWeeks,
-} from 'date-fns';
 import { OffsetPaginationResponse } from '../../system/pagination';
 import { ActivityRepository } from '../managements/activity.repository';
 import { LogWorkStatus } from './log-work-status.enum';
@@ -17,14 +9,9 @@ import {
   ActivityMatcher,
   WorkTimeUtils,
 } from './work-status-evaluator.service';
-import {
-  FindAnalyticLogRequest,
-  FindV2AnalyticLogRequest,
-  FindV2AnalyticLogResponse,
-  GroupType,
-} from './dtos/presentation/find-analytic-log.request';
 import { LogFileService } from './log-file.service';
 import { utils, write } from 'xlsx';
+import { WorkLogExtractor } from './work-log-extractor';
 
 export type LogDTO = {
   userSn: number;
@@ -94,57 +81,11 @@ export class ActivityLogService {
     });
   }
 
-  findAnalyticLogs(findAnalyticLogRequest: FindAnalyticLogRequest) {
-    const {
-      fromDate = subWeeks(new Date(), 1).toISOString(),
-      toDate = new Date().toISOString(),
-    } = findAnalyticLogRequest;
-
-    return this.activityLogRepository.findAnalyticLogs({
-      fromDate,
-      toDate,
-    });
-  }
-
-  async findV2AnalyticLogs({
-    groupType,
-  }: FindV2AnalyticLogRequest): Promise<FindV2AnalyticLogResponse> {
-    function getTimeSeriesFilter() {
-      if (groupType === GroupType.MONTHLY) {
-        return {
-          fromDate: startOfMonth(new Date()).toISOString(),
-          toDate: new Date().toISOString(),
-        };
-      }
-
-      if (groupType === GroupType.YEARLY) {
-        return {
-          fromDate: startOfYear(new Date()).toISOString(),
-          toDate: new Date().toISOString(),
-        };
-      }
-
-      return {
-        fromDate: startOfWeek(subWeeks(new Date(), 1)).toISOString(),
-        toDate: new Date().toISOString(),
-      };
-    }
-
-    const items = await this.activityLogRepository.findV2AnalyticLogs({
-      ...getTimeSeriesFilter(),
-      groupType,
-    });
-
-    return {
-      items,
-    };
-  }
-
   async uploadActivityLogs() {
     const data = (await this.logFileService.getLogs()).toString('utf-8');
     const fullLogs = JSON.parse(data) as LogDTO[];
 
-    const lastYearLogs = this.extractLogsFromLastHalfYear(fullLogs);
+    const lastYearLogs = WorkLogExtractor.extractLogsFromLastHalfYear(fullLogs);
     const logSegmentProcessor = new LogSegmentProcessor(lastYearLogs);
 
     await logSegmentProcessor.onEachDeviceUserId(
@@ -213,32 +154,6 @@ export class ActivityLogService {
     this.logger.log(
       `Finished process: ${logSegmentProcessor.getDeviceIds().toString()}`,
     );
-  }
-
-  /**
-   * Apply binary search to find logs from the previous year
-   */
-  private extractLogsFromLastHalfYear(logs: LogDTO[]) {
-    const START_OF_PREVIOUS_YEAR = format(
-      subMonths(new Date(), 6),
-      'yyyy-MM-dd',
-    );
-    let left = 0;
-    let right = logs.length - 1;
-    let result = logs.length;
-
-    while (left <= right) {
-      const mid = Math.floor((left + right) / 2);
-
-      if (logs[mid].recordTime >= START_OF_PREVIOUS_YEAR) {
-        result = mid;
-        right = mid - 1;
-      } else {
-        left = mid + 1;
-      }
-    }
-
-    return logs.slice(result);
   }
 
   async downloadReportFile(): Promise<Buffer> {
