@@ -16,6 +16,7 @@ import {
   UserActivityTrendResponse,
 } from './user-trend.dto';
 import { LogWorkStatus } from '../activities/work-logs/log-work-status.enum';
+import { MyKPI } from './my-kpi.dto';
 
 @Injectable()
 export class DashboardService {
@@ -32,6 +33,81 @@ export class DashboardService {
         (SELECT COUNT(DISTINCT( track_id )) FROM "activity_logs" WHERE work_status = 'L' AND from_time >= $1 AND to_time <= $2) as "totalLateMembers"`;
 
     return (await this.dataSource.query<KPI[]>(SQL, [fromTime, toTime]))[0];
+  }
+
+  async findMyKPI(userId: string): Promise<MyKPI> {
+    const fromTime = startOfMonth(new Date()).toISOString();
+    const toTime = endOfMonth(new Date()).toISOString();
+
+    const SQL = `
+      WITH
+total_payment AS (
+  SELECT COALESCE(SUM(amount), 0) AS value
+      FROM payments
+      WHERE paid_at BETWEEN $1 AND $2
+        AND user_id = $3
+        ),
+estimated_paid AS (
+      SELECT
+        (
+        EXTRACT(YEAR FROM AGE(NOW(), u.joined_at)) * 12 +
+        EXTRACT(MONTH FROM AGE(NOW(), u.joined_at))
+        ) * mmc.amount AS value
+      FROM users u
+        LEFT JOIN operation_fees of ON u.operation_fee_id = of.id
+        LEFT JOIN monthly_money_configs mmc ON of.monthly_config_id = mmc.id
+      WHERE u.id = $3
+        ),
+
+pending_requests AS (
+      SELECT COUNT(id) AS value
+      FROM activity_requests
+      WHERE updated_at BETWEEN $1 AND $2
+        AND approval_status = 'P'
+        AND author_id = $3
+        ),
+
+late_activities AS (
+      SELECT COUNT(DISTINCT track_id) AS value
+      FROM activity_logs
+      WHERE work_status = 'L'
+        AND from_time >= $1
+        AND to_time <= $2
+        ),
+
+finished_work AS (
+      SELECT COUNT(al.from_time) AS value
+      FROM users u
+        LEFT JOIN device_user_logs dul ON dul.device_user_id = u.tracking_id
+        LEFT JOIN activity_logs al ON al.track_id = dul.device_user_id
+      WHERE al.from_time >= $1
+        AND al.to_time <= $2
+        AND u.id = $3),
+
+to_be_finished_work AS (
+      SELECT COUNT(id) AS value
+      FROM activities
+      WHERE author_id = $3
+)
+
+
+SELECT
+  tp.value AS "totalPayment",
+  ep.value AS "estimatedPaid",
+  pr.value AS "totalPendingRequests",
+  la.value AS "totalLateActivities",
+  fw.value AS "totalFinishedWork",
+  tw.value AS "totalToBeFinishedWork"
+FROM total_payment tp,
+     estimated_paid ep,
+     pending_requests pr,
+     late_activities la,
+     finished_work fw,
+     to_be_finished_work tw`;
+
+    return (
+      await this.dataSource.query<MyKPI[]>(SQL, [fromTime, toTime, userId])
+    )[0];
   }
 
   async findUserActivityTrends({

@@ -105,6 +105,16 @@ export class RoleServiceImpl implements RoleService {
     };
   }
 
+  findMyRoles(userId: string): Promise<Role[]> {
+    return this.roleRepository.find({
+      where: {
+        users: {
+          id: userId,
+        },
+      },
+    });
+  }
+
   async updateRole(
     id: number,
     { rights: permissionIds }: UpdateRoleDto,
