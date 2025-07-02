@@ -3,6 +3,7 @@ import { DashboardService } from './dashboard.service';
 import { UserActivityTrendRequest } from './user-trend.dto';
 import { Identified } from '../account-service/account-service.package';
 import { CurrentUser } from '../account-service/management/user.decorator';
+import { MyActivityTrendGroupType } from './my-activity-trend.dto';
 
 @Controller('dashboard')
 export class DashboardController {
@@ -24,5 +25,17 @@ export class DashboardController {
   @Get('/user-activity-trends')
   findUserActivityTrends(@Query() query: UserActivityTrendRequest) {
     return this.dashboardService.findUserActivityTrends(query);
+  }
+
+  @Identified
+  @Get('/user-activity-trends/me')
+  findMyActivityTrends(
+    @CurrentUser('sub') userId: string,
+    @Query('groupType') groupType: MyActivityTrendGroupType,
+  ) {
+    return this.dashboardService.findMyActivityTrends({
+      groupType,
+      userId,
+    });
   }
 }
