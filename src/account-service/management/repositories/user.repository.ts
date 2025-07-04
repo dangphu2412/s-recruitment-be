@@ -5,8 +5,8 @@ import { User } from '../../shared/entities/user.entity';
 import { UserStatus } from '../user-status.constant';
 import { OffsetPaginationResponse } from '../../../system/pagination';
 import { GetUsersQueryRequest } from '../dtos/presentations/get-users-query.request';
-import { UserOverviewAggregate } from '../dtos/aggregates/user-overview.aggregate';
 import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
+import { ReminderUserDTO } from '../dtos/core/reminder-user.dto';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -19,7 +19,7 @@ export class UserRepository extends Repository<User> {
 
   async findPaginatedOverviewUsers(
     query: GetUsersQueryRequest,
-  ): Promise<OffsetPaginationResponse<UserOverviewAggregate>> {
+  ): Promise<OffsetPaginationResponse<User>> {
     const {
       userStatus,
       search = '',
@@ -93,7 +93,7 @@ export class UserRepository extends Repository<User> {
 
     return OffsetPaginationResponse.of({
       query,
-      items: data as UserOverviewAggregate[],
+      items: data as User[],
       totalRecords,
     });
   }
@@ -105,5 +105,26 @@ export class UserRepository extends Repository<User> {
       .orUpdate(['full_name', 'birthday', 'phone_number'], ['username'])
       .returning('')
       .execute();
+  }
+
+  /**
+   * Reminder users should be in the interval of 2 years since joined and still active
+   */
+  async findReminderUsers(): Promise<ReminderUserDTO[]> {
+    const sql = `
+WITH debt_users as (  
+   SELECT "users"."id" AS "id", "users"."email" AS "email",
+   LEAST(
+     DATE_PART('year', AGE(NOW(), "users"."joined_at")) * 12 + DATE_PART('month', AGE(NOW(), "users"."joined_at")),
+     "monthlyConfig".month_range 
+   ) - COALESCE("operationFee"."paid_months", 0) AS "debtMonths" 
+   FROM "users" "users" 
+   LEFT JOIN "operation_fees" "operationFee" ON "operationFee"."id"="users"."operation_fee_id" 
+   LEFT JOIN "monthly_money_configs" "monthlyConfig" ON "monthlyConfig"."id"="operationFee"."monthly_config_id" 
+   WHERE ( "users"."joined_at" >= CURRENT_DATE - INTERVAL '24 months' ) AND ( "users"."deleted_at" IS NULL )
+)
+SELECT * FROM debt_users WHERE "debtMonths" > 0`;
+
+    return this.manager.query<ReminderUserDTO[]>(sql, []);
   }
 }
