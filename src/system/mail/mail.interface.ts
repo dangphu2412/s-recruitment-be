@@ -5,7 +5,7 @@ export const MAIL_SERVICE_TOKEN = createProviderToken('MailService');
 export type SendMailDTO = {
   to: string[] | string;
   subject: string;
-  text: string;
+  html?: string;
 };
 
 export interface MailService {
