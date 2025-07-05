@@ -112,18 +112,16 @@ export class UserRepository extends Repository<User> {
    */
   async findReminderUsers(): Promise<ReminderUserDTO[]> {
     const sql = `
-WITH debt_users as (  
-   SELECT "users"."id" AS "id", "users"."email" AS "email",
-   LEAST(
-     DATE_PART('year', AGE(NOW(), "users"."joined_at")) * 12 + DATE_PART('month', AGE(NOW(), "users"."joined_at")),
-     "monthlyConfig".month_range 
-   ) - COALESCE("operationFee"."paid_months", 0) AS "debtMonths" 
-   FROM "users" "users" 
-   LEFT JOIN "operation_fees" "operationFee" ON "operationFee"."id"="users"."operation_fee_id" 
-   LEFT JOIN "monthly_money_configs" "monthlyConfig" ON "monthlyConfig"."id"="operationFee"."monthly_config_id" 
-   WHERE ( "users"."joined_at" >= CURRENT_DATE - INTERVAL '24 months' ) AND ( "users"."deleted_at" IS NULL )
-)
-SELECT * FROM debt_users WHERE "debtMonths" > 0`;
+      SELECT 
+        "users"."id" AS "id",
+        "users"."email" AS "email",
+         LEAST(
+           DATE_PART('year', AGE(NOW(), "users"."joined_at")) * 12 + DATE_PART('month', AGE(NOW(), "users"."joined_at")),
+           "monthlyConfig".month_range
+         ) - COALESCE("operationFee"."paid_months", 0) AS "debtMonths"
+      FROM "users" "users"
+         LEFT JOIN "operation_fees" "operationFee" ON "operationFee"."id"="users"."operation_fee_id"
+         LEFT JOIN "monthly_money_configs" "monthlyConfig" ON "monthlyConfig"."id"="operationFee"."monthly_config_id"`;
 
     return this.manager.query<ReminderUserDTO[]>(sql, []);
   }
