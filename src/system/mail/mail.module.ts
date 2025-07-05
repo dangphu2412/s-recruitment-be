@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { MAIL_SERVICE_TOKEN } from './mail.interface';
 import { LocalMailServiceImpl, MailServiceImpl } from './mail.service';
 import { ConfigService } from '@nestjs/config';
@@ -14,7 +14,12 @@ import { ConfigService } from '@nestjs/config';
         prod: MailServiceImpl,
         config: ConfigService,
       ) => {
-        return config.get('NODE_ENV') === 'production' ? prod : local;
+        const isProd = config.get('NODE_ENV') === 'production';
+        Logger.log(
+          `MailService use ${isProd ? 'Resend' : 'Local MailDev'}`,
+          MailModule.name,
+        );
+        return isProd ? prod : local;
       },
       inject: [LocalMailServiceImpl, MailServiceImpl, ConfigService],
     },

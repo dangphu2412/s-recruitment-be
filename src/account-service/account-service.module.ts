@@ -29,6 +29,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './registration/services/jwt.strategy';
 import { MoneyReminderJob } from './management/jobs/money-reminder.job';
 import { MailModule } from '../system/mail/mail.module';
+import { FeatureFlagsModule } from '../system/feature-flags/feature-flags.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { MailModule } from '../system/mail/mail.module';
     }),
     MasterDataServiceModule,
     MailModule,
+    FeatureFlagsModule,
     TypeOrmModule.forFeature([User, Role, Permission]),
   ],
   controllers: [

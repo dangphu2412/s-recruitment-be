@@ -8,6 +8,10 @@ import {
 import { MonthlyReminderEmailTemplate } from './monthly-reminder-email';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { ReminderUserDTO } from '../dtos/core/reminder-user.dto';
+import {
+  FeatureFlagsService,
+  FLAGS,
+} from '../../../system/feature-flags/feature-flags.service';
 
 @Injectable()
 export class MoneyReminderJob {
@@ -17,10 +21,15 @@ export class MoneyReminderJob {
     private userRepository: UserRepository,
     @Inject(MAIL_SERVICE_TOKEN)
     private mailService: MailService,
+    private featureFlagsService: FeatureFlagsService,
   ) {}
 
-  @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_NOON)
+  @Cron(CronExpression.EVERY_5_SECONDS)
   async remindDebtMoney() {
+    if (this.featureFlagsService.ifOff(FLAGS.ENABLE_V1_REMINDER_JOB)) {
+      return;
+    }
+
     this.logger.log('Starting reminder job');
     const users = await this.userRepository.findReminderUsers();
 
