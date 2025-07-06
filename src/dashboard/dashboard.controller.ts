@@ -1,15 +1,19 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { UserActivityTrendRequest } from './user-trend.dto';
-import { Identified } from '../account-service/account-service.package';
+import {
+  CanAccessBy,
+  Identified,
+} from '../account-service/account-service.package';
 import { CurrentUser } from '../account-service/management/user.decorator';
 import { MyActivityTrendGroupType } from './my-activity-trend.dto';
+import { Permissions } from '../account-service/authorization/access-definition.constant';
 
 @Controller('dashboard')
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
-  @Identified
+  @CanAccessBy(Permissions.READ_KPI)
   @Get('/kpi')
   findKPI() {
     return this.dashboardService.findKPI();
@@ -21,7 +25,7 @@ export class DashboardController {
     return this.dashboardService.findMyKPI(userId);
   }
 
-  @Identified
+  @CanAccessBy(Permissions.READ_KPI)
   @Get('/user-activity-trends')
   findUserActivityTrends(@Query() query: UserActivityTrendRequest) {
     return this.dashboardService.findUserActivityTrends(query);

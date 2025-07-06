@@ -27,6 +27,10 @@ import { PermissionController } from './authorization/controllers/permissions.co
 import { SALT_ROUNDS } from './registration/interfaces/password-manager.interface';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './registration/services/jwt.strategy';
+import { MoneyReminderJob } from './management/jobs/money-reminder.job';
+import { MailModule } from '../system/mail/mail.module';
+import { FeatureFlagsModule } from '../system/feature-flags/feature-flags.module';
+import { UserReminderController } from './management/controllers/user-reminder.controller';
 
 @Module({
   imports: [
@@ -38,12 +42,15 @@ import { JwtStrategy } from './registration/services/jwt.strategy';
       inject: [ConfigService],
     }),
     MasterDataServiceModule,
+    MailModule,
+    FeatureFlagsModule,
     TypeOrmModule.forFeature([User, Role, Permission]),
   ],
   controllers: [
     AuthController,
     RoleController,
     UserController,
+    UserReminderController,
     PermissionController,
   ],
   providers: [
@@ -52,6 +59,7 @@ import { JwtStrategy } from './registration/services/jwt.strategy';
     RoleAuthorizationStrategy,
     RoleRepository,
     UserRepository,
+    MoneyReminderJob,
     {
       provide: AuthServiceToken,
       useClass: AuthServiceImpl,

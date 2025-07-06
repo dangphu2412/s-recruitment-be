@@ -55,9 +55,9 @@ total_payment AS (
         ),
 estimated_paid AS (
       SELECT
-        (
-        EXTRACT(YEAR FROM AGE(NOW(), u.joined_at)) * 12 +
-        EXTRACT(MONTH FROM AGE(NOW(), u.joined_at))
+        LEAST(
+          EXTRACT(YEAR FROM AGE(NOW(), u.joined_at)) * 12 + EXTRACT(MONTH FROM AGE(NOW(), u.joined_at)),
+          COALESCE(mmc.month_range, 0)
         ) * mmc.amount AS value
       FROM users u
         LEFT JOIN operation_fees of ON u.operation_fee_id = of.id

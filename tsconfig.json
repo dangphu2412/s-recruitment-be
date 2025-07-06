@@ -2,9 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
-    "lib": [
-      "es2019"
-    ],
+    "lib": ["es2019", "dom", "dom.iterable", "esnext"],
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -21,7 +19,9 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "jsx": "react",
   },
   "exclude": ["**/*.test.ts", "**/*.mock.ts", "**/*.json", "node_modules"]
 }
