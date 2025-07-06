@@ -11,6 +11,7 @@ import {
   PAYMENT_CREATED_EVENT,
   PaymentCreatedEvent,
 } from '../domain/core/events/payment-created.event';
+import { OffsetPaginationResponse } from '../../system/pagination';
 
 @Injectable()
 export class PaymentService {
@@ -50,5 +51,22 @@ export class PaymentService {
 
   findUserPaymentsByUserId(userId: string) {
     return this.paymentRepository.findUserPaymentsByUserId(userId);
+  }
+
+  async findMyPayments(userId: string) {
+    const items = await this.paymentRepository.find({
+      where: {
+        userId,
+      },
+    });
+
+    return OffsetPaginationResponse.of({
+      items,
+      totalRecords: items.length,
+      query: {
+        page: 1,
+        size: items.length,
+      },
+    });
   }
 }

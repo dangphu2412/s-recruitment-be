@@ -24,7 +24,7 @@ export class MoneyReminderJob {
     private featureFlagsService: FeatureFlagsService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_NOON)
   async remindDebtMoney() {
     if (this.featureFlagsService.ifOff(FLAGS.ENABLE_V1_REMINDER_JOB)) {
       return;
@@ -46,8 +46,11 @@ export class MoneyReminderJob {
     const results = await Promise.allSettled(
       Array.from(groupedUsersByDebtMonths.entries()).map(
         ([debtMonths, users]) => {
+          const to = (users as ReminderUserDTO[]).map((user) => user.email);
+          this.logger.log(`Sending to ${to} debt ${debtMonths}`);
+
           return this.mailService.sendMail({
-            to: (users as ReminderUserDTO[]).map((user) => user.email),
+            to,
             subject: '[S-Group] NHẮC NHỞ TIỀN THÁNG',
             html: renderToStaticMarkup(
               MonthlyReminderEmailTemplate({
