@@ -12,12 +12,13 @@ import { OperationFee } from '../domain/data-access/entities/operation-fee.entit
 import { MonthlyMoneyConfig } from '../domain/data-access/entities/monthly-money-config.entity';
 import { MonthlyMoneyConfigServiceToken } from '../domain/core/services/monthly-money-config.service';
 import { MonthlyMoneyOperationServiceToken } from '../domain/core/services/monthly-money-operation.service';
+import { PaymentController } from './payment.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([OperationFee, MonthlyMoneyConfig, Payment]),
   ],
-  controllers: [MonthlyMoneyController],
+  controllers: [MonthlyMoneyController, PaymentController],
   providers: [
     {
       provide: MonthlyMoneyConfigServiceToken,

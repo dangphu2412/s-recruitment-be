@@ -16,7 +16,7 @@ export class MailServiceImpl implements MailService {
   }
 
   async sendMail(dto: SendMailDTO) {
-    this.logger.debug(`Sending to ${dto.to}`);
+    this.logger.log(`Sending to ${dto.to}`);
     const response = await this.resend.emails.send({
       from: 'noibo@mail.sgroupvn.org',
       replyTo: 'noibosgroup@gmail.com',

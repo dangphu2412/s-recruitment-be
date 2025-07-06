@@ -30,6 +30,7 @@ import { JwtStrategy } from './registration/services/jwt.strategy';
 import { MoneyReminderJob } from './management/jobs/money-reminder.job';
 import { MailModule } from '../system/mail/mail.module';
 import { FeatureFlagsModule } from '../system/feature-flags/feature-flags.module';
+import { UserReminderController } from './management/controllers/user-reminder.controller';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { FeatureFlagsModule } from '../system/feature-flags/feature-flags.module
     AuthController,
     RoleController,
     UserController,
+    UserReminderController,
     PermissionController,
   ],
   providers: [
