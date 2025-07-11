@@ -40,6 +40,7 @@ export interface UserService {
 
   updateUserRoles(id: string, payload: UpdateUserRolesDto): Promise<void>;
   updateUser(dto: UpdateUserDTO): Promise<void>;
+  updateMyProfile(dto: UpdateUserDTO): Promise<void>;
   upgradeToMembers(upgradeUserMemberInput: UpgradeUserMemberDTO): Promise<void>;
   toggleUserIsActive(id: string): Promise<void>;
 }
