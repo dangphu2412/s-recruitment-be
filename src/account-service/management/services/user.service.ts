@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { OffsetPaginationResponse } from 'src/system/pagination';
-import { omit } from 'lodash';
+import { identity, omit, pickBy } from 'lodash';
 import { In, InsertResult, IsNull } from 'typeorm';
 import { PasswordManager } from '../../registration/services/password-manager';
 import {
@@ -190,6 +190,7 @@ export class UserServiceImpl implements UserService {
       where: {
         id,
       },
+      relations: ['department', 'period'],
     });
 
     if (!user) {
@@ -389,7 +390,11 @@ export class UserServiceImpl implements UserService {
   }
 
   async updateUser(dto: UpdateUserDTO): Promise<void> {
-    await this.userRepository.update({ id: dto.id }, dto);
+    await this.userRepository.update({ id: dto.id }, pickBy(dto, identity));
+  }
+
+  async updateMyProfile({ id, ...dto }: UpdateUserDTO): Promise<void> {
+    await this.userRepository.update({ id: id }, pickBy(dto, identity));
   }
 
   async updateUserRoles(
