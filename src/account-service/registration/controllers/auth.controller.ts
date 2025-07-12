@@ -6,6 +6,9 @@ import {
   AuthService,
   AuthServiceToken,
 } from '../interfaces/auth-service.interface';
+import { CurrentUser } from '../../management/user.decorator';
+import { UpdateMyPasswordRequest } from '../dtos/presentations/update-my-password.request';
+import { Identified } from '../identified.decorator';
 
 @ApiTags('auth')
 @Controller({
@@ -39,5 +42,14 @@ export class AuthController {
   @Delete('logout')
   public logout(@Body() renewTokensDto: RenewTokensRequestDto) {
     return this.authService.logOut(renewTokensDto.refreshToken);
+  }
+
+  @Identified
+  @Post('password')
+  public updateMyPassword(
+    @CurrentUser('sub') userId: string,
+    @Body() dto: UpdateMyPasswordRequest,
+  ) {
+    return this.authService.updateMyPassword(userId, dto);
   }
 }
