@@ -42,6 +42,7 @@ import { UpdateUserRequest } from '../dtos/presentations/update-user.request';
 import { Identified } from '../../registration/identified.decorator';
 import { OffsetPaginationResponse } from '../../../system/pagination';
 import { UploadUserFileValidatorPipe } from '../upload-user-file.pipe';
+import { UpdateMyProfileRequest } from '../dtos/presentations/update-my-profile.request';
 
 @ApiTags('users')
 @Controller({
@@ -107,6 +108,19 @@ export class UserController {
     @Body() dto: UpdateUserRequest,
   ) {
     await this.userService.updateUser({
+      ...dto,
+      id: userId,
+    });
+  }
+
+  @Identified
+  @Patch('/me')
+  @ApiNoContentResponse()
+  async updateMyProfile(
+    @CurrentUser('sub') userId: string,
+    @Body() dto: UpdateMyProfileRequest,
+  ) {
+    await this.userService.updateMyProfile({
       ...dto,
       id: userId,
     });
