@@ -1,6 +1,7 @@
 export type UpdateUserDTO = {
   id: string;
-  fullName: string;
+  fullName?: string;
+  password?: string;
   departmentId?: string;
   trackingId?: string;
   periodId?: string;

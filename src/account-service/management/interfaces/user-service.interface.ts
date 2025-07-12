@@ -23,6 +23,7 @@ export interface UserService {
    * @deprecated This API too abstract and not correctly used
    */
   findOne(query: GetUserDTO): Promise<User>;
+  findById(id: string): Promise<User | null>;
   findProbationUsers(
     userProbationQueryInput: UserProbationQueryDTO,
   ): Promise<PaginatedUserProbationDTO>;
