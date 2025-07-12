@@ -25,6 +25,7 @@ import {
   TokenFactoryToken,
 } from '../interfaces/token-factory.interface';
 import { AuthService } from '../interfaces/auth-service.interface';
+import { UpdateMyPasswordRequest } from '../dtos/presentations/update-my-password.request';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
@@ -94,5 +95,33 @@ export class AuthServiceImpl implements AuthService {
 
       throw new BadRequestException();
     }
+  }
+
+  async updateMyPassword(
+    myId: string,
+    updateMyPassword: UpdateMyPasswordRequest,
+  ): Promise<void> {
+    const user = await this.userService.findById(myId);
+
+    if (
+      isEmpty(user) ||
+      !(await this.passwordManager.compare(
+        updateMyPassword.currentPassword,
+        user.password,
+      ))
+    ) {
+      throw new BadRequestException('Incorrect password');
+    }
+
+    if (updateMyPassword.currentPassword === updateMyPassword.newPassword) {
+      throw new BadRequestException('New password should not be the same');
+    }
+
+    await this.userService.updateUser({
+      id: user.id,
+      password: await this.passwordManager.generate(
+        updateMyPassword.newPassword,
+      ),
+    });
   }
 }

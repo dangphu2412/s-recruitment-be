@@ -213,6 +213,10 @@ export class UserServiceImpl implements UserService {
     return user;
   }
 
+  findById(id: string): Promise<User> {
+    return this.userRepository.findOneBy({ id });
+  }
+
   async toggleUserIsActive(id: string): Promise<void> {
     const user = await this.userRepository.findOne({
       withDeleted: true,
