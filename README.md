@@ -1,122 +1,70 @@
-# Member management Backend Project
+# 🧑‍💼 User Management Backend API
 
-## Installation
+A backend service for managing user accounts, access control, and related billing and activity tracking in a Domain-Driven Design (DDD) architecture. This service is built with [NestJS](https://nestjs.com/) and uses `pnpm` as the package manager.
+
+## 📦 Tech Stack
+
+- **Framework**: [NestJS](https://nestjs.com/)
+- **Language**: TypeScript
+- **Package Manager**: [pnpm](https://pnpm.io/)
+- **Architecture**: Domain-Driven Design (DDD)
+- **Database**: PostgreSQL
+- **ORM**: Prisma (optional if applicable)
+- **Mail Service**: Resend (for notifications)
+- **Shared Utilities**: Feature flags, file storage, mail service
+
+---
+
+## 🗂️ Domain Overview
+
+The application is organized into modules that follow DDD boundaries. Here's a breakdown:
+
+### 🔐 Account Service
+- `Account Registration`: Handles user sign-up
+- `Account Authorization`: Role-based access control
+- `Account Management`: Profile and status updates
+
+### 🧾 Billing
+- `User Operation Fee`: Handles monthly user fee logic
+- `Payments`: Tracks transaction history and debt status
+
+### 📋 Activities
+- `Activity Requests`: Submit and track activity approvals
+- `Work Logs`: Logs user attendance or task tracking
+
+### 📊 Dashboard
+- `KPI` & `User Trends`: Metrics & performance insights
+
+### 🛠 Shared Services
+- `File Storage`, `Mail Service`, `Feature Flags`
+
+### 📚 Master Data
+- Periods, Departments, Time of Day, Day of Week
+
+> 💡 See `docs/` or the diagram for full service interaction.
+
+<img src="./docs/data-domain-driven.png" width="800">
+
+---
+
+## 🚀 Getting Started
+
+### 📥 Prerequisites
+
+- [Node.js](https://nodejs.org/) v18+
+- [pnpm](https://pnpm.io/) (install via `npm i -g pnpm`)
+- [PostgreSQL](https://www.postgresql.org/) database
+
+### 🔧 Install Dependencies
 
 ```bash
-$ pnpm
+pnpm install
 ```
-
-## Running the app
-
+And run it
 ```bash
-# development
-$ pnpm start
-
-# watch mode
-$ pnpm start:dev
-
-# production mode
-$ pnpm start:prod
+pnpm run dev
 ```
-
-## Test
-
+Trigger upload work logs
 ```bash
-# unit tests
-$ pnpm test
-
-# e2e tests
-$ pnpm test:e2e
-
-# test coverage
-$ pnpm test:cov
+pnpm run upload
 ```
-
-## Architecture Decision
-N-Tier Architecture
-Domain Driven Design
-
-Naming Terminology
-- Entity: Database Model
-```typescript
-// Just name it as it is
-// bad
-class UserEntity {}
-
-// Good
-class User {}
-```
-- DTO: Data Transfer Object
-Which is known as an object transfer across the layers
-Pattern: [name]DTO
-```typescript
-// Postfix with DTO
-// bad
-class User {}
-
-// Good
-class UserDTO {}
-```
-- Incoming request - response communication via network
-Pattern: [name]Request, [name]Response
-```typescript
-// Postfix with Request, Response
-// bad
-class User {}
-
-// Good
-class UserRequest {}
-class UserResponse {}
-```
-
-When the business give us the small complexity, we can use the following pattern:
-N-Tier Architecture
-- Controller: Presentation layer
-- Service: Business logic
-- Repository: Data access layer
-Share the same DTO between layers
-
-When the business give us the medium complexity, we can use the following pattern:
-Domain Driven Design
-- Entity: Database Model
-- Repository: Data access layer
-- Service: Business logic
-- Controller: Presentation layer
-- DTO: Data Transfer Object
-- Mapper: Convert between Entity and DTO
-
-When the business give us the large complexity, we can use the following pattern:
-Domain Driven Design
-- Entity: Database Model
-- Repository: Data access layer
-- Service: Business logic
-- Controller: Presentation layer
-- DTO: Data Transfer Object
-- Mapper: Convert between Entity and DTO
-- Domain: Business domain
-- Specification: Business rule
-- Aggregate: Business transaction
-- Event: Business event
-- Saga: Business process
-- Factory: Business creation
-- Value Object: Business value
-- Policy: Business policy
-- Strategy: Business strategy
-- Context: Business context
-- Module: Business module
-- Layer: Business layer
-- Application: Business application
-- Infrastructure: Business infrastructure
-- Shared Kernel: Business shared kernel
-- Anti-corruption Layer: Business anti-corruption layer
-- Bounded Context: Business bounded context
-
-## For CRUD operation, keep the same terminology for consistency development experience
-- Create
-Prefix: create
-- Read
-Prefix: find
-- Update
-Prefix: update
-- Delete
-Prefix: delete
