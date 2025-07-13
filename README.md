@@ -9,9 +9,8 @@ A backend service for managing user accounts, access control, and related billin
 - **Package Manager**: [pnpm](https://pnpm.io/)
 - **Architecture**: Domain-Driven Design (DDD)
 - **Database**: PostgreSQL
-- **ORM**: Prisma (optional if applicable)
+- **ORM**: TypeORM
 - **Mail Service**: Resend (for notifications)
-- **Shared Utilities**: Feature flags, file storage, mail service
 
 ---
 
@@ -20,17 +19,18 @@ A backend service for managing user accounts, access control, and related billin
 The application is organized into modules that follow DDD boundaries. Here's a breakdown:
 
 ### 🔐 Account Service
-- `Account Registration`: Handles user sign-up
+- `Account Registration`: Incharge of requesting user creation
 - `Account Authorization`: Role-based access control
 - `Account Management`: Profile and status updates
 
 ### 🧾 Billing
 - `User Operation Fee`: Handles monthly user fee logic
-- `Payments`: Tracks transaction history and debt status
+- `Payments`: Tracks transaction history
 
 ### 📋 Activities
 - `Activity Requests`: Submit and track activity approvals
-- `Work Logs`: Logs user attendance or task tracking
+- `Activity Managements`: Manage member activities
+- `Work Logs`: Handle logs of attendance
 
 ### 📊 Dashboard
 - `KPI` & `User Trends`: Metrics & performance insights
