@@ -1,17 +1,16 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { UserRepository } from '../repositories/user.repository';
 import {
-  MAIL_SERVICE_TOKEN,
-  MailService,
-} from '../../../system/mail/mail.interface';
-import { MonthlyReminderEmailTemplate } from './monthly-reminder-email';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { ReminderUserDTO } from '../dtos/core/reminder-user.dto';
+  MAIL_REMINDER_TOPIC,
+  ReminderUserDTO,
+  SendReminderMessage,
+} from '../dtos/core/reminder-user.dto';
 import {
   FeatureFlagsService,
   FLAGS,
 } from '../../../system/feature-flags/feature-flags.service';
+import { MessageQueueClient } from '../../../system/message-queue/message-queue.client';
 
 @Injectable()
 export class MoneyReminderJob {
@@ -19,9 +18,8 @@ export class MoneyReminderJob {
 
   constructor(
     private userRepository: UserRepository,
-    @Inject(MAIL_SERVICE_TOKEN)
-    private mailService: MailService,
     private featureFlagsService: FeatureFlagsService,
+    private messageQueueClient: MessageQueueClient,
   ) {}
 
   @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_NOON)
@@ -31,10 +29,12 @@ export class MoneyReminderJob {
     }
 
     this.logger.log('Starting reminder job');
+
     const users = await this.userRepository.findReminderUsers();
 
     const groupedUsersByDebtMonths = new Map<number, ReminderUserDTO[]>();
 
+    this.logger.debug('Grouping users by debt month');
     users.forEach((user) => {
       if (!groupedUsersByDebtMonths.has(user.debtMonths)) {
         groupedUsersByDebtMonths.set(user.debtMonths, []);
@@ -47,17 +47,16 @@ export class MoneyReminderJob {
       Array.from(groupedUsersByDebtMonths.entries()).map(
         ([debtMonths, users]) => {
           const to = (users as ReminderUserDTO[]).map((user) => user.email);
-          this.logger.log(`Sending to ${to} debt ${debtMonths}`);
+          this.logger.debug({ message: `Emitting ${debtMonths}`, to });
 
-          return this.mailService.sendMail({
-            to,
-            subject: '[S-Group] NHẮC NHỞ TIỀN THÁNG',
-            html: renderToStaticMarkup(
-              MonthlyReminderEmailTemplate({
-                missingMonths: parseInt(String(debtMonths)),
-              }),
-            ),
-          });
+          this.messageQueueClient.emit<SendReminderMessage>(
+            MAIL_REMINDER_TOPIC,
+            {
+              id: debtMonths,
+              debtMonths,
+              to,
+            },
+          );
         },
       ),
     );
