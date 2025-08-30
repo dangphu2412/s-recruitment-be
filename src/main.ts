@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {
   FastifyAdapter,
@@ -16,6 +16,7 @@ import {
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import morgan from 'morgan';
 import { ConfigService } from '@nestjs/config';
+import { Logger } from 'nestjs-pino';
 
 const MAIN_CONTEXT = 'MainContext';
 
@@ -25,7 +26,15 @@ async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
+    {
+      bufferLogs: true,
+    },
   );
+
+  const logger = app.get(Logger);
+  const configService = app.get(ConfigService);
+
+  app.useLogger(logger);
 
   const config = new DocumentBuilder()
     .setTitle('App example')
@@ -50,7 +59,6 @@ async function bootstrap() {
       },
     },
   });
-  const configService = app.get(ConfigService);
 
   const corsOrigin = configService.get<string>('CORS');
 
@@ -64,8 +72,7 @@ async function bootstrap() {
     }),
   );
 
-  const logger = new Logger();
-  app.useGlobalFilters(new AppExceptionFilter(logger));
+  app.useGlobalFilters(new AppExceptionFilter());
 
   await app.listen(
     configService.get('PORT', 3000),

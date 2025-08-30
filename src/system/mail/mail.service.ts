@@ -38,7 +38,7 @@ export class LocalMailServiceImpl implements MailService {
   async sendMail(dto: SendMailDTO) {
     this.logger.debug(`[Local] Fake sending to ${dto.to}`);
     const transporter = nodemailer.createTransport({
-      host: 'localhost',
+      host: '127.0.0.1',
       port: 1025,
       secure: false,
       auth: {
