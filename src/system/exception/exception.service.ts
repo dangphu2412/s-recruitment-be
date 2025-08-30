@@ -16,7 +16,9 @@ export function exceptionFactory(errors: ValidationError[]) {
 
 @Catch()
 export class AppExceptionFilter implements ExceptionFilter {
-  constructor(private logger: Logger) {}
+  private logger = new Logger(AppExceptionFilter.name);
+
+  constructor() {}
 
   catch(exception: HttpException | Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();

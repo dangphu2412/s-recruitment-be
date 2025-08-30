@@ -31,6 +31,8 @@ import { MoneyReminderJob } from './management/jobs/money-reminder.job';
 import { MailModule } from '../system/mail/mail.module';
 import { FeatureFlagsModule } from '../system/feature-flags/feature-flags.module';
 import { UserReminderController } from './management/controllers/user-reminder.controller';
+import { MessageQueueModule } from '../system/message-queue/message-queue.module';
+import { SendMoneyReminderConsumer } from './management/jobs/send-money-reminder.consumer';
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { UserReminderController } from './management/controllers/user-reminder.c
     MasterDataServiceModule,
     MailModule,
     FeatureFlagsModule,
+    MessageQueueModule,
     TypeOrmModule.forFeature([User, Role, Permission]),
   ],
   controllers: [
@@ -60,6 +63,7 @@ import { UserReminderController } from './management/controllers/user-reminder.c
     RoleRepository,
     UserRepository,
     MoneyReminderJob,
+    SendMoneyReminderConsumer,
     {
       provide: AuthServiceToken,
       useClass: AuthServiceImpl,

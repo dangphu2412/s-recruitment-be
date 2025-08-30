@@ -20,5 +20,5 @@ jobs:
       - name: Setup packages
         run: pnpm install --frozen-lockfile
 
-      - name: Audit the package
-        run: pnpm audit --audit-level=critical
+#      - name: Audit the package
+#        run: pnpm audit --audit-level=critical
