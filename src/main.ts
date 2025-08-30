@@ -14,7 +14,6 @@ import {
   exceptionFactory,
 } from './system/exception/exception.service';
 import { initializeTransactionalContext } from 'typeorm-transactional';
-import morgan from 'morgan';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 
@@ -46,7 +45,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  app.use(morgan('common'));
   await app.register(compression, { encodings: ['gzip', 'deflate'] });
   await app.register(contentParser);
   await app.register(fastifyHelmet, {
