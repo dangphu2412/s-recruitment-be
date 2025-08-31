@@ -7,8 +7,22 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { ValidationError } from '@nestjs/common/interfaces/external/validation-error.interface';
+
+type ExceptionContext = {
+  code: string;
+  message: string;
+};
+
+export class BusinessException extends Error {
+  code: string;
+
+  constructor({ code, message }: ExceptionContext) {
+    super(message);
+    this.code = code;
+  }
+}
 
 export function exceptionFactory(errors: ValidationError[]) {
   return new BadRequestException(errors.toString());
@@ -18,39 +32,53 @@ export function exceptionFactory(errors: ValidationError[]) {
 export class AppExceptionFilter implements ExceptionFilter {
   private logger = new Logger(AppExceptionFilter.name);
 
-  constructor() {}
-
-  catch(exception: HttpException | Error, host: ArgumentsHost) {
+  catch(
+    exception: HttpException | Error | BusinessException,
+    host: ArgumentsHost,
+  ) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<FastifyReply>();
-    const request = ctx.getRequest();
+    const request = ctx.getRequest<FastifyRequest>();
 
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
+    if (exception instanceof BusinessException) {
+      this.logger.debug(exception);
 
-    if (exception instanceof HttpException) {
-      status = exception.getStatus();
-      const exceptionResponse = exception.getResponse();
-
-      if (typeof exceptionResponse === 'string') {
-        message = exceptionResponse;
-      } else if (
-        typeof exceptionResponse === 'object' &&
-        (exceptionResponse as any).message
-      ) {
-        message = (exceptionResponse as any).message;
-      }
-    } else {
-      // Log internal error details
-      this.logger.error(
-        `Unexpected error on ${request.method} ${request.url}`,
-        (exception as Error).stack || '',
-      );
+      return response.status(HttpStatus.UNPROCESSABLE_ENTITY).send({
+        statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        businessCode: exception.code,
+        message: exception.message,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+      });
     }
 
-    response.status(status).send({
-      statusCode: status,
-      message,
+    if (exception instanceof HttpException) {
+      if (exception.getStatus() >= 500) {
+        this.logger.error(exception);
+        this.logger.error({
+          body: request.body,
+          params: request.params,
+        });
+      }
+
+      return response.status(exception.getStatus()).send({
+        statusCode: exception.getStatus(),
+        message: exception.message,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+      });
+    }
+
+    this.logger.error(exception);
+    this.logger.error({
+      type: 'exception_metadata',
+      body: request.body,
+      params: request.params,
+    });
+
+    response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: 'Internal Server Error',
       timestamp: new Date().toISOString(),
       path: request.url,
     });
