@@ -24,7 +24,7 @@ import { UpdateApprovalActivityRequestRequest } from './dtos/presentation/update
 import { UpdateMyActivityRequestRequest } from './dtos/presentation/update-my-activity.request';
 import { FindRequestedActivityRequestDTO } from './dtos/presentation/find-requested-activity-request.dto';
 import { Identified } from '../../account-service/registration/identified.decorator';
-import { FileInterceptor } from '../../system/file';
+import { FileInterceptor } from '../../system/file/file.interceptor';
 import { ApiConsumes } from '@nestjs/swagger';
 import { FileActivityRequestDTO } from './dtos/core/file-create-activity-request.dto';
 import { UploadRequestActivityFileValidatorPipe } from './upload-activity-request-file.pipe';
