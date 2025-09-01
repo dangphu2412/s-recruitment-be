@@ -7,6 +7,7 @@ import { MailModule } from './mail/mail.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MessageQueueModule } from './message-queue/message-queue.module';
 import { LoggerModule } from 'nestjs-pino';
+import { HeathModule } from './health/heath.module';
 
 @Global()
 @Module({
@@ -22,6 +23,7 @@ import { LoggerModule } from 'nestjs-pino';
     MailModule,
     ScheduleModule.forRoot(),
     MessageQueueModule,
+    HeathModule,
     LoggerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
@@ -30,20 +32,20 @@ import { LoggerModule } from 'nestjs-pino';
 
         return {
           pinoHttp: {
-            autoLogging: false,
+            autoLogging: true,
             level: isProd ? 'info' : 'debug',
             // In Local env, we use pino-pretty to format logs for human readability, not machine readability.
-            transport: isProd
-              ? undefined
-              : {
+            transport: !isProd
+              ? {
                   target: 'pino-pretty',
                   options: {
                     colorize: true,
                     translateTime: 'SYS:standard',
                   },
-                },
+                }
+              : undefined,
           },
-          exclude: [{ method: RequestMethod.ALL, path: 'health' }],
+          exclude: [{ method: RequestMethod.ALL, path: 'health/readiness' }],
         };
       },
     }),

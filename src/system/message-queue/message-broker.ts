@@ -12,13 +12,17 @@ type ConsumerConfig = {
 
 @Injectable()
 export class BrokerService {
+  private logger = new Logger(BrokerService.name);
+
   private topics: Map<string, ConsumerConfig[]> = new Map();
 
   subscribe(topic: string, handler: Handler, rate: number) {
-    Logger.log(`[BrokerService] topic: ${topic}`);
+    this.logger.debug(`Subscribing topic: ${topic}`, BrokerService.name);
+
     if (!this.topics.has(topic)) {
       this.topics.set(topic, []);
     }
+
     this.topics.get(topic)!.push({
       handler,
       rate,
@@ -44,6 +48,7 @@ export class BrokerService {
     consumer.processing = true;
 
     const interval = consumer.rate; // ms between messages
+
     const loop = async () => {
       const msg = consumer.queue.shift();
 
@@ -51,12 +56,14 @@ export class BrokerService {
         try {
           await consumer.handler(msg);
         } catch (err) {
-          console.error('[Broker] error processing message', err);
+          this.logger.error(err);
         }
+
         setTimeout(loop, interval);
-      } else {
-        consumer.processing = false;
+        return;
       }
+
+      consumer.processing = false;
     };
 
     loop();
