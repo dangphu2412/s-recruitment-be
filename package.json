@@ -157,10 +157,24 @@
       ".module.ts",
       "client",
       "dtos",
-      "index.ts"
+      "index.ts",
+      ".dto.ts",
+      ".entity.ts",
+      ".interface.ts",
+      ".enum.ts",
+      ".constant.ts",
+      "/src/system/database/migrations",
+      "/src/system/database/config"
     ],
     "moduleNameMapper": {
       "src/(.*)": "<rootDir>/src/$1"
+    },
+    "coverageThreshold": {
+      "global": {
+        "branches": 20,
+        "functions": 40,
+        "lines": 40
+      }
     }
   },
   "lint-staged": {
