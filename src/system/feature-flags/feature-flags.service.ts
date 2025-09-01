@@ -17,7 +17,8 @@ export class FeatureFlagsService {
         this.flagsMap.set(key, true);
       }
     });
-    Logger.log(Array.from(this.flagsMap.entries()));
+
+    Logger.debug(Array.from(this.flagsMap.entries()), FeatureFlagsService.name);
   }
 
   isOn(key: keyof typeof FLAGS): boolean {
