@@ -176,6 +176,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
 
     const queryBuilder = this.activityRequestRepository
       .createQueryBuilder('activity')
+      .withDeleted()
       .leftJoinAndSelect('activity.author', 'author')
       .leftJoinAndSelect('activity.dayOfWeek', 'dayOfWeek')
       .leftJoinAndSelect('activity.timeOfDay', 'timeOfDay');
