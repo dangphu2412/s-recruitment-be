@@ -26,6 +26,7 @@ import {
 } from '../interfaces/token-factory.interface';
 import { AuthService } from '../interfaces/auth-service.interface';
 import { UpdateMyPasswordRequest } from '../dtos/presentations/update-my-password.request';
+import { LogOutRequiredException } from '../exceptions/log-out-required.exception';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
@@ -93,7 +94,7 @@ export class AuthServiceImpl implements AuthService {
 
       await this.roleService.clean(jwtPayload.sub);
 
-      throw new BadRequestException();
+      throw new LogOutRequiredException();
     }
   }
 
