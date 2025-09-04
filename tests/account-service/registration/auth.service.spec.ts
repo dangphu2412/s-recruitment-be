@@ -19,10 +19,10 @@ import {
   TokenFactoryToken,
 } from '../../../src/account-service/registration/interfaces/token-factory.interface';
 import {
-  BadRequestException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { LogOutRequiredException } from '../../../src/account-service/registration/exceptions/log-out-required.exception';
 
 // Mock extractJwtPayload utility
 jest.mock(
@@ -183,7 +183,7 @@ describe('AuthServiceImpl', () => {
       (extractJwtPayload as jest.Mock).mockReturnValue({ sub: 'user-id' });
 
       await expect(authService.renewTokens('bad_refresh')).rejects.toThrow(
-        BadRequestException,
+        LogOutRequiredException,
       );
 
       expect(roleService.clean).toHaveBeenCalledWith('user-id');
