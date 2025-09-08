@@ -11,6 +11,7 @@ import {
   FLAGS,
 } from '../../../system/feature-flags/feature-flags.service';
 import { MessageQueueClient } from '../../../system/message-queue/message-queue.client';
+import { subYears } from 'date-fns';
 
 @Injectable()
 export class MoneyReminderJob {
@@ -30,18 +31,7 @@ export class MoneyReminderJob {
 
     this.logger.log('Starting reminder job');
 
-    const users = await this.userRepository.findReminderUsers();
-
-    const groupedUsersByDebtMonths = new Map<number, ReminderUserDTO[]>();
-
-    this.logger.debug('Grouping users by debt month');
-    users.forEach((user) => {
-      if (!groupedUsersByDebtMonths.has(user.debtMonths)) {
-        groupedUsersByDebtMonths.set(user.debtMonths, []);
-      }
-
-      groupedUsersByDebtMonths.get(user.debtMonths).push(user);
-    });
+    const groupedUsersByDebtMonths = await this.getGroupedUsersByDebtMonths();
 
     const results = await Promise.allSettled(
       Array.from(groupedUsersByDebtMonths.entries()).map(
@@ -68,5 +58,43 @@ export class MoneyReminderJob {
     }
 
     this.logger.log('Finished reminder job');
+  }
+
+  private async getGroupedUsersByDebtMonths(): Promise<
+    Map<number, ReminderUserDTO[]>
+  > {
+    const users = await this.userRepository.findReminderUsers();
+
+    const groupedUsersByDebtMonths = new Map<number, ReminderUserDTO[]>();
+
+    this.logger.debug('Grouping users by debt month');
+    users.forEach((user) => {
+      if (!groupedUsersByDebtMonths.has(user.debtMonths)) {
+        groupedUsersByDebtMonths.set(user.debtMonths, []);
+      }
+
+      groupedUsersByDebtMonths.get(user.debtMonths).push(user);
+    });
+
+    this.removeOldMemberNotDebt(groupedUsersByDebtMonths);
+
+    return groupedUsersByDebtMonths;
+  }
+
+  private removeOldMemberNotDebt(
+    groupedUsersByDebtMonths: Map<number, ReminderUserDTO[]>,
+  ) {
+    const users = groupedUsersByDebtMonths.get(0);
+    if (!users?.length) {
+      return;
+    }
+
+    groupedUsersByDebtMonths.set(
+      0,
+      users.filter(
+        (user) =>
+          new Date(user.joinedAt).getTime() > subYears(new Date(), 2).getTime(),
+      ),
+    );
   }
 }

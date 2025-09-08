@@ -3,6 +3,7 @@ import { Message } from '../../../../system/message-queue/message-queue.client';
 export type ReminderUserDTO = {
   id: string;
   email: string;
+  joinedAt: string;
   debtMonths: number;
 };
 
