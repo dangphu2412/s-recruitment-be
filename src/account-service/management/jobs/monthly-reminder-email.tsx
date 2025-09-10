@@ -24,7 +24,7 @@ export function MonthlyReminderEmailTemplate({
     accountNumber: '4016092002',
     accountHolder: 'TRAN DUC MANH',
   };
-  const currentMonth = new Date().getMonth();
+  const currentMonth = new Date().getMonth() + 1;
 
   return (
     <Html>
