@@ -115,6 +115,7 @@ export class UserRepository extends Repository<User> {
       SELECT 
         "users"."id" AS "id",
         "users"."email" AS "email",
+        "users"."joined_at" AS "joinedAt",
          LEAST(
            DATE_PART('year', AGE(NOW(), "users"."joined_at")) * 12 + DATE_PART('month', AGE(NOW(), "users"."joined_at")),
            "monthlyConfig".month_range
