@@ -28,6 +28,9 @@ export interface ActivityRequestService {
     id: number,
     userId: string,
   ): Promise<FindRequestedMyActivityResponseDTO>;
+  findRequestedActivity(
+    id: number,
+  ): Promise<FindRequestedMyActivityResponseDTO>;
   createRequestActivity(dto: CreateActivityRequestDTO): Promise<void>;
   createRequestActivityByFile(dto: FileActivityRequestDTO): Promise<void>;
   updateMyRequestActivity(dto: UpdateMyActivityRequestDTO): Promise<void>;
