@@ -89,7 +89,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
       .select(['author.email', 'author.id', 'author.fullName'])
       .addSelect('COUNT(author.id) as late_count')
       .andWhere('activityLog.fromTime >= :fromDate', {
-        fromDate: subMonths(new Date(), 6),
+        fromDate: subMonths(new Date(), 1),
       })
       .andWhere('activityLog.toTime <= :toDate', { toDate: new Date() })
       .andWhere('activityLog.workStatus = :status', {
