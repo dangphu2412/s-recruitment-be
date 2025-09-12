@@ -248,6 +248,17 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     });
   }
 
+  findRequestedActivity(
+    id: number,
+  ): Promise<FindRequestedMyActivityResponseDTO> {
+    return this.activityRequestRepository.findOne({
+      where: {
+        id,
+      },
+      relations: ['author', 'dayOfWeek', 'timeOfDay'],
+    });
+  }
+
   async createRequestActivity(dto: CreateActivityRequestDTO): Promise<void> {
     const entity = this.mapRequestActivityToEntity(dto);
 

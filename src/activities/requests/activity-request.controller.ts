@@ -66,6 +66,12 @@ export class ActivityRequestController {
     return this.activityRequestService.findMyRequestedActivity(id, user.sub);
   }
 
+  @CanAccessBy(Permissions.READ_ACTIVITY_REQUESTS)
+  @Get('/:id')
+  findRequestedActivity(@Param('id', ParseIntPipe) id: number) {
+    return this.activityRequestService.findRequestedActivity(id);
+  }
+
   @CanAccessBy(Permissions.WRITE_MY_ACTIVITY_REQUESTS)
   @Post()
   createRequestedActivity(

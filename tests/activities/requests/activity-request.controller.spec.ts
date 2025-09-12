@@ -21,6 +21,7 @@ describe('ActivityRequestController', () => {
   beforeEach(async () => {
     const serviceMock = {
       findRequestedActivities: jest.fn(),
+      findRequestedActivity: jest.fn(),
       findMyRequestedActivities: jest.fn(),
       findMyRequestedActivity: jest.fn(),
       createRequestActivity: jest.fn(),
@@ -136,6 +137,37 @@ describe('ActivityRequestController', () => {
         id,
         user.sub,
       );
+      expect(result).toEqual(expectedResponse);
+    });
+  });
+
+  describe('findRequestedActivity', () => {
+    it('should call findRequestedActivity with correct parameters', async () => {
+      const id = 1;
+      const expectedResponse = {
+        id: 1,
+        requestType: 'string',
+        timeOfDay: {
+          id: 'string',
+          name: 'string',
+        },
+        dayOfWeek: {
+          id: 'string',
+          name: 'string',
+        },
+        author: {
+          id: 'string',
+          fullName: 'string',
+        },
+      } as FindRequestedMyActivityResponseDTO;
+
+      jest
+        .spyOn(service, 'findRequestedActivity')
+        .mockResolvedValue(expectedResponse);
+
+      const result = await controller.findRequestedActivity(id);
+
+      expect(service.findRequestedActivity).toHaveBeenCalledWith(id);
       expect(result).toEqual(expectedResponse);
     });
   });
