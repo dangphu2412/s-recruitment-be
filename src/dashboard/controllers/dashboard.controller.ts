@@ -1,13 +1,13 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { DashboardService } from './dashboard.service';
-import { UserActivityTrendRequest } from './user-trend.dto';
+import { DashboardService } from '../services/dashboard.service';
+import { UserActivityTrendRequest } from '../dtos/user-trend.dto';
 import {
   CanAccessBy,
   Identified,
-} from '../account-service/account-service.package';
-import { CurrentUser } from '../account-service/management/user.decorator';
-import { MyActivityTrendGroupType } from './my-activity-trend.dto';
-import { Permissions } from '../account-service/authorization/access-definition.constant';
+} from '../../account-service/account-service.package';
+import { CurrentUser } from '../../account-service/management/user.decorator';
+import { MyActivityTrendGroupType } from '../dtos/my-activity-trend.dto';
+import { Permissions } from '../../account-service/authorization/access-definition.constant';
 
 @Controller('dashboard')
 export class DashboardController {

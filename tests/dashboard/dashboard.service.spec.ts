@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DashboardService } from '../../src/dashboard/dashboard.service';
+import { DashboardService } from '../../src/dashboard/services/dashboard.service';
 import { DataSource } from 'typeorm';
 
 describe('DashboardService', () => {
