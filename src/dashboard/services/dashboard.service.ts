@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { KPI } from './kpi.dto';
+import { KPI } from '../dtos/kpi.dto';
 import { DataSource } from 'typeorm';
 import {
   endOfMonth,
@@ -14,15 +14,15 @@ import {
   UserActivityTrend,
   UserActivityTrendRequest,
   UserActivityTrendResponse,
-} from './user-trend.dto';
-import { LogWorkStatus } from '../activities/work-logs/log-work-status.enum';
-import { MyKPI } from './my-kpi.dto';
+} from '../dtos/user-trend.dto';
+import { LogWorkStatus } from '../../activities/work-logs/log-work-status.enum';
+import { MyKPI } from '../dtos/my-kpi.dto';
 import {
   MyActivityTrend,
   MyActivityTrendGroupType,
   MyActivityTrendRequest,
   MyActivityTrendResponse,
-} from './my-activity-trend.dto';
+} from '../dtos/my-activity-trend.dto';
 
 @Injectable()
 export class DashboardService {
