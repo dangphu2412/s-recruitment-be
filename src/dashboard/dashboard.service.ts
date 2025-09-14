@@ -50,9 +50,8 @@ export class DashboardService {
 total_payment AS (
   SELECT COALESCE(SUM(amount), 0) AS value
       FROM payments
-      WHERE paid_at BETWEEN $1 AND $2
-        AND user_id = $3
-        ),
+      WHERE user_id = $3
+),
 estimated_paid AS (
       SELECT
         LEAST(
