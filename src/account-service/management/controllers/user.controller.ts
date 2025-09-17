@@ -71,7 +71,11 @@ export class UserController {
     return this.userService.findUserDetail(userId);
   }
 
-  @CanAccessBy(Permissions.READ_USERS, Permissions.WRITE_USERS)
+  @CanAccessBy(
+    Permissions.READ_USERS,
+    Permissions.WRITE_USERS,
+    Permissions.READ_ACTIVITY_LOGS,
+  )
   @Get('/')
   @ApiOkResponse()
   async findUsers(
