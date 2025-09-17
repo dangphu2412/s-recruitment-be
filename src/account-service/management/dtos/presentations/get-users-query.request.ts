@@ -24,6 +24,9 @@ export class GetUsersQueryRequest extends OffsetPaginationRequest {
   @IsOptional()
   @DeserializeQueryToArray()
   roleIds?: number[];
+
+  @IsOptional()
+  birthday?: string | null;
 }
 
 export type UserManagementViewDTO = {

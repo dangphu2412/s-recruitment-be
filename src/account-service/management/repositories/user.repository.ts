@@ -7,6 +7,7 @@ import { OffsetPaginationResponse } from '../../../system/pagination';
 import { GetUsersQueryRequest } from '../dtos/presentations/get-users-query.request';
 import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
 import { ReminderUserDTO } from '../dtos/core/reminder-user.dto';
+import { format } from 'date-fns';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -27,6 +28,7 @@ export class UserRepository extends Repository<User> {
       periodIds,
       roleIds,
       size,
+      birthday,
     } = query;
     const offset = OffsetPaginationRequest.getOffset(query.page, query.size);
 
@@ -87,6 +89,15 @@ export class UserRepository extends Repository<User> {
       qb.andWhere('roles.id IN (:...roleIds)', {
         roleIds,
       });
+    }
+
+    if (birthday) {
+      const formatted = format(new Date(birthday), 'yyyy-MM-dd');
+
+      // TODO: Prent SQL Injection
+      qb.andWhere(
+        `EXTRACT(month FROM "users"."birthday") = EXTRACT(MONTH FROM DATE '${formatted}')`,
+      );
     }
 
     const [data, totalRecords] = await qb.getManyAndCount();

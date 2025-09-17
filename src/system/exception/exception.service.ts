@@ -55,10 +55,6 @@ export class AppExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       if (exception.getStatus() >= 500) {
         this.logger.error(exception);
-        this.logger.error({
-          body: request.body,
-          params: request.params,
-        });
       }
 
       return response.status(exception.getStatus()).send({
@@ -70,13 +66,8 @@ export class AppExceptionFilter implements ExceptionFilter {
     }
 
     this.logger.error(exception);
-    this.logger.error({
-      type: 'exception_metadata',
-      body: request.body,
-      params: request.params,
-    });
 
-    response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+    return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       message: 'Internal Server Error',
       timestamp: new Date().toISOString(),
