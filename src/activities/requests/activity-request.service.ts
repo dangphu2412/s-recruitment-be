@@ -107,8 +107,6 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       .flat();
 
     await this.activityRequestRepository.insert(entities);
-
-    return;
   }
 
   static createUserActivityRequestByRow(row: string[]): UserActivityRequest {
@@ -174,12 +172,27 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   }: FindRequestedActivityQueryDTO): Promise<FindRequestedActivitiesResponseDTO> {
     const offset = OffsetPaginationRequest.getOffset(page, size);
 
+    /**
+     * Select specific fields: https://stackoverflow.com/questions/62390886/select-specific-columns-from-left-join-query-typeorm
+     */
     const queryBuilder = this.activityRequestRepository
       .createQueryBuilder('activity')
       .withDeleted()
-      .leftJoinAndSelect('activity.author', 'author')
-      .leftJoinAndSelect('activity.dayOfWeek', 'dayOfWeek')
-      .leftJoinAndSelect('activity.timeOfDay', 'timeOfDay');
+      .leftJoin('activity.author', 'author')
+      .addSelect(['author.id', 'author.fullName'])
+      .leftJoin('activity.assignee', 'assignee')
+      .addSelect(['assignee.id', 'assignee.fullName'])
+      .leftJoin('activity.approver', 'approver')
+      .addSelect(['approver.id', 'approver.fullName'])
+      .leftJoin('activity.dayOfWeek', 'dayOfWeek')
+      .addSelect(['dayOfWeek.id', 'dayOfWeek.name'])
+      .leftJoin('activity.timeOfDay', 'timeOfDay')
+      .addSelect([
+        'timeOfDay.id',
+        'timeOfDay.name',
+        'timeOfDay.fromTime',
+        'timeOfDay.toTime',
+      ]);
 
     if (query) {
       queryBuilder.andWhere('author.fullName ILIKE :query', {
@@ -251,12 +264,26 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   findRequestedActivity(
     id: number,
   ): Promise<FindRequestedMyActivityResponseDTO> {
-    return this.activityRequestRepository.findOne({
-      where: {
-        id,
-      },
-      relations: ['author', 'dayOfWeek', 'timeOfDay'],
-    });
+    return this.activityRequestRepository
+      .createQueryBuilder('activity')
+      .withDeleted()
+      .leftJoin('activity.author', 'author')
+      .addSelect(['author.id', 'author.fullName'])
+      .leftJoin('activity.assignee', 'assignee')
+      .addSelect(['assignee.id', 'assignee.fullName', 'assignee.email'])
+      .leftJoin('activity.approver', 'approver')
+      .addSelect(['approver.id', 'approver.fullName', 'approver.email'])
+      .leftJoin('activity.dayOfWeek', 'dayOfWeek')
+      .addSelect(['dayOfWeek.id', 'dayOfWeek.name'])
+      .leftJoin('activity.timeOfDay', 'timeOfDay')
+      .addSelect([
+        'timeOfDay.id',
+        'timeOfDay.name',
+        'timeOfDay.fromTime',
+        'timeOfDay.toTime',
+      ])
+      .andWhere('activity.id = :id', { id })
+      .getOne();
   }
 
   async createRequestActivity(dto: CreateActivityRequestDTO): Promise<void> {
