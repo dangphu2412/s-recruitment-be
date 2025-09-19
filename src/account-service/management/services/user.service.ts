@@ -24,10 +24,7 @@ import { UserService } from '../interfaces/user-service.interface';
 import { MyProfile, UserDetail } from '../dtos/core/my-profile';
 import { GetUserDTO } from '../dtos/core/get-users.dto';
 import { User } from '../../shared/entities/user.entity';
-import {
-  GetUsersQueryRequest,
-  UserManagementViewDTO,
-} from '../dtos/presentations/get-users-query.request';
+import { UserManagementViewDTO } from '../dtos/presentations/get-users-query.request';
 import { Transactional } from 'typeorm-transactional';
 import { UpdateUserRolesDto } from '../dtos/presentations/update-user-roles.dto';
 import { addMonths, differenceInMonths, parse } from 'date-fns';
@@ -47,6 +44,7 @@ import { ResourceCRUDService } from '../../../system/resource-templates/resource
 import { Period } from '../../../master-data-service/periods/period.entity';
 import { PeriodCRUDService } from '../../../master-data-service/periods/period.controller';
 import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
+import { GetUsersQueryDTO } from '../dtos/core/get-users-query.dto';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -69,7 +67,7 @@ export class UserServiceImpl implements UserService {
   }
 
   async findUsers(
-    query: GetUsersQueryRequest,
+    query: GetUsersQueryDTO,
   ): Promise<OffsetPaginationResponse<UserManagementViewDTO>> {
     const { items: data, metadata } =
       await this.userRepository.findPaginatedOverviewUsers(query);

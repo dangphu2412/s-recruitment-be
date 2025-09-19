@@ -5,7 +5,7 @@ import { UserStatus } from '../../user-status.constant';
 export type GetUsersQueryDTO = OffsetPaginationRequest & {
   joinedIn?: DateRangeQuery;
 
-  search: string;
+  search?: string;
 
   userStatus?: UserStatus[];
 
@@ -13,5 +13,9 @@ export type GetUsersQueryDTO = OffsetPaginationRequest & {
 
   periodIds?: number[];
 
+  birthday?: string;
+
   roleIds?: number[];
+
+  roleNames?: string[];
 };

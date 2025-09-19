@@ -41,6 +41,7 @@ import {
   FindMyRequestedActivityQueryDTO,
   FindRequestedMyActivitiesResponseDTO,
 } from './dtos/core/find-my-requested-acitivities.dto';
+import { SystemRoles } from '../../account-service/authorization/access-definition.constant';
 
 type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
 
@@ -289,6 +290,8 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   async createRequestActivity(dto: CreateActivityRequestDTO): Promise<void> {
     const entity = this.mapRequestActivityToEntity(dto);
 
+    entity.assigneeId = (await this.getAssignee()).id;
+
     await this.activityRequestRepository.insert(entity);
   }
 
@@ -333,6 +336,17 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     throw new InternalServerErrorException('Invalid request type');
   }
 
+  async getAssignee() {
+    const { items } = await this.userService.findUsers({
+      page: 1,
+      search: '',
+      size: 20,
+      roleNames: [SystemRoles.HR] as string[],
+    });
+
+    return items[Math.floor(Math.random() * items.length)];
+  }
+
   /**
    * TODO: Batch update instead of single update
    */
@@ -375,6 +389,9 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
             dayOfWeekId: activityRequest.dayOfWeekId,
             requestChangeDay: activityRequest.requestChangeDay,
             compensatoryDay: activityRequest.compensatoryDay,
+          });
+          await this.activityRequestRepository.update(activityRequest.id, {
+            approverId: dto.authorId,
           });
         }
       }),
