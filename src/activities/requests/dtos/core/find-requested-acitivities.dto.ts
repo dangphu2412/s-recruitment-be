@@ -25,4 +25,12 @@ export type FindRequestedActivitiesResponseDTO = OffsetPaginationResponse<{
     id: string;
     fullName: string;
   };
+  assignee: {
+    id: string;
+    fullName: string;
+  };
+  approver: {
+    id: string;
+    fullName: string;
+  };
 }>;
