@@ -2,10 +2,7 @@ import { Controller, Get, Inject } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CanAccessBy } from '../can-access-by.decorator';
 import { Permissions } from '../access-definition.constant';
-import {
-  PermissionService,
-  PermissionServiceToken,
-} from '../interfaces/permission-service.interface';
+import { PermissionService } from '../interfaces/permission-service.interface';
 
 @ApiTags('permissions')
 @Controller({
@@ -14,7 +11,7 @@ import {
 })
 export class PermissionController {
   constructor(
-    @Inject(PermissionServiceToken)
+    @Inject(PermissionService)
     private readonly permissionService: PermissionService,
   ) {}
 

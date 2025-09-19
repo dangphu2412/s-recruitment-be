@@ -1,16 +1,13 @@
 import { MenuRepository } from './menu.repositoryt';
 import { Inject, Injectable } from '@nestjs/common';
 import { Menu, MenuService } from '../client';
-import {
-  RoleService,
-  RoleServiceToken,
-} from '../../account-service/authorization/interfaces/role-service.interface';
+import { RoleService } from '../../account-service/authorization/interfaces/role-service.interface';
 
 @Injectable()
 export class MenuServiceImpl implements MenuService {
   constructor(
     private readonly menuRepository: MenuRepository,
-    @Inject(RoleServiceToken)
+    @Inject(RoleService)
     private readonly roleService: RoleService,
   ) {}
 

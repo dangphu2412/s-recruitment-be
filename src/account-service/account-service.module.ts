@@ -16,13 +16,13 @@ import { UserServiceImpl } from './management/services/user.service';
 import { UserRepository } from './management/repositories/user.repository';
 import { User } from './shared/entities/user.entity';
 import { Role } from './shared/entities/role.entity';
-import { RoleServiceToken } from './authorization/interfaces/role-service.interface';
-import { UserServiceToken } from './management/interfaces/user-service.interface';
+import { RoleService } from './authorization/interfaces/role-service.interface';
+import { UserService } from './management/interfaces/user-service.interface';
 import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
-import { AuthServiceToken } from './registration/interfaces/auth-service.interface';
-import { TokenFactoryToken } from './registration/interfaces/token-factory.interface';
+import { AuthService } from './registration/interfaces/auth-service.interface';
+import { TokenFactory } from './registration/interfaces/token-factory.interface';
 import { PermissionServiceImpl } from './authorization/services/permission.service';
-import { PermissionServiceToken } from './authorization/interfaces/permission-service.interface';
+import { PermissionService } from './authorization/interfaces/permission-service.interface';
 import { PermissionController } from './authorization/controllers/permissions.controller';
 import { SALT_ROUNDS } from './registration/interfaces/password-manager.interface';
 import { ConfigService } from '@nestjs/config';
@@ -65,23 +65,23 @@ import { SendMoneyReminderConsumer } from './management/jobs/send-money-reminder
     MoneyReminderJob,
     SendMoneyReminderConsumer,
     {
-      provide: AuthServiceToken,
+      provide: AuthService,
       useClass: AuthServiceImpl,
     },
     {
-      provide: TokenFactoryToken,
+      provide: TokenFactory,
       useClass: TokenGeneratorImpl,
     },
     {
-      provide: RoleServiceToken,
+      provide: RoleService,
       useClass: RoleServiceImpl,
     },
     {
-      provide: PermissionServiceToken,
+      provide: PermissionService,
       useClass: PermissionServiceImpl,
     },
     {
-      provide: UserServiceToken,
+      provide: UserService,
       useClass: UserServiceImpl,
     },
     {
@@ -92,6 +92,6 @@ import { SendMoneyReminderConsumer } from './management/jobs/send-money-reminder
       inject: [ConfigService],
     },
   ],
-  exports: [PasswordManager, UserServiceToken, RoleServiceToken],
+  exports: [PasswordManager, UserService, RoleService],
 })
 export class AccountServiceModule {}

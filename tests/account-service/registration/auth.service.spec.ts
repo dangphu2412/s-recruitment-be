@@ -1,23 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import {
-  RoleService,
-  RoleServiceToken,
-} from '../../../src/account-service/authorization/interfaces/role-service.interface';
+import { RoleService } from '../../../src/account-service/authorization/interfaces/role-service.interface';
 import { AuthServiceImpl } from '../../../src/account-service/registration/services/auth.service';
-import {
-  UserService,
-  UserServiceToken,
-} from '../../../src/account-service/management/interfaces/user-service.interface';
+import { UserService } from '../../../src/account-service/management/interfaces/user-service.interface';
 import { PasswordManager } from '../../../src/account-service/registration/services/password-manager';
 import { BasicLoginRequestDto } from '../../../src/account-service/registration/dtos/presentations/basic-login.request.dto';
 
 import { extractJwtPayload } from '../../../src/account-service/registration/services/jwt.utils';
 import { User } from '../../../src/account-service/shared/entities/user.entity';
-import {
-  TokenFactory,
-  TokenFactoryToken,
-} from '../../../src/account-service/registration/interfaces/token-factory.interface';
+import { TokenFactory } from '../../../src/account-service/registration/interfaces/token-factory.interface';
 import {
   InternalServerErrorException,
   NotFoundException,
@@ -45,20 +36,20 @@ describe('AuthServiceImpl', () => {
       providers: [
         AuthServiceImpl,
         {
-          provide: UserServiceToken,
+          provide: UserService,
           useValue: {
             findOne: jest.fn(),
           },
         },
         {
-          provide: RoleServiceToken,
+          provide: RoleService,
           useValue: {
             clean: jest.fn(),
             findPermissionsByUserId: jest.fn(),
           },
         },
         {
-          provide: TokenFactoryToken,
+          provide: TokenFactory,
           useValue: {
             create: jest.fn(),
           },
@@ -79,9 +70,9 @@ describe('AuthServiceImpl', () => {
     }).compile();
 
     authService = module.get<AuthServiceImpl>(AuthServiceImpl);
-    userService = module.get(UserServiceToken);
-    roleService = module.get(RoleServiceToken);
-    tokenFactory = module.get(TokenFactoryToken);
+    userService = module.get(UserService);
+    roleService = module.get(RoleService);
+    tokenFactory = module.get(TokenFactory);
     jwtService = module.get(JwtService);
     passwordManager = module.get(PasswordManager);
   });

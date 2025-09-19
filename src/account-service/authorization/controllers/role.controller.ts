@@ -10,10 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateRoleRequestDto } from '../dtos/presentation/update-role-request.dto';
-import {
-  RoleService,
-  RoleServiceToken,
-} from '../interfaces/role-service.interface';
+import { RoleService } from '../interfaces/role-service.interface';
 import { CanAccessBy } from '../can-access-by.decorator';
 import { Permissions } from '../access-definition.constant';
 import { CreateRoleRequestDTO } from '../dtos/presentation/create-role-request.dto';
@@ -30,7 +27,7 @@ import { CurrentUser } from '../../management/user.decorator';
 })
 export class RoleController {
   constructor(
-    @Inject(RoleServiceToken)
+    @Inject(RoleService)
     private readonly roleService: RoleService,
   ) {}
 

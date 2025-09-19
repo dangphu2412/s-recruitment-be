@@ -7,7 +7,7 @@ import { ActivityRequestServiceImpl } from '../../../src/activities/requests/act
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ActivityRequest } from '../../../src/activities/shared/entities/activity-request.entity';
 import { ActivityServiceToken } from '../../../src/activities/managements/interfaces/activity.service';
-import { UserServiceToken } from '../../../src/account-service/management/interfaces/user-service.interface';
+import { UserService } from '../../../src/account-service/management/interfaces/user-service.interface';
 
 describe(ActivityRequestServiceImpl.name, () => {
   let service: ActivityRequestService;
@@ -28,7 +28,7 @@ describe(ActivityRequestServiceImpl.name, () => {
           useValue: {},
         },
         {
-          provide: UserServiceToken,
+          provide: UserService,
           useValue: {},
         },
       ],

@@ -2,10 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from '../../../src/account-service/registration/controllers/auth.controller';
 import { BasicLoginRequestDto } from '../../../src/account-service/registration/dtos/presentations/basic-login.request.dto';
 import { RenewTokensRequestDto } from '../../../src/account-service/registration/dtos/presentations/renew-tokens.request.dto';
-import {
-  AuthService,
-  AuthServiceToken,
-} from 'src/account-service/registration/interfaces/auth-service.interface';
+import { AuthService } from 'src/account-service/registration/interfaces/auth-service.interface';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -22,14 +19,14 @@ describe('AuthController', () => {
       controllers: [AuthController],
       providers: [
         {
-          provide: AuthServiceToken,
+          provide: AuthService,
           useValue: mockAuthService,
         },
       ],
     }).compile();
 
     authController = module.get<AuthController>(AuthController);
-    authService = module.get<AuthService>(AuthServiceToken);
+    authService = module.get<AuthService>(AuthService);
   });
 
   afterEach(() => {
