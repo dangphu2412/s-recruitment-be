@@ -15,6 +15,7 @@ import { CreatePaymentRequest } from '../dtos/presentations/create-payment.reque
 import { UserManagementViewDTO } from '../dtos/presentations/get-users-query.request';
 
 export const UserServiceToken = createProviderToken('UserServiceToken');
+export const UserService = Symbol('UserServiceToken');
 
 export interface UserService {
   findMyProfile(id: string): Promise<MyProfile>;

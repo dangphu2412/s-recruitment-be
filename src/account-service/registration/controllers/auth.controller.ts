@@ -2,10 +2,7 @@ import { Body, Controller, Delete, Inject, Post } from '@nestjs/common';
 import { ApiNoContentResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BasicLoginRequestDto } from '../dtos/presentations/basic-login.request.dto';
 import { RenewTokensRequestDto } from '../dtos/presentations/renew-tokens.request.dto';
-import {
-  AuthService,
-  AuthServiceToken,
-} from '../interfaces/auth-service.interface';
+import { AuthService } from '../interfaces/auth-service.interface';
 import { CurrentUser } from '../../management/user.decorator';
 import { UpdateMyPasswordRequest } from '../dtos/presentations/update-my-password.request';
 import { Identified } from '../identified.decorator';
@@ -17,7 +14,7 @@ import { Identified } from '../identified.decorator';
 })
 export class AuthController {
   constructor(
-    @Inject(AuthServiceToken)
+    @Inject(AuthService)
     private readonly authService: AuthService,
   ) {}
 

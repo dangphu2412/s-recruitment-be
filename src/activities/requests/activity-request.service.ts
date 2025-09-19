@@ -31,10 +31,7 @@ import {
   FileActivityRequestRow,
 } from './dtos/core/file-create-activity-request.dto';
 import { read, utils } from 'xlsx';
-import {
-  UserService,
-  UserServiceToken,
-} from '../../account-service/management/interfaces/user-service.interface';
+import { UserService } from '../../account-service/management/interfaces/user-service.interface';
 import { keyBy } from 'lodash';
 import { OffsetPaginationRequest } from '../../system/pagination/offset-pagination-request';
 import {
@@ -57,7 +54,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     private readonly activityRequestRepository: Repository<ActivityRequest>,
     @Inject(ActivityServiceToken)
     private readonly activityService: ActivityService,
-    @Inject(UserServiceToken)
+    @Inject(UserService)
     private readonly userService: UserService,
   ) {}
 

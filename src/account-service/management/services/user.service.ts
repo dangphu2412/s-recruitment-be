@@ -16,10 +16,7 @@ import {
   FileRow,
 } from '../dtos/presentations/file-create-users.dto';
 import { read, utils } from 'xlsx';
-import {
-  RoleService,
-  RoleServiceToken,
-} from '../../authorization/interfaces/role-service.interface';
+import { RoleService } from '../../authorization/interfaces/role-service.interface';
 import { UserService } from '../interfaces/user-service.interface';
 import { MyProfile, UserDetail } from '../dtos/core/my-profile';
 import { GetUserDTO } from '../dtos/core/get-users.dto';
@@ -53,7 +50,7 @@ export class UserServiceImpl implements UserService {
     private readonly passwordManager: PasswordManager,
     @Inject(MonthlyMoneyOperationServiceToken)
     private readonly moneyOperationService: MonthlyMoneyOperationService,
-    @Inject(RoleServiceToken)
+    @Inject(RoleService)
     private readonly roleService: RoleService,
     private readonly paymentService: PaymentService,
     @Inject(PeriodCRUDService.token)
