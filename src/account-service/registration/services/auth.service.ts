@@ -10,20 +10,11 @@ import { extractJwtPayload } from './jwt.utils';
 import isEmpty from 'lodash/isEmpty';
 import { PasswordManager } from './password-manager';
 import { UserCredentialsDTO } from '../dtos/core/login-credentials.dto';
-import {
-  UserService,
-  UserServiceToken,
-} from '../../management/interfaces/user-service.interface';
+import { UserService } from '../../management/interfaces/user-service.interface';
 import { JwtPayload } from '../jwt-payload';
-import {
-  RoleService,
-  RoleServiceToken,
-} from '../../authorization/interfaces/role-service.interface';
+import { RoleService } from '../../authorization/interfaces/role-service.interface';
 import { BasicLoginRequestDto } from '../dtos/presentations/basic-login.request.dto';
-import {
-  TokenFactory,
-  TokenFactoryToken,
-} from '../interfaces/token-factory.interface';
+import { TokenFactory } from '../interfaces/token-factory.interface';
 import { AuthService } from '../interfaces/auth-service.interface';
 import { UpdateMyPasswordRequest } from '../dtos/presentations/update-my-password.request';
 import { LogOutRequiredException } from '../exceptions/log-out-required.exception';
@@ -31,11 +22,11 @@ import { LogOutRequiredException } from '../exceptions/log-out-required.exceptio
 @Injectable()
 export class AuthServiceImpl implements AuthService {
   constructor(
-    @Inject(UserServiceToken)
+    @Inject(UserService)
     private readonly userService: UserService,
-    @Inject(RoleServiceToken)
+    @Inject(RoleService)
     private readonly roleService: RoleService,
-    @Inject(TokenFactoryToken)
+    @Inject(TokenFactory)
     private readonly tokenFactory: TokenFactory,
     private readonly jwtService: JwtService,
     private readonly passwordManager: PasswordManager,

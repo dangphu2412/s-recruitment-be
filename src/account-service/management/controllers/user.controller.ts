@@ -28,10 +28,7 @@ import {
   GetUsersQueryRequest,
   UserManagementViewDTO,
 } from '../dtos/presentations/get-users-query.request';
-import {
-  UserService,
-  UserServiceToken,
-} from '../interfaces/user-service.interface';
+import { UserService } from '../interfaces/user-service.interface';
 import { JwtPayload } from '../../registration/jwt-payload';
 import { CreateUsersRequestDTO } from '../dtos/presentations/create-users.request';
 import { PaymentService } from '../../../monthly-money/internal/payment.service';
@@ -51,7 +48,7 @@ import { UpdateMyProfileRequest } from '../dtos/presentations/update-my-profile.
 })
 export class UserController {
   constructor(
-    @Inject(UserServiceToken)
+    @Inject(UserService)
     private readonly userService: UserService,
     private readonly paymentService: PaymentService,
   ) {}

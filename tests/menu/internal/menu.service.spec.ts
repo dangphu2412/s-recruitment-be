@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MenuServiceImpl } from '../../../src/menu/internal/menu.service';
 import { MenuRepository } from '../../../src/menu/internal/menu.repositoryt';
-import {
-  RoleService,
-  RoleServiceToken,
-} from '../../../src/account-service/authorization/interfaces/role-service.interface';
+import { RoleService } from '../../../src/account-service/authorization/interfaces/role-service.interface';
 import { Menu } from '../../../src/menu';
 
 describe('MenuServiceImpl', () => {
@@ -24,7 +21,7 @@ describe('MenuServiceImpl', () => {
           },
         },
         {
-          provide: RoleServiceToken,
+          provide: RoleService,
           useValue: {
             findPermissionsByUserId: jest.fn(),
           },
@@ -34,7 +31,7 @@ describe('MenuServiceImpl', () => {
 
     service = module.get<MenuServiceImpl>(MenuServiceImpl);
     menuRepository = module.get(MenuRepository);
-    roleService = module.get(RoleServiceToken);
+    roleService = module.get(RoleService);
   });
 
   describe('findMenusByUserId', () => {

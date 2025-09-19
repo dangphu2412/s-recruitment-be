@@ -71,23 +71,26 @@ pending_requests AS (
         AND approval_status = 'P'
         AND author_id = $3
         ),
-
-late_activities AS (
-      SELECT COUNT(DISTINCT track_id) AS value
+work_logs AS (
+      SELECT track_id, work_status
       FROM activity_logs
-      WHERE work_status = 'L'
+        LEFT JOIN users ON users.tracking_id = activity_logs.track_id
+      WHERE 1=1
         AND from_time >= $1
         AND to_time <= $2
+        AND users.id = $3
         ),
+late_activities AS (
+      SELECT COUNT(DISTINCT track_id) AS value
+        FROM work_logs
+        WHERE work_status = 'L'
+      ),
 
 finished_work AS (
-      SELECT COUNT(al.from_time) AS value
-      FROM users u
-        LEFT JOIN device_user_logs dul ON dul.device_user_id = u.tracking_id
-        LEFT JOIN activity_logs al ON al.track_id = dul.device_user_id
-      WHERE al.from_time >= $1
-        AND al.to_time <= $2
-        AND u.id = $3),
+      SELECT COUNT(DISTINCT track_id) AS value
+      FROM work_logs
+      WHERE work_status = 'O'
+      ),
 
 to_be_finished_work AS (
       SELECT COUNT(id) AS value

@@ -2,10 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { AuthorizationStrategy } from 'src/account-service/authorization/interfaces/authorization-strategy.interface';
 import { registerStrategy } from './authorization-strategy.register';
 import { JwtPayload } from '../../registration/jwt-payload';
-import {
-  RoleService,
-  RoleServiceToken,
-} from '../interfaces/role-service.interface';
+import { RoleService } from '../interfaces/role-service.interface';
 import { Permissions } from '../access-definition.constant';
 
 @Injectable()
@@ -13,7 +10,7 @@ export class RoleAuthorizationStrategy
   implements AuthorizationStrategy<JwtPayload, string[]>
 {
   constructor(
-    @Inject(RoleServiceToken)
+    @Inject(RoleService)
     private readonly roleService: RoleService,
   ) {
     registerStrategy(RoleAuthorizationStrategy.name, this);

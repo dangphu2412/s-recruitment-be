@@ -1,4 +1,3 @@
-import { createProviderToken } from '../../../system/nestjs-extensions';
 import { AccessControlView } from '../dtos/core/role-list.dto';
 import { Role } from '../../shared/entities/role.entity';
 import { UpdateRoleDto } from '../dtos/core/update-role.dto';
@@ -6,7 +5,7 @@ import { CreateRoleRequestDTO } from '../dtos/presentation/create-role-request.d
 import { UpdateAssignedPersonsRequestDTO } from '../dtos/presentation/update-assigned-persons.request';
 import { GetAccessControlRequestDTO } from '../dtos/presentation/get-access-control.request';
 
-export const RoleServiceToken = createProviderToken('RoleService');
+export const RoleService = Symbol('RoleService');
 
 export interface RoleService {
   findAccessControlView(
