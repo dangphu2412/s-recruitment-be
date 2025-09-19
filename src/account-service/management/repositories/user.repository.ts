@@ -4,10 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../shared/entities/user.entity';
 import { UserStatus } from '../user-status.constant';
 import { OffsetPaginationResponse } from '../../../system/pagination';
-import { GetUsersQueryRequest } from '../dtos/presentations/get-users-query.request';
 import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
 import { ReminderUserDTO } from '../dtos/core/reminder-user.dto';
 import { format } from 'date-fns';
+import { GetUsersQueryDTO } from '../dtos/core/get-users-query.dto';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -19,7 +19,7 @@ export class UserRepository extends Repository<User> {
   }
 
   async findPaginatedOverviewUsers(
-    query: GetUsersQueryRequest,
+    query: GetUsersQueryDTO,
   ): Promise<OffsetPaginationResponse<User>> {
     const {
       userStatus,
@@ -27,6 +27,7 @@ export class UserRepository extends Repository<User> {
       departmentIds,
       periodIds,
       roleIds,
+      roleNames,
       size,
       birthday,
     } = query;
@@ -91,6 +92,12 @@ export class UserRepository extends Repository<User> {
       });
     }
 
+    if (roleNames?.length) {
+      qb.andWhere('roles.name IN (:...roleNames)', {
+        roleNames,
+      });
+    }
+
     if (birthday) {
       const formatted = format(new Date(birthday), 'yyyy-MM-dd');
 
@@ -104,7 +111,7 @@ export class UserRepository extends Repository<User> {
 
     return OffsetPaginationResponse.of({
       query,
-      items: data as User[],
+      items: data,
       totalRecords,
     });
   }

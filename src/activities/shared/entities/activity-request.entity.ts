@@ -80,6 +80,18 @@ export class ActivityRequest {
   })
   authorId: string;
 
+  @Column({
+    name: 'assignee_id',
+    type: 'varchar',
+  })
+  assigneeId: string;
+
+  @Column({
+    name: 'approver_id',
+    type: 'varchar',
+  })
+  approverId: string;
+
   @CreateDateColumn({
     name: 'created_at',
   })
