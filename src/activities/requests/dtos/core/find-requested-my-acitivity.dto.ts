@@ -13,4 +13,13 @@ export type FindRequestedMyActivityResponseDTO = {
     id: string;
     fullName: string;
   };
+  assignee: {
+    id: string;
+    fullName: string;
+    email: string;
+  };
+  approver: {
+    id: string;
+    email: string;
+  };
 };

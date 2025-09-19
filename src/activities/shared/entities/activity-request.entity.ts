@@ -97,6 +97,20 @@ export class ActivityRequest {
   })
   author: User;
 
+  @ManyToOne(() => User, (user) => user.activityRequests)
+  @JoinColumn({
+    name: 'assignee_id',
+    referencedColumnName: 'id',
+  })
+  assignee: User;
+
+  @ManyToOne(() => User, (user) => user.activityRequests)
+  @JoinColumn({
+    name: 'approver_id',
+    referencedColumnName: 'id',
+  })
+  approver: User;
+
   @ManyToOne(() => TimeOfDay, (timeOfDay) => timeOfDay.activityRequests)
   @JoinColumn({
     name: 'time_of_day_id',
