@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
+import { InternalFile } from '../../system/file/file.interceptor';
 
 @Injectable()
 export class UploadUserFileValidatorPipe implements PipeTransform {
-  transform(file: Express.Multer.File): any {
+  transform(file: InternalFile): any {
     const FIFTY_KB = 1024 * 50;
 
     if (file.size > FIFTY_KB) {
