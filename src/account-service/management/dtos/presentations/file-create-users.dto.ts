@@ -1,4 +1,5 @@
 import { IsNumber, IsOptional } from 'class-validator';
+import { InternalFile } from '../../../../system/file/file.interceptor';
 
 export type FileRow = {
   'Họ và Tên': string;
@@ -15,5 +16,5 @@ export class FileCreateUsersDto {
   @IsNumber()
   monthlyConfigId?: number;
 
-  file: Express.Multer.File;
+  file: InternalFile;
 }

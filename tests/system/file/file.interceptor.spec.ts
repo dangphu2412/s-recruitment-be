@@ -37,14 +37,13 @@ describe('FileInterceptor', () => {
     // Arrange
     const fieldName = 'file';
     const moduleOptions = { dest: 'uploads' } as AnyObj;
-    const localOptions = { limits: { fileSize: 10 } } as AnyObj;
 
     const innerMiddleware = jest.fn((_req, _res, cb) => cb(null));
     const singleMethod = jest.fn(() => innerMiddleware);
 
     mockedMulter.mockReturnValue({ single: singleMethod });
 
-    const InterceptorClass = FileInterceptor(fieldName, localOptions);
+    const InterceptorClass = FileInterceptor(fieldName);
     const interceptor = new InterceptorClass(moduleOptions);
 
     const { ctx, req, res } = makeHttpCtx();
@@ -56,7 +55,6 @@ describe('FileInterceptor', () => {
     // Assert
     expect(FastifyMulter).toHaveBeenCalledWith({
       ...moduleOptions,
-      ...localOptions,
     });
     expect(singleMethod).toHaveBeenCalledWith(fieldName);
     expect(innerMiddleware).toHaveBeenCalledWith(
