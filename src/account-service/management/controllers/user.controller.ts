@@ -21,7 +21,10 @@ import {
 import { CurrentUser } from '../user.decorator';
 import { CanAccessBy } from '../../authorization/can-access-by.decorator';
 import { UpdateUserRolesDto } from '../dtos/presentations/update-user-roles.dto';
-import { FileInterceptor } from '../../../system/file/file.interceptor';
+import {
+  FileInterceptor,
+  InternalFile,
+} from '../../../system/file/file.interceptor';
 import { FileCreateUsersDto } from '../dtos/presentations/file-create-users.dto';
 import { Permissions } from '../../authorization/access-definition.constant';
 import {
@@ -151,7 +154,7 @@ export class UserController {
   createUsersByFile(
     @Body() dto: FileCreateUsersDto,
     @UploadedFile(new UploadUserFileValidatorPipe())
-    file: Express.Multer.File,
+    file: InternalFile,
   ) {
     return this.userService.createUsersByFile({ ...dto, file });
   }

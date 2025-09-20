@@ -1,3 +1,5 @@
+import { InternalFile } from '../../../../system/file/file.interceptor';
+
 /**
  * Navigate here for the detail format
  *
@@ -7,5 +9,5 @@
 export type FileActivityRequestRow = string[];
 
 export class FileActivityRequestDTO {
-  file: Express.Multer.File;
+  file: InternalFile;
 }

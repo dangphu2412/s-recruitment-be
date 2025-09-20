@@ -24,7 +24,10 @@ import { UpdateApprovalActivityRequestRequest } from './dtos/presentation/update
 import { UpdateMyActivityRequestRequest } from './dtos/presentation/update-my-activity.request';
 import { FindRequestedActivityRequestDTO } from './dtos/presentation/find-requested-activity-request.dto';
 import { Identified } from '../../account-service/registration/identified.decorator';
-import { FileInterceptor } from '../../system/file/file.interceptor';
+import {
+  FileInterceptor,
+  InternalFile,
+} from '../../system/file/file.interceptor';
 import { ApiConsumes } from '@nestjs/swagger';
 import { FileActivityRequestDTO } from './dtos/core/file-create-activity-request.dto';
 import { UploadRequestActivityFileValidatorPipe } from './upload-activity-request-file.pipe';
@@ -91,7 +94,7 @@ export class ActivityRequestController {
   createActivityRequestByFile(
     @Body() dto: FileActivityRequestDTO,
     @UploadedFile(new UploadRequestActivityFileValidatorPipe())
-    file: Express.Multer.File,
+    file: InternalFile,
   ) {
     return this.activityRequestService.createRequestActivityByFile({
       ...dto,
