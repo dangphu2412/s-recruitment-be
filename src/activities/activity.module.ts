@@ -22,6 +22,10 @@ import { ActivityRequestController } from './requests/activity-request.controlle
 import { AccountServiceModule } from '../account-service/account-service.module';
 import { DeviceUser } from '../system/database/entities/user-log.entity';
 import { LogFileService } from './work-logs/log-file.service';
+import {
+  ActivityRequestRepository,
+  ActivityRequestRepositoryImpl,
+} from './requests/repositories/activity-request.repository';
 
 @Module({
   imports: [
@@ -48,6 +52,10 @@ import { LogFileService } from './work-logs/log-file.service';
     {
       provide: ActivityServiceToken,
       useClass: ActivityServiceImpl,
+    },
+    {
+      provide: ActivityRequestRepository,
+      useClass: ActivityRequestRepositoryImpl,
     },
     DeviceUserCRUDService.createProvider(),
     ActivityRepository,
