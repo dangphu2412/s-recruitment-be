@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MenuService, MenuServiceToken } from '../../../src/menu';
-import { MenuController } from '../../../src/menu/internal/menu.controller';
-import { JwtPayload } from '../../../src/account-service/registration/jwt-payload';
+import { MenuController } from '../../../src/menu/presentation/menu.controller';
+import { MenuService } from '../../../src/menu/domain/services/menu.service.interface';
+import { MenuAggregate } from '../../../src/menu/domain/aggregates/menu.aggregate';
 
 describe('MenuController', () => {
   let controller: MenuController;
@@ -12,7 +12,7 @@ describe('MenuController', () => {
       controllers: [MenuController],
       providers: [
         {
-          provide: MenuServiceToken,
+          provide: MenuService,
           useValue: {
             findMenusByUserId: jest.fn(),
           },
@@ -21,18 +21,17 @@ describe('MenuController', () => {
     }).compile();
 
     controller = module.get<MenuController>(MenuController);
-    menuService = module.get(MenuServiceToken);
+    menuService = module.get(MenuService);
   });
 
   describe('findMenusByUserId', () => {
     it('should return menus for given userId', async () => {
-      const mockUser: JwtPayload = { sub: 'user-123' } as JwtPayload;
       const expectedMenus = [
         { id: '1', name: 'Breakfast', subMenus: [], parent: null },
-      ];
+      ] as unknown as MenuAggregate[];
       menuService.findMenusByUserId.mockResolvedValue(expectedMenus);
 
-      const result = await controller.findMenusByUserId(mockUser);
+      const result = await controller.findMenusByUserId('user-123');
 
       expect(menuService.findMenusByUserId).toHaveBeenCalledWith('user-123');
       expect(result).toEqual(expectedMenus);

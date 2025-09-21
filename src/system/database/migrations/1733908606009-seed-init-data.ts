@@ -16,7 +16,7 @@ import { MenuFactory } from '../processors/menu.factory';
 import { MonthlyMoneyConfig } from '../entities/monthly-money-config.entity';
 import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
 import { Department } from '../entities/department.entity';
-import { MenuCode } from '../../../menu/client/menu-code.constant';
+import { MenuCode } from '../../../menu/domain/menu-code.constant';
 import { DatabaseUtils } from '../utils/database.utils';
 
 type InsertMenu = Omit<Menu, 'parent' | 'subMenus' | 'parentId'> & {

@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MenuServiceImpl } from '../../../src/menu/internal/menu.service';
-import { MenuRepository } from '../../../src/menu/internal/menu.repositoryt';
+import { MenuServiceImpl } from '../../../src/menu/use-cases/menu.service';
 import { RoleService } from '../../../src/account-service/authorization/interfaces/role-service.interface';
-import { Menu } from '../../../src/system/database/entities/menu.entity';
+import { MenuRepository } from '../../../src/menu/domain/repositories/menu.repository.interface';
+import { MenuAggregate } from '../../../src/menu/domain/aggregates/menu.aggregate';
 
 describe('MenuServiceImpl', () => {
   let service: MenuServiceImpl;
@@ -17,7 +17,7 @@ describe('MenuServiceImpl', () => {
         {
           provide: MenuRepository,
           useValue: {
-            findByPermissionCodes: jest.fn(),
+            findByGrantedAccessCodes: jest.fn(),
           },
         },
         {
@@ -45,7 +45,7 @@ describe('MenuServiceImpl', () => {
 
       // Assert
       expect(roleService.findPermissionsByUserId).toHaveBeenCalledWith(userId);
-      expect(menuRepository.findByPermissionCodes).not.toHaveBeenCalled();
+      expect(menuRepository.findByGrantedAccessCodes).not.toHaveBeenCalled();
       expect(result).toEqual([]);
     });
 
@@ -53,18 +53,18 @@ describe('MenuServiceImpl', () => {
       // Arrange
       const userId = 'user-123';
       const permissions = ['PERM_READ', 'PERM_WRITE'];
-      const expectedMenus: Menu[] = [
+      const expectedMenus = [
         { id: '1', name: 'Dashboard', subMenus: [], parent: null },
-      ];
+      ] as unknown as MenuAggregate[];
       roleService.findPermissionsByUserId.mockResolvedValue(permissions);
-      menuRepository.findByPermissionCodes.mockResolvedValue(expectedMenus);
+      menuRepository.findByGrantedAccessCodes.mockResolvedValue(expectedMenus);
 
       // Act
       const result = await service.findMenusByUserId(userId);
 
       // Assert
       expect(roleService.findPermissionsByUserId).toHaveBeenCalledWith(userId);
-      expect(menuRepository.findByPermissionCodes).toHaveBeenCalledWith(
+      expect(menuRepository.findByGrantedAccessCodes).toHaveBeenCalledWith(
         permissions,
       );
       expect(result).toEqual(expectedMenus);

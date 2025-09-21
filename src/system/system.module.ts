@@ -32,7 +32,7 @@ import { HeathModule } from './health/heath.module';
 
         return {
           pinoHttp: {
-            autoLogging: true,
+            autoLogging: false,
             level: isProd ? 'info' : 'debug',
             // In Local env, we use pino-pretty to format logs for human readability, not machine readability.
             transport: !isProd
