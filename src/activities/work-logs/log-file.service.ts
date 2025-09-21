@@ -7,10 +7,13 @@ import { join } from 'path';
 @Injectable()
 export class LogFileService implements OnModuleInit {
   private readonly logger = new Logger(LogFileService.name);
-  private storage: Storage;
-  private serviceAccountFilePath = join(process.cwd(), 'service_account.json');
-  private logsFilePath = join(process.cwd(), 'logs.json');
-  private logsFileMetaPath = join(process.cwd(), 'logs.meta.json');
+  private readonly storage: Storage;
+  private readonly serviceAccountFilePath = join(
+    process.cwd(),
+    'service_account.json',
+  );
+  private readonly logsFilePath = join(process.cwd(), 'logs.json');
+  private readonly logsFileMetaPath = join(process.cwd(), 'logs.meta.json');
 
   constructor(private readonly configService: ConfigService) {
     this.storage = new Storage({
