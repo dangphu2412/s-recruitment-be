@@ -1,4 +1,4 @@
-import { Role } from '../../../shared/entities/role.entity';
+import { Role } from '../../../../system/database/entities/role.entity';
 
 export type AccessControlList = Required<
   Role & {

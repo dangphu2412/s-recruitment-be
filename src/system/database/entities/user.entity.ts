@@ -14,12 +14,12 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Role } from './role.entity';
-import { Payment } from '../../../monthly-money/domain/data-access/entities/payment.entity';
-import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
-import { Department } from '../../../master-data-service/departments/department.entity';
-import { Period } from '../../../master-data-service/periods/period.entity';
-import { ActivityRequest } from '../../../activities/shared/entities/activity-request.entity';
-import { ActivityLog } from '../../../activities/shared/entities/activity-log.entity';
+import { Payment } from './payment.entity';
+import { OperationFee } from './operation-fee.entity';
+import { Department } from './department.entity';
+import { Period } from './period.entity';
+import { ActivityRequest } from './activity-request.entity';
+import { ActivityLog } from './activity-log.entity';
 
 @Entity({
   name: 'users',

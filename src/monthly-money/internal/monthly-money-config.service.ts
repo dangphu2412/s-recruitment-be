@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MonthlyMoneyConfig } from '../domain/data-access/entities/monthly-money-config.entity';
+import { MonthlyMoneyConfig } from '../../system/database/entities/monthly-money-config.entity';
 import { MonthlyMoneyConfigService } from '../domain/core/services/monthly-money-config.service';
 import { NotFoundException } from '@nestjs/common';
 

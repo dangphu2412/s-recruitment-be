@@ -4,7 +4,7 @@ import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { OffsetPaginationResponse } from '../../system/pagination';
 import { ActivityRepository } from '../managements/activity.repository';
 import { LogWorkStatus } from './log-work-status.enum';
-import { ActivityLog } from '../shared/entities/activity-log.entity';
+import { ActivityLog } from '../../system/database/entities/activity-log.entity';
 import {
   ActivityMatcher,
   WorkTimeUtils,

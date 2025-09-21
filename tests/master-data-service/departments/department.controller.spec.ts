@@ -4,7 +4,7 @@ import {
   DepartmentsController,
 } from '../../../src/master-data-service/departments/departments.controller';
 import { ResourceCRUDService } from '../../../src/system/resource-templates/resource-service-template';
-import { Department } from '../../../src/master-data-service/departments/department.entity';
+import { Department } from '../../../src/system/database/entities/department.entity';
 
 describe('DepartmentsController', () => {
   let controller: DepartmentsController;

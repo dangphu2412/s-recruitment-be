@@ -1,7 +1,7 @@
 import { Brackets, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Activity } from '../shared/entities/activity.entity';
+import { Activity } from '../../system/database/entities/activity.entity';
 import { FindActivitiesDTO } from './dtos/core/find-activities.dto';
 import { RequestTypes } from '../shared/request-activity-status.enum';
 

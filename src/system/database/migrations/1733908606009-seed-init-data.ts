@@ -1,21 +1,21 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { DayOfWeek } from '../../../master-data-service/day-of-weeks/day-of-week';
-import { TimeOfDay } from '../../../master-data-service/time-of-days/time-of-day.entity';
-import { Role } from '../../../account-service/shared/entities/role.entity';
-import { Permission } from '../../../account-service/shared/entities/permission.entity';
+import { DayOfWeek } from '../entities/day-of-week';
+import { TimeOfDay } from '../entities/time-of-day.entity';
+import { Role } from '../entities/role.entity';
+import { Permission } from '../entities/permission.entity';
 import { RolePermissionConnector } from '../processors/role-permission.connector';
 import {
   Permissions,
   SystemRoles,
 } from '../../../account-service/authorization/access-definition.constant';
-import { User } from '../../../account-service/shared/entities/user.entity';
+import { User } from '../entities/user.entity';
 import { PasswordManager } from '../../../account-service/registration/services/password-manager';
 import { ConfigService } from '@nestjs/config';
-import { Menu } from '../../../menu';
+import { Menu } from '../entities/menu.entity';
 import { MenuFactory } from '../processors/menu.factory';
-import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
+import { MonthlyMoneyConfig } from '../entities/monthly-money-config.entity';
 import { PermissionMenuSettingsConnector } from '../processors/permission-menu-settings.connector';
-import { Department } from '../../../master-data-service/departments/department.entity';
+import { Department } from '../entities/department.entity';
 import { MenuCode } from '../../../menu/client/menu-code.constant';
 import { DatabaseUtils } from '../utils/database.utils';
 

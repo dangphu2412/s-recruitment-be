@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { MonthlyMoneyConfigServiceImpl } from '../../../src/monthly-money/internal/monthly-money-config.service';
-import { MonthlyMoneyConfig } from '../../../src/monthly-money/domain/data-access/entities/monthly-money-config.entity';
+import { MonthlyMoneyConfig } from '../../../src/system/database/entities/monthly-money-config.entity';
 
 describe('MonthlyMoneyConfigServiceImpl', () => {
   let service: MonthlyMoneyConfigServiceImpl;

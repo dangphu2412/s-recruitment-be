@@ -3,7 +3,7 @@ import {
   CreateMoneyFeeDTO,
   CreateMoneyFeeResultsDTO,
 } from '../dto/create-money-fee.dto';
-import { OperationFee } from '../../data-access/entities/operation-fee.entity';
+import { OperationFee } from '../../../../system/database/entities/operation-fee.entity';
 
 export const MonthlyMoneyOperationServiceToken = createProviderToken(
   'MonthlyMoneyOperationService',

@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { User } from '../../../account-service/shared/entities/user.entity';
-import { LogWorkStatus } from '../../work-logs/log-work-status.enum';
+import { User } from './user.entity';
+import { LogWorkStatus } from '../../../activities/work-logs/log-work-status.enum';
 import { DeviceUser } from './user-log.entity';
 
 @Entity({

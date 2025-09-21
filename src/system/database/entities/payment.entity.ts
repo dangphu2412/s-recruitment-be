@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../../../../account-service/shared/entities/user.entity';
+import { User } from './user.entity';
 
 @Entity({
   name: 'payments',

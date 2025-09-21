@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MenuServiceImpl } from '../../../src/menu/internal/menu.service';
 import { MenuRepository } from '../../../src/menu/internal/menu.repositoryt';
 import { RoleService } from '../../../src/account-service/authorization/interfaces/role-service.interface';
-import { Menu } from '../../../src/menu';
+import { Menu } from '../../../src/system/database/entities/menu.entity';
 
 describe('MenuServiceImpl', () => {
   let service: MenuServiceImpl;
