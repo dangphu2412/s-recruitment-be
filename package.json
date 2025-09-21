@@ -163,6 +163,7 @@
       ".interface.ts",
       ".enum.ts",
       ".constant.ts",
+      ".repository.ts",
       "/src/system/database/migrations",
       "/src/system/database/config"
     ],
@@ -172,8 +173,8 @@
     "coverageThreshold": {
       "global": {
         "branches": 45,
-        "functions": 60,
-        "lines": 65
+        "functions": 65,
+        "lines": 70
       }
     }
   },

@@ -1,208 +1,206 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  ActivityRequestService,
-  ActivityRequestServiceToken,
-} from '../../../src/activities/requests/interfaces/activity-request.service';
-import { ActivityRequestServiceImpl } from '../../../src/activities/requests/activity-request.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { ActivityRequest } from '../../../src/system/database/entities/activity-request.entity';
-import { ActivityServiceToken } from '../../../src/activities/managements/interfaces/activity.service';
 import { UserService } from '../../../src/account-service/management/interfaces/user-service.interface';
 
-describe(ActivityRequestServiceImpl.name, () => {
-  let service: ActivityRequestService;
+import { InternalFile } from '../../../src/system/file/file.interceptor';
+import { ActivityRequestServiceImpl } from '../../../src/activities/requests/activity-request.service';
+import { ActivityRequestRepository } from '../../../src/activities/requests/repositories/activity-request.repository';
+import { ActivityServiceToken } from '../../../src/activities/managements/interfaces/activity.service';
+import {
+  ApprovalRequestAction,
+  RequestActivityStatus,
+  RequestTypes,
+} from '../../../src/activities/shared/request-activity-status.enum';
+import { ActivityRequest } from '../../../src/system/database/entities/activity-request.entity';
+import { User } from '../../../src/system/database/entities/user.entity';
+import { read, utils } from 'xlsx';
+
+jest.mock('typeorm-transactional', () => ({
+  Transactional: () => {
+    return function (
+      target: unknown,
+      propertyKey: string,
+      descriptor: PropertyDescriptor,
+    ) {
+      // leave the method unchanged → just return descriptor
+      return descriptor;
+    };
+  },
+}));
+
+jest.mock('xlsx', () => ({
+  read: jest.fn(),
+  utils: {
+    sheet_to_json: jest.fn(),
+  },
+}));
+
+describe('ActivityRequestServiceImpl', () => {
+  let service: ActivityRequestServiceImpl;
+  let activityRequestRepository: ActivityRequestRepository;
+  let activityService: any;
+  let userService: UserService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        ActivityRequestServiceImpl,
         {
-          provide: ActivityRequestServiceToken,
-          useValue: ActivityRequestServiceImpl,
-        },
-        {
-          provide: getRepositoryToken(ActivityRequest),
-          useValue: {},
+          provide: ActivityRequestRepository,
+          useValue: {
+            insert: jest.fn(),
+            find: jest.fn(),
+            findOne: jest.fn(),
+            findBy: jest.fn(),
+            update: jest.fn(),
+            findOverviewRequests: jest.fn(),
+            findDetailById: jest.fn(),
+          },
         },
         {
           provide: ActivityServiceToken,
-          useValue: {},
+          useValue: {
+            createActivity: jest.fn(),
+          },
         },
         {
           provide: UserService,
-          useValue: {},
+          useValue: {
+            findUsers: jest.fn(),
+            findUsersByFullNames: jest.fn(),
+          },
         },
       ],
     }).compile();
 
-    service = module.get<ActivityRequestService>(ActivityRequestServiceToken);
+    service = module.get(ActivityRequestServiceImpl);
+    activityRequestRepository = module.get(ActivityRequestRepository);
+    activityService = module.get(ActivityServiceToken);
+    userService = module.get(UserService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  describe('createRequestActivity', () => {
+    it('should insert mapped entity and assign assignee', async () => {
+      const dto = {
+        authorId: 'u1',
+        requestType: RequestTypes.WORKING,
+        timeOfDayId: 'MORN',
+        dayOfWeekId: '1',
+      };
+
+      jest.spyOn(userService, 'findUsers').mockResolvedValue({
+        items: [{ id: 'hr-1' }],
+      } as any);
+      jest
+        .spyOn(activityRequestRepository, 'insert')
+        .mockResolvedValue(undefined);
+
+      await service.createRequestActivity(dto as any);
+
+      expect(userService.findUsers).toHaveBeenCalled();
+      expect(activityRequestRepository.insert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          authorId: 'u1',
+          assigneeId: 'hr-1',
+          requestType: RequestTypes.WORKING,
+        }),
+      );
+    });
   });
 
-  describe('Test create activity request by sheet', () => {
-    it('Should return an empty request', async () => {
-      expect(
-        ActivityRequestServiceImpl.createUserActivityRequestByRow([]),
-      ).toEqual({
-        name: undefined,
-        activitySheetRequests: [],
-      });
+  describe('updateApprovalRequestActivity', () => {
+    it('should approve and create activity', async () => {
+      const requests = [
+        {
+          id: 1,
+          authorId: 'u1',
+          approvalStatus: RequestActivityStatus.PENDING,
+          requestType: RequestTypes.WORKING,
+          timeOfDayId: 'MORN',
+          dayOfWeekId: '1',
+        },
+      ] as ActivityRequest[];
+      jest
+        .spyOn(activityRequestRepository, 'findBy')
+        .mockResolvedValue(requests);
+      jest
+        .spyOn(activityRequestRepository, 'update')
+        .mockResolvedValue(undefined);
+      jest
+        .spyOn(activityService, 'createActivity')
+        .mockResolvedValue(undefined);
+
+      await service.updateApprovalRequestActivity({
+        ids: [1],
+        action: ApprovalRequestAction.APPROVE,
+        authorId: 'approver-1',
+      } as any);
+
+      expect(activityService.createActivity).toHaveBeenCalled();
+      expect(activityRequestRepository.update).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({
+          approvalStatus: RequestActivityStatus.APPROVED,
+        }),
+      );
     });
 
-    it('Should return an monday request', async () => {
-      expect(
-        ActivityRequestServiceImpl.createUserActivityRequestByRow([
-          '',
-          'Name',
-          '',
-          'x',
-        ]),
-      ).toEqual({
-        name: 'Name',
-        activitySheetRequests: [
-          {
-            dayOfWeekId: 1, // Monday
-            timeOfDayId: 'SUM-MORN',
-          },
-        ],
-      });
+    it('should throw if no requests found', async () => {
+      jest.spyOn(activityRequestRepository, 'findBy').mockResolvedValue([]);
+
+      await expect(
+        service.updateApprovalRequestActivity({
+          ids: [99],
+          action: ApprovalRequestAction.REJECT,
+          authorId: 'hr',
+        } as any),
+      ).rejects.toThrow('Activity request not found');
     });
+  });
 
-    it('Should return an sunday request', async () => {
-      expect(
-        ActivityRequestServiceImpl.createUserActivityRequestByRow([
-          '',
-          'Name',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          'x',
-          '',
-          '',
-        ]),
-      ).toEqual({
-        name: 'Name',
-        activitySheetRequests: [
-          {
-            dayOfWeekId: 0, // Sunday
-            timeOfDayId: 'SUM-MORN',
-          },
-        ],
-      });
-    });
+  describe('createRequestActivityByFile', () => {
+    it('should parse file and insert activity requests', async () => {
+      // Arrange fake Excel file
+      const file: InternalFile = {
+        encoding: 'utf-8',
+        fieldname: 'fieldname',
+        buffer: Buffer.from(''),
+        size: 10,
+        mimetype: 'application/octet-stream',
+        originalname: 'test.xlsx',
+      };
+      jest
+        .spyOn(userService, 'findUsersByFullNames')
+        .mockResolvedValue([{ id: 'u1', fullName: 'Alice' }] as User[]);
+      jest
+        .spyOn(activityRequestRepository, 'insert')
+        .mockResolvedValue(undefined);
 
-    it('Should return an monday request ignore case x or X', async () => {
-      expect(
-        ActivityRequestServiceImpl.createUserActivityRequestByRow([
-          '',
-          'Name',
-          '',
-          'X',
-        ]),
-      ).toEqual({
-        name: 'Name',
-        activitySheetRequests: [
-          {
-            dayOfWeekId: 1, // Monday
-            timeOfDayId: 'SUM-MORN',
-          },
-        ],
-      });
-    });
-
-    it('Should return an request in afternoon', async () => {
-      expect(
-        ActivityRequestServiceImpl.createUserActivityRequestByRow([
-          '',
-          'Name',
-          '',
-          '',
-          'X',
-        ]),
-      ).toEqual({
-        name: 'Name',
-        activitySheetRequests: [
-          {
-            dayOfWeekId: 1, // Monday
-            timeOfDayId: 'SUM-AFT',
-          },
-        ],
+      // Spy on xlsx utils
+      const sheet_to_json = jest.spyOn(utils, 'sheet_to_json');
+      sheet_to_json.mockReturnValue([
+        ['header1'], // row 0
+        ['header2'], // row 1
+        ['', 'Alice', '', 'x'], // row 2 with "x"
+      ]);
+      (read as jest.Mock).mockReturnValue({
+        Sheets: { name: {} },
+        SheetNames: ['name'],
       });
 
-      expect(
-        ActivityRequestServiceImpl.createUserActivityRequestByRow([
-          '',
-          'Name',
-          '',
-          '',
-          '',
-          '',
-          '',
-          'x',
-          '',
-        ]),
-      ).toEqual({
-        name: 'Name',
-        activitySheetRequests: [
-          {
-            dayOfWeekId: 2, // Monday
-            timeOfDayId: 'SUM-AFT',
-          },
-        ],
-      });
-    });
+      // Act
+      await service.createRequestActivityByFile({ file });
 
-    it('Should return monday morning request, tuesday afternoon request and wednesday evening', () => {
-      expect(
-        ActivityRequestServiceImpl.createUserActivityRequestByRow([
-          '',
-          'Name',
-          '',
-          'x',
-          '',
-          '',
-          '',
-          'x',
-          '',
-          '',
-          '',
-          'x',
+      // Assert
+      expect(userService.findUsersByFullNames).toHaveBeenCalledWith(['Alice']);
+      expect(activityRequestRepository.insert).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({
+            authorId: 'u1',
+            requestType: RequestTypes.WORKING,
+            approvalStatus: RequestActivityStatus.PENDING,
+          }),
         ]),
-      ).toEqual({
-        name: 'Name',
-        activitySheetRequests: [
-          {
-            dayOfWeekId: 1,
-            timeOfDayId: 'SUM-MORN',
-          },
-          {
-            dayOfWeekId: 2,
-            timeOfDayId: 'SUM-AFT',
-          },
-          {
-            dayOfWeekId: 3,
-            timeOfDayId: 'SUM-EVN',
-          },
-        ],
-      });
+      );
     });
   });
 });
