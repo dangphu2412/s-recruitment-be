@@ -221,16 +221,16 @@ export class UserServiceImpl implements UserService {
       relations: ['roles'],
     });
 
+    if (!user) {
+      throw new NotFoundException();
+    }
+
     if (
       user.roles.some(
         (role) => role.name === (SystemRoles.SUPER_ADMIN as string),
       )
     ) {
       throw new ForbiddenException('Cannot deactivate super admin');
-    }
-
-    if (!user) {
-      throw new NotFoundException();
     }
 
     if (user.deletedAt === null) {
@@ -411,7 +411,7 @@ export class UserServiceImpl implements UserService {
       throw new NotFoundException();
     }
 
-    if (payload.roleIds) {
+    if (payload.roleIds?.length) {
       user.roles = await this.roleService.findByIds(payload.roleIds);
     }
 

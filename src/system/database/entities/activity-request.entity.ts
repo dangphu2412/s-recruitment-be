@@ -10,7 +10,7 @@ import {
 import { User } from './user.entity';
 import { RequestActivityStatus } from '../../../activities/shared/request-activity-status.enum';
 import { TimeOfDay } from './time-of-day.entity';
-import { DayOfWeek } from './day-of-week';
+import { DayOfWeek } from './day-of-week.entity';
 
 @Entity({
   name: 'activity_requests',

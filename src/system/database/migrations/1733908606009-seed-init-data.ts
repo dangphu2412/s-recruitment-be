@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { DayOfWeek } from '../entities/day-of-week';
+import { DayOfWeek } from '../entities/day-of-week.entity';
 import { TimeOfDay } from '../entities/time-of-day.entity';
 import { Role } from '../entities/role.entity';
 import { Permission } from '../entities/permission.entity';

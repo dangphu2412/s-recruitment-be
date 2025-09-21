@@ -10,7 +10,7 @@ import { Period } from '../entities/period.entity';
 import { Department } from '../entities/department.entity';
 import { ActivityRequest } from '../entities/activity-request.entity';
 import { Activity } from '../entities/activity.entity';
-import { DayOfWeek } from '../entities/day-of-week';
+import { DayOfWeek } from '../entities/day-of-week.entity';
 import { TimeOfDay } from '../entities/time-of-day.entity';
 import { ActivityLog } from '../entities/activity-log.entity';
 import { DeviceUser } from '../entities/user-log.entity';

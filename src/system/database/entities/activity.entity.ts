@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { TimeOfDay } from './time-of-day.entity';
-import { DayOfWeek } from './day-of-week';
+import { DayOfWeek } from './day-of-week.entity';
 
 @Entity({
   name: 'activities',

@@ -16,5 +16,5 @@ export class CreateUsersRequestDTO {
 
   @IsOptional()
   @IsString()
-  birthday: string;
+  birthday?: string;
 }
