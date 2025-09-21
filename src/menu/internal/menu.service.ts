@@ -1,7 +1,8 @@
 import { MenuRepository } from './menu.repositoryt';
 import { Inject, Injectable } from '@nestjs/common';
-import { Menu, MenuService } from '../client';
+import { MenuService } from '../client';
 import { RoleService } from '../../account-service/authorization/interfaces/role-service.interface';
+import { Menu } from '../../system/database/entities/menu.entity';
 
 @Injectable()
 export class MenuServiceImpl implements MenuService {

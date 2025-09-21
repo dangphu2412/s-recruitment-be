@@ -1,5 +1,5 @@
 import { AccessControlView } from '../dtos/core/role-list.dto';
-import { Role } from '../../shared/entities/role.entity';
+import { Role } from '../../../system/database/entities/role.entity';
 import { UpdateRoleDto } from '../dtos/core/update-role.dto';
 import { CreateRoleRequestDTO } from '../dtos/presentation/create-role-request.dto';
 import { UpdateAssignedPersonsRequestDTO } from '../dtos/presentation/update-assigned-persons.request';

@@ -1,4 +1,4 @@
-import { Permission } from 'src/account-service/shared/entities/permission.entity';
+import { Permission } from 'src/system/database/entities/permission.entity';
 import { PermissionService } from '../interfaces/permission-service.interface';
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';

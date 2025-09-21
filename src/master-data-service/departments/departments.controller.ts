@@ -3,7 +3,7 @@ import {
   createCRUDService,
   ResourceCRUDService,
 } from '../../system/resource-templates/resource-service-template';
-import { Department } from './department.entity';
+import { Department } from '../../system/database/entities/department.entity';
 import { IsString } from 'class-validator';
 import { Identified } from '../../account-service/registration/identified.decorator';
 import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';

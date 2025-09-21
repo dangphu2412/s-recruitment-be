@@ -1,5 +1,5 @@
 import { MenuRepository } from '../../../src/menu/internal/menu.repositoryt';
-import { Menu } from '../../../src/menu';
+import { Menu } from '../../../src/system/database/entities/menu.entity';
 
 describe('MenuRepository', () => {
   let repository: MenuRepository;

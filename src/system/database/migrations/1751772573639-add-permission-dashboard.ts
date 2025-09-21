@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { Permission } from '../../../account-service/shared/entities/permission.entity';
+import { Permission } from '../entities/permission.entity';
 import { Permissions } from '../../../account-service/authorization/access-definition.constant';
 import { Menu } from '../../../menu';
 import { MenuCode } from '../../../menu/client/menu-code.constant';

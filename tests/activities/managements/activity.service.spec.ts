@@ -3,7 +3,7 @@ import { ActivityServiceImpl } from '../../../src/activities/managements/activit
 import { ActivityRepository } from '../../../src/activities/managements/activity.repository';
 import { FindActivitiesDTO } from '../../../src/activities/managements/dtos/core/find-activities.dto';
 import { CreateActivityDTO } from '../../../src/activities/managements/dtos/core/create-activity.dto';
-import { Activity } from '../../../src/activities/shared/entities/activity.entity';
+import { Activity } from '../../../src/system/database/entities/activity.entity';
 
 describe(ActivityServiceImpl.name, () => {
   let activityService: ActivityServiceImpl;

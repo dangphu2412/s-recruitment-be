@@ -3,7 +3,7 @@ import {
   createCRUDService,
   ResourceCRUDService,
 } from '../../system/resource-templates/resource-service-template';
-import { TimeOfDay } from './time-of-day.entity';
+import { TimeOfDay } from '../../system/database/entities/time-of-day.entity';
 import { Identified } from '../../account-service/account-service.package';
 
 export const TimeOfDayCRUDService = createCRUDService(TimeOfDay);

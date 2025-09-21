@@ -9,13 +9,13 @@ import { RoleAuthorizationStrategy } from './authorization/services/role-authori
 import { RoleServiceImpl } from './authorization/services/role.service';
 import { RoleRepository } from './authorization/repositories/role.repository';
 import { RoleController } from './authorization/controllers/role.controller';
-import { Permission } from './shared/entities/permission.entity';
+import { Permission } from '../system/database/entities/permission.entity';
 import { MonthlyMoneyModule } from '../monthly-money/internal/monthly-money.module';
 import { UserController } from './management/controllers/user.controller';
 import { UserServiceImpl } from './management/services/user.service';
 import { UserRepository } from './management/repositories/user.repository';
-import { User } from './shared/entities/user.entity';
-import { Role } from './shared/entities/role.entity';
+import { User } from '../system/database/entities/user.entity';
+import { Role } from '../system/database/entities/role.entity';
 import { RoleService } from './authorization/interfaces/role-service.interface';
 import { UserService } from './management/interfaces/user-service.interface';
 import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';

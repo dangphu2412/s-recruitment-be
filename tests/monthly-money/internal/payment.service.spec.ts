@@ -7,7 +7,7 @@ import {
   MonthlyMoneyOperationServiceToken,
 } from '../../../src/monthly-money/domain/core/services/monthly-money-operation.service';
 import { CreatePaymentDTO } from '../../../src/monthly-money/domain/core/dto/create-payment.dto';
-import { Payment } from '../../../src/monthly-money/domain/data-access/entities/payment.entity';
+import { Payment } from '../../../src/system/database/entities/payment.entity';
 import { PAYMENT_CREATED_EVENT } from '../../../src/monthly-money/domain/core/events/payment-created.event';
 import { OffsetPaginationResponse } from '../../../src/system/pagination';
 

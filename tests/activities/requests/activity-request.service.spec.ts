@@ -5,7 +5,7 @@ import {
 } from '../../../src/activities/requests/interfaces/activity-request.service';
 import { ActivityRequestServiceImpl } from '../../../src/activities/requests/activity-request.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ActivityRequest } from '../../../src/activities/shared/entities/activity-request.entity';
+import { ActivityRequest } from '../../../src/system/database/entities/activity-request.entity';
 import { ActivityServiceToken } from '../../../src/activities/managements/interfaces/activity.service';
 import { UserService } from '../../../src/account-service/management/interfaces/user-service.interface';
 

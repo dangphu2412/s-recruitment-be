@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { ActivityRequestService } from './interfaces/activity-request.service';
-import { ActivityRequest } from '../shared/entities/activity-request.entity';
+import { ActivityRequest } from '../../system/database/entities/activity-request.entity';
 import {
   ApprovalRequestAction,
   RequestActivityStatus,

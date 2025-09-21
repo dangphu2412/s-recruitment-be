@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Role } from '../../shared/entities/role.entity';
+import { Role } from '../../../system/database/entities/role.entity';
 import { AccessControlList } from '../dtos/aggregates/access-control-list.aggregate';
 import { GetAccessControlRequestDTO } from '../dtos/presentation/get-access-control.request';
 import keyBy from 'lodash/keyBy';

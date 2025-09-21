@@ -1,4 +1,4 @@
-import { Permission } from '../../shared/entities/permission.entity';
+import { Permission } from '../../../system/database/entities/permission.entity';
 
 export const PermissionService = Symbol('PermissionService');
 

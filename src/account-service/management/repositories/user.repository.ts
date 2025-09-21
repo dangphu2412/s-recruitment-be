@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../shared/entities/user.entity';
+import { User } from '../../../system/database/entities/user.entity';
 import { UserStatus } from '../user-status.constant';
 import { OffsetPaginationResponse } from '../../../system/pagination';
 import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';

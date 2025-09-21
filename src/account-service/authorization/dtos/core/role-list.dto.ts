@@ -1,4 +1,4 @@
-import { Permission } from 'src/account-service/shared/entities/permission.entity';
+import { Permission } from 'src/system/database/entities/permission.entity';
 
 export type Right = Permission & { canAccess: boolean };
 export type AccessControlView = {

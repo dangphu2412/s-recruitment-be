@@ -2,7 +2,7 @@ import { createProviderToken } from 'src/system/nestjs-extensions';
 import { OffsetPaginationResponse } from 'src/system/pagination';
 import { CreateUsersRequestDTO } from '../dtos/presentations/create-users.request';
 import { FileCreateUsersDto } from '../dtos/presentations/file-create-users.dto';
-import { User } from '../../shared/entities/user.entity';
+import { User } from '../../../system/database/entities/user.entity';
 import { MyProfile, UserDetail } from '../dtos/core/my-profile';
 import { UpdateUserRolesDto } from '../dtos/presentations/update-user-roles.dto';
 import { PaginatedUserProbationDTO } from '../dtos/core/user-probation.dto';

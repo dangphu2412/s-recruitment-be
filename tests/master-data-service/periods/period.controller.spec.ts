@@ -4,7 +4,7 @@ import {
   PeriodCRUDService,
 } from '../../../src/master-data-service/periods/period.controller';
 import { ResourceCRUDService } from '../../../src/system/resource-templates/resource-service-template';
-import { Period } from '../../../src/master-data-service/periods/period.entity';
+import { Period } from '../../../src/system/database/entities/period.entity';
 
 describe('PeriodController', () => {
   let controller: PeriodController;

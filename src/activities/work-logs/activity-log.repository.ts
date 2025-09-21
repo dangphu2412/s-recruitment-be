@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { ActivityLog } from '../shared/entities/activity-log.entity';
+import { ActivityLog } from '../../system/database/entities/activity-log.entity';
 import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { subMonths, subWeeks } from 'date-fns';
 import { LogWorkStatus } from './log-work-status.enum';

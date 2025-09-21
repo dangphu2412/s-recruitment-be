@@ -5,7 +5,7 @@ import {
   MonthlyMoneyConfigServiceToken,
 } from '../domain/core/services/monthly-money-config.service';
 import { MonthlyMoneyOperationService } from '../domain/core/services/monthly-money-operation.service';
-import { OperationFee } from '../domain/data-access/entities/operation-fee.entity';
+import { OperationFee } from '../../system/database/entities/operation-fee.entity';
 import {
   CreateMoneyFeeDTO,
   CreateMoneyFeeResultsDTO,
