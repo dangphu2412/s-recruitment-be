@@ -18,7 +18,7 @@ import {
   DayOfWeekCRUDServiceContainer,
   DayOfWeeksController,
 } from './day-of-weeks/day-of-weeks.controller';
-import { DayOfWeek } from '../system/database/entities/day-of-week';
+import { DayOfWeek } from '../system/database/entities/day-of-week.entity';
 import { TimeOfDay } from '../system/database/entities/time-of-day.entity';
 
 @Module({

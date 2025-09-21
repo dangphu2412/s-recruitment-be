@@ -3,7 +3,7 @@ import {
   createCRUDService,
   ResourceCRUDService,
 } from '../../system/resource-templates/resource-service-template';
-import { DayOfWeek } from '../../system/database/entities/day-of-week';
+import { DayOfWeek } from '../../system/database/entities/day-of-week.entity';
 import { Identified } from '../../account-service/registration/identified.decorator';
 
 export const DayOfWeekCRUDServiceContainer = createCRUDService(DayOfWeek);
