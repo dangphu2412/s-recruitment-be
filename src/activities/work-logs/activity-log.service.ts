@@ -20,8 +20,10 @@ export type LogDTO = {
 };
 
 class LogSegmentProcessor {
-  private deviceIdMapToDateSegmentedLogs: Map<string, Map<string, LogDTO[]>> =
-    new Map();
+  private readonly deviceIdMapToDateSegmentedLogs: Map<
+    string,
+    Map<string, LogDTO[]>
+  > = new Map();
 
   constructor(logs: LogDTO[]) {
     for (const log of logs) {
