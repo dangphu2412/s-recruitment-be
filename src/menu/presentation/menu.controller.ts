@@ -1,9 +1,8 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { MenuService, MenuServiceToken } from '../client';
-import { CurrentUser } from '../../account-service/management/user.decorator';
-import { JwtPayload } from '../../account-service/registration/jwt-payload';
+import { CurrentUserId } from '../../account-service/management/user.decorator';
 import { Identified } from '../../account-service/registration/identified.decorator';
+import { MenuService } from '../domain/services/menu.service.interface';
 
 @Controller({
   path: 'menus',
@@ -12,13 +11,13 @@ import { Identified } from '../../account-service/registration/identified.decora
 @ApiTags('menus')
 export class MenuController {
   constructor(
-    @Inject(MenuServiceToken)
+    @Inject(MenuService)
     private readonly menuService: MenuService,
   ) {}
 
   @Identified
   @Get()
-  findMenusByUserId(@CurrentUser() { sub: userId }: JwtPayload) {
+  findMenusByUserId(@CurrentUserId userId: string) {
     return this.menuService.findMenusByUserId(userId);
   }
 }
