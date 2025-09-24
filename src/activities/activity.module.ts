@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
-import { ActivityRequest } from './shared/entities/activity-request.entity';
+import { ActivityRequest } from '../system/database/entities/activity-request.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActivityController } from './managements/activity.controller';
 import { ActivityRequestServiceImpl } from './requests/activity-request.service';
 import { ActivityRequestServiceToken } from './requests/interfaces/activity-request.service';
-import { Activity } from './shared/entities/activity.entity';
+import { Activity } from '../system/database/entities/activity.entity';
 import { ActivityServiceImpl } from './managements/activity.service';
 import { ActivityServiceToken } from './managements/interfaces/activity.service';
 import { ActivityRepository } from './managements/activity.repository';
-import { ActivityLog } from './shared/entities/activity-log.entity';
+import { ActivityLog } from '../system/database/entities/activity-log.entity';
 import { ActivityLogRepository } from './work-logs/activity-log.repository';
 import { ActivityLogService } from './work-logs/activity-log.service';
 import { ActivitiesLogController } from './work-logs/activities-log.controller';
@@ -20,8 +20,12 @@ import { ActivityMatcher } from './work-logs/work-status-evaluator.service';
 import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
 import { ActivityRequestController } from './requests/activity-request.controller';
 import { AccountServiceModule } from '../account-service/account-service.module';
-import { DeviceUser } from './shared/entities/user-log.entity';
+import { DeviceUser } from '../system/database/entities/user-log.entity';
 import { LogFileService } from './work-logs/log-file.service';
+import {
+  ActivityRequestRepository,
+  ActivityRequestRepositoryImpl,
+} from './requests/repositories/activity-request.repository';
 
 @Module({
   imports: [
@@ -48,6 +52,10 @@ import { LogFileService } from './work-logs/log-file.service';
     {
       provide: ActivityServiceToken,
       useClass: ActivityServiceImpl,
+    },
+    {
+      provide: ActivityRequestRepository,
+      useClass: ActivityRequestRepositoryImpl,
     },
     DeviceUserCRUDService.createProvider(),
     ActivityRepository,

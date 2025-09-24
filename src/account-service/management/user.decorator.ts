@@ -7,3 +7,5 @@ export const CurrentUser = createParamDecorator(
     return propKey ? req.user[propKey] : (req.user as JwtPayload);
   },
 );
+
+export const CurrentUserId = CurrentUser('sub');

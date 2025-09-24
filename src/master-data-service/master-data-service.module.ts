@@ -8,8 +8,8 @@ import {
   DepartmentsController,
 } from './departments/departments.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Department } from './departments/department.entity';
-import { Period } from './periods/period.entity';
+import { Department } from '../system/database/entities/department.entity';
+import { Period } from '../system/database/entities/period.entity';
 import {
   TimeOfDayCRUDService,
   TimeOfDaysController,
@@ -18,8 +18,8 @@ import {
   DayOfWeekCRUDServiceContainer,
   DayOfWeeksController,
 } from './day-of-weeks/day-of-weeks.controller';
-import { DayOfWeek } from './day-of-weeks/day-of-week';
-import { TimeOfDay } from './time-of-days/time-of-day.entity';
+import { DayOfWeek } from '../system/database/entities/day-of-week.entity';
+import { TimeOfDay } from '../system/database/entities/time-of-day.entity';
 
 @Module({
   imports: [

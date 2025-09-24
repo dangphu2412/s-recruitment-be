@@ -1,4 +1,4 @@
-import { User } from '../../../shared/entities/user.entity';
+import { User } from '../../../../system/database/entities/user.entity';
 
 export type MyProfile = Pick<User, 'id' | 'username'>;
 

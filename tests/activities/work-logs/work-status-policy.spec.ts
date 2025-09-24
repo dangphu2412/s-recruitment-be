@@ -3,9 +3,9 @@ import {
   ActivityMatcher,
   WorkTimeUtils,
 } from '../../../src/activities/work-logs/work-status-evaluator.service';
-import { TimeOfDay } from '../../../src/master-data-service/time-of-days/time-of-day.entity';
-import { DayOfWeek } from '../../../src/master-data-service/day-of-weeks/day-of-week';
-import { User } from '../../../src/account-service/shared/entities/user.entity';
+import { TimeOfDay } from '../../../src/system/database/entities/time-of-day.entity';
+import { DayOfWeek } from '../../../src/system/database/entities/day-of-week.entity';
+import { User } from '../../../src/system/database/entities/user.entity';
 import { parseISO } from 'date-fns';
 
 describe('WorkStatusPolicy', () => {

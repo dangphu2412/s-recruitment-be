@@ -20,7 +20,7 @@ import { RoleService } from '../../authorization/interfaces/role-service.interfa
 import { UserService } from '../interfaces/user-service.interface';
 import { MyProfile, UserDetail } from '../dtos/core/my-profile';
 import { GetUserDTO } from '../dtos/core/get-users.dto';
-import { User } from '../../shared/entities/user.entity';
+import { User } from '../../../system/database/entities/user.entity';
 import { UserManagementViewDTO } from '../dtos/presentations/get-users-query.request';
 import { Transactional } from 'typeorm-transactional';
 import { UpdateUserRolesDto } from '../dtos/presentations/update-user-roles.dto';
@@ -38,7 +38,7 @@ import { UpdateUserDTO } from '../dtos/core/update-user.dto';
 import { CreatePaymentRequest } from '../dtos/presentations/create-payment.request';
 import { PaymentService } from '../../../monthly-money/internal/payment.service';
 import { ResourceCRUDService } from '../../../system/resource-templates/resource-service-template';
-import { Period } from '../../../master-data-service/periods/period.entity';
+import { Period } from '../../../system/database/entities/period.entity';
 import { PeriodCRUDService } from '../../../master-data-service/periods/period.controller';
 import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
 import { GetUsersQueryDTO } from '../dtos/core/get-users-query.dto';
@@ -221,16 +221,16 @@ export class UserServiceImpl implements UserService {
       relations: ['roles'],
     });
 
+    if (!user) {
+      throw new NotFoundException();
+    }
+
     if (
       user.roles.some(
         (role) => role.name === (SystemRoles.SUPER_ADMIN as string),
       )
     ) {
       throw new ForbiddenException('Cannot deactivate super admin');
-    }
-
-    if (!user) {
-      throw new NotFoundException();
     }
 
     if (user.deletedAt === null) {
@@ -411,7 +411,7 @@ export class UserServiceImpl implements UserService {
       throw new NotFoundException();
     }
 
-    if (payload.roleIds) {
+    if (payload.roleIds?.length) {
       user.roles = await this.roleService.findByIds(payload.roleIds);
     }
 

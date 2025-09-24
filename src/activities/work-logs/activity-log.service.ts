@@ -4,7 +4,7 @@ import { FindLogsRequest } from './dtos/presentation/find-logs.request';
 import { OffsetPaginationResponse } from '../../system/pagination';
 import { ActivityRepository } from '../managements/activity.repository';
 import { LogWorkStatus } from './log-work-status.enum';
-import { ActivityLog } from '../shared/entities/activity-log.entity';
+import { ActivityLog } from '../../system/database/entities/activity-log.entity';
 import {
   ActivityMatcher,
   WorkTimeUtils,
@@ -20,8 +20,10 @@ export type LogDTO = {
 };
 
 class LogSegmentProcessor {
-  private deviceIdMapToDateSegmentedLogs: Map<string, Map<string, LogDTO[]>> =
-    new Map();
+  private readonly deviceIdMapToDateSegmentedLogs: Map<
+    string,
+    Map<string, LogDTO[]>
+  > = new Map();
 
   constructor(logs: LogDTO[]) {
     for (const log of logs) {

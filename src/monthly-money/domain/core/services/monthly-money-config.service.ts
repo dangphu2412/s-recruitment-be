@@ -1,5 +1,5 @@
 import { createProviderToken } from '../../../../system/nestjs-extensions';
-import { MonthlyMoneyConfig } from '../../data-access/entities/monthly-money-config.entity';
+import { MonthlyMoneyConfig } from '../../../../system/database/entities/monthly-money-config.entity';
 
 export const MonthlyMoneyConfigServiceToken = createProviderToken(
   'MonthlyMoneyConfigService',

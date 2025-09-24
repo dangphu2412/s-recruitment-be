@@ -1,19 +1,19 @@
-import { Menu } from '../../../menu';
+import { Menu } from '../entities/menu.entity';
 import { join } from 'path';
-import { User } from '../../../account-service/shared/entities/user.entity';
-import { Role } from '../../../account-service/shared/entities/role.entity';
-import { Permission } from '../../../account-service/shared/entities/permission.entity';
-import { Payment } from '../../../monthly-money/domain/data-access/entities/payment.entity';
-import { MonthlyMoneyConfig } from '../../../monthly-money/domain/data-access/entities/monthly-money-config.entity';
-import { OperationFee } from '../../../monthly-money/domain/data-access/entities/operation-fee.entity';
-import { Period } from '../../../master-data-service/periods/period.entity';
-import { Department } from '../../../master-data-service/departments/department.entity';
-import { ActivityRequest } from '../../../activities/shared/entities/activity-request.entity';
-import { Activity } from '../../../activities/shared/entities/activity.entity';
-import { DayOfWeek } from '../../../master-data-service/day-of-weeks/day-of-week';
-import { TimeOfDay } from '../../../master-data-service/time-of-days/time-of-day.entity';
-import { ActivityLog } from '../../../activities/shared/entities/activity-log.entity';
-import { DeviceUser } from '../../../activities/shared/entities/user-log.entity';
+import { User } from '../entities/user.entity';
+import { Role } from '../entities/role.entity';
+import { Permission } from '../entities/permission.entity';
+import { Payment } from '../entities/payment.entity';
+import { MonthlyMoneyConfig } from '../entities/monthly-money-config.entity';
+import { OperationFee } from '../entities/operation-fee.entity';
+import { Period } from '../entities/period.entity';
+import { Department } from '../entities/department.entity';
+import { ActivityRequest } from '../entities/activity-request.entity';
+import { Activity } from '../entities/activity.entity';
+import { DayOfWeek } from '../entities/day-of-week.entity';
+import { TimeOfDay } from '../entities/time-of-day.entity';
+import { ActivityLog } from '../entities/activity-log.entity';
+import { DeviceUser } from '../entities/user-log.entity';
 
 export const APP_ENTITIES = [
   User,

@@ -3,10 +3,9 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In } from 'typeorm';
 import { ActivityRequestService } from './interfaces/activity-request.service';
-import { ActivityRequest } from '../shared/entities/activity-request.entity';
+import { ActivityRequest } from '../../system/database/entities/activity-request.entity';
 import {
   ApprovalRequestAction,
   RequestActivityStatus,
@@ -33,12 +32,12 @@ import {
 import { read, utils } from 'xlsx';
 import { UserService } from '../../account-service/management/interfaces/user-service.interface';
 import { keyBy } from 'lodash';
-import { OffsetPaginationRequest } from '../../system/pagination/offset-pagination-request';
 import {
   FindMyRequestedActivityQueryDTO,
   FindRequestedMyActivitiesResponseDTO,
 } from './dtos/core/find-my-requested-acitivities.dto';
 import { SystemRoles } from '../../account-service/authorization/access-definition.constant';
+import { ActivityRequestRepository } from './repositories/activity-request.repository';
 
 type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
 
@@ -50,8 +49,8 @@ type UserActivityRequest = {
 @Injectable()
 export class ActivityRequestServiceImpl implements ActivityRequestService {
   constructor(
-    @InjectRepository(ActivityRequest)
-    private readonly activityRequestRepository: Repository<ActivityRequest>,
+    @Inject(ActivityRequestRepository)
+    private readonly activityRequestRepository: ActivityRequestRepository,
     @Inject(ActivityServiceToken)
     private readonly activityService: ActivityService,
     @Inject(UserService)
@@ -158,92 +157,10 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     });
   }
 
-  async findRequestedActivities({
-    query,
-    page,
-    size,
-    departmentIds,
-    fromDate,
-    toDate,
-    status,
-    requestTypes,
-  }: FindRequestedActivityQueryDTO): Promise<FindRequestedActivitiesResponseDTO> {
-    const offset = OffsetPaginationRequest.getOffset(page, size);
-
-    /**
-     * Select specific fields: https://stackoverflow.com/questions/62390886/select-specific-columns-from-left-join-query-typeorm
-     */
-    const queryBuilder = this.activityRequestRepository
-      .createQueryBuilder('activity')
-      .withDeleted()
-      .leftJoin('activity.author', 'author')
-      .addSelect(['author.id', 'author.fullName'])
-      .leftJoin('activity.assignee', 'assignee')
-      .addSelect(['assignee.id', 'assignee.fullName'])
-      .leftJoin('activity.approver', 'approver')
-      .addSelect(['approver.id', 'approver.fullName'])
-      .leftJoin('activity.dayOfWeek', 'dayOfWeek')
-      .addSelect(['dayOfWeek.id', 'dayOfWeek.name'])
-      .leftJoin('activity.timeOfDay', 'timeOfDay')
-      .addSelect([
-        'timeOfDay.id',
-        'timeOfDay.name',
-        'timeOfDay.fromTime',
-        'timeOfDay.toTime',
-      ]);
-
-    if (query) {
-      queryBuilder.andWhere('author.fullName ILIKE :query', {
-        query: `%${query}%`,
-      });
-    }
-
-    if (departmentIds) {
-      queryBuilder.leftJoinAndSelect('author.department', 'department');
-      queryBuilder.andWhere('department.id IN (:...departmentIds)', {
-        departmentIds,
-      });
-    }
-
-    if (status) {
-      queryBuilder.andWhere('activity.approvalStatus IN (:...status)', {
-        status,
-      });
-    }
-
-    if (requestTypes) {
-      queryBuilder.andWhere('activity.requestType IN (:...requestTypes)', {
-        requestTypes,
-      });
-    }
-
-    if (fromDate) {
-      queryBuilder.andWhere('activity.updatedAt >= :fromDate', {
-        fromDate,
-      });
-    }
-
-    if (toDate) {
-      queryBuilder.andWhere('activity.updatedAt <= :toDate', {
-        toDate,
-      });
-    }
-
-    queryBuilder
-      .skip(offset)
-      .take(size)
-      .addOrderBy('activity.updatedAt', 'DESC');
-
-    const [items, totalRecords] = await queryBuilder.getManyAndCount();
-
-    return OffsetPaginationResponse.of({
-      items,
-      totalRecords,
-      query: {
-        page,
-        size,
-      },
-    });
+  async findRequestedActivities(
+    dto: FindRequestedActivityQueryDTO,
+  ): Promise<FindRequestedActivitiesResponseDTO> {
+    return this.activityRequestRepository.findOverviewRequests(dto);
   }
 
   findMyRequestedActivity(
@@ -262,26 +179,7 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   findRequestedActivity(
     id: number,
   ): Promise<FindRequestedMyActivityResponseDTO> {
-    return this.activityRequestRepository
-      .createQueryBuilder('activity')
-      .withDeleted()
-      .leftJoin('activity.author', 'author')
-      .addSelect(['author.id', 'author.fullName'])
-      .leftJoin('activity.assignee', 'assignee')
-      .addSelect(['assignee.id', 'assignee.fullName', 'assignee.email'])
-      .leftJoin('activity.approver', 'approver')
-      .addSelect(['approver.id', 'approver.fullName', 'approver.email'])
-      .leftJoin('activity.dayOfWeek', 'dayOfWeek')
-      .addSelect(['dayOfWeek.id', 'dayOfWeek.name'])
-      .leftJoin('activity.timeOfDay', 'timeOfDay')
-      .addSelect([
-        'timeOfDay.id',
-        'timeOfDay.name',
-        'timeOfDay.fromTime',
-        'timeOfDay.toTime',
-      ])
-      .andWhere('activity.id = :id', { id })
-      .getOne();
+    return this.activityRequestRepository.findDetailById(id);
   }
 
   async createRequestActivity(dto: CreateActivityRequestDTO): Promise<void> {

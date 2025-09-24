@@ -7,7 +7,7 @@ import { PasswordManager } from '../../../src/account-service/registration/servi
 import { BasicLoginRequestDto } from '../../../src/account-service/registration/dtos/presentations/basic-login.request.dto';
 
 import { extractJwtPayload } from '../../../src/account-service/registration/services/jwt.utils';
-import { User } from '../../../src/account-service/shared/entities/user.entity';
+import { User } from '../../../src/system/database/entities/user.entity';
 import { TokenFactory } from '../../../src/account-service/registration/interfaces/token-factory.interface';
 import {
   InternalServerErrorException,

@@ -6,7 +6,7 @@ import { Logger } from '@nestjs/common';
 import { WorkLogExtractor } from './activities/work-logs/work-log-extractor';
 
 // https://github.com/caobo171/node-zklib
-async function main() {
+export async function main() {
   config();
 
   const storage = new Storage({
@@ -49,4 +49,6 @@ async function main() {
   process.exit(0);
 }
 
-main();
+if (require.main === module) {
+  main();
+}

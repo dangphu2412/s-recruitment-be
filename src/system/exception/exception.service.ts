@@ -30,7 +30,7 @@ export function exceptionFactory(errors: ValidationError[]) {
 
 @Catch()
 export class AppExceptionFilter implements ExceptionFilter {
-  private logger = new Logger(AppExceptionFilter.name);
+  private readonly logger = new Logger(AppExceptionFilter.name);
 
   catch(
     exception: HttpException | Error | BusinessException,

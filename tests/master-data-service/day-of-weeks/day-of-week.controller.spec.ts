@@ -4,7 +4,7 @@ import {
   DayOfWeeksController,
 } from '../../../src/master-data-service/day-of-weeks/day-of-weeks.controller';
 import { ResourceCRUDService } from '../../../src/system/resource-templates/resource-service-template';
-import { DayOfWeek } from '../../../src/master-data-service/day-of-weeks/day-of-week';
+import { DayOfWeek } from '../../../src/system/database/entities/day-of-week.entity';
 
 describe('DayOfWeeksController', () => {
   let controller: DayOfWeeksController;

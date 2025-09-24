@@ -1,7 +1,7 @@
 import { Brackets, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Activity } from '../shared/entities/activity.entity';
+import { Activity } from '../../system/database/entities/activity.entity';
 import { FindActivitiesDTO } from './dtos/core/find-activities.dto';
 import { RequestTypes } from '../shared/request-activity-status.enum';
 
@@ -14,7 +14,12 @@ export class ActivityRepository extends Repository<Activity> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  findActivities({ fromDate, toDate, authorId }: FindActivitiesDTO) {
+  findActivities({
+    fromDate,
+    toDate,
+    authorId,
+    dayOfWeekId,
+  }: FindActivitiesDTO) {
     const queryBuilder = this.createQueryBuilder('activity');
 
     // Find all member activities requestType is working
@@ -27,39 +32,49 @@ export class ActivityRepository extends Repository<Activity> {
       .leftJoinAndSelect('activity.dayOfWeek', 'dayOfWeek')
       .andWhere(
         new Brackets((qb) => {
-          qb.andWhere('activity.requestType = :requestType', {
-            requestType: RequestTypes.WORKING,
-          })
-            .orWhere(
-              new Brackets((qb) => {
-                qb.andWhere('activity.requestType = :requestType3', {
-                  requestType3: RequestTypes.ABSENCE,
-                }).andWhere(
-                  'activity.compensatoryDay BETWEEN :fromDate AND :toDate',
-                  {
-                    fromDate,
-                    toDate,
-                  },
-                );
-
-                return qb;
-              }),
-            )
-            .orWhere(
-              new Brackets((qb) => {
-                qb.andWhere('activity.requestType = :requestType2', {
-                  requestType2: RequestTypes.LATE,
-                }).andWhere(
-                  'activity.requestChangeDay BETWEEN :fromDate AND :toDate',
-                  {
-                    fromDate,
-                    toDate,
-                  },
-                );
-
-                return qb;
-              }),
+          if (dayOfWeekId) {
+            qb.andWhere(
+              'activity.requestType = :requestType AND dayOfWeek.id = :dayOfWeekId',
+              {
+                requestType: RequestTypes.WORKING,
+                dayOfWeekId,
+              },
             );
+          } else {
+            qb.andWhere('activity.requestType = :requestType', {
+              requestType: RequestTypes.WORKING,
+            });
+          }
+
+          qb.orWhere(
+            new Brackets((qb) => {
+              qb.andWhere('activity.requestType = :requestType3', {
+                requestType3: RequestTypes.ABSENCE,
+              }).andWhere(
+                'activity.compensatoryDay BETWEEN :fromDate AND :toDate',
+                {
+                  fromDate,
+                  toDate,
+                },
+              );
+
+              return qb;
+            }),
+          ).orWhere(
+            new Brackets((qb) => {
+              qb.andWhere('activity.requestType = :requestType2', {
+                requestType2: RequestTypes.LATE,
+              }).andWhere(
+                'activity.requestChangeDay BETWEEN :fromDate AND :toDate',
+                {
+                  fromDate,
+                  toDate,
+                },
+              );
+
+              return qb;
+            }),
+          );
         }),
       );
 

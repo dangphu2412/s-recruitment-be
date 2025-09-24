@@ -3,7 +3,7 @@ import {
   createCRUDService,
   ResourceCRUDService,
 } from '../../system/resource-templates/resource-service-template';
-import { Period } from './period.entity';
+import { Period } from '../../system/database/entities/period.entity';
 import { IsString } from 'class-validator';
 import {
   CanAccessBy,

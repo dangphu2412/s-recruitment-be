@@ -5,7 +5,7 @@ import {
   MonthlyMoneyOperationServiceToken,
 } from '../domain/core/services/monthly-money-operation.service';
 import { CreatePaymentDTO } from '../domain/core/dto/create-payment.dto';
-import { Payment } from '../domain/data-access/entities/payment.entity';
+import { Payment } from '../../system/database/entities/payment.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   PAYMENT_CREATED_EVENT,

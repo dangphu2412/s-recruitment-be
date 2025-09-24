@@ -4,7 +4,7 @@ import {
   TimeOfDaysController,
 } from '../../../src/master-data-service/time-of-days/time-of-days.controller';
 import { ResourceCRUDService } from '../../../src/system/resource-templates/resource-service-template';
-import { TimeOfDay } from '../../../src/master-data-service/time-of-days/time-of-day.entity';
+import { TimeOfDay } from '../../../src/system/database/entities/time-of-day.entity';
 
 describe('TimeOfDaysController', () => {
   let controller: TimeOfDaysController;

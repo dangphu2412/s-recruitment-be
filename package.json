@@ -67,7 +67,6 @@
     "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
     "ms": "^2.1.3",
-    "multer": "^1.4.5-lts.1",
     "nestjs-pino": "^4.4.0",
     "node-zklib": "^1.3.0",
     "nodemailer": "^7.0.4",
@@ -84,7 +83,6 @@
     "resend": "^4.6.0",
     "rimraf": "^5.0.8",
     "rxjs": "7.2.0",
-    "slugify": "^1.6.5",
     "typeorm": "^0.3.17",
     "typeorm-transactional": "^0.5.0",
     "xlsx": "^0.18.5"
@@ -150,7 +148,8 @@
       "dist",
       ".module.ts",
       ".exception.ts",
-      "index.ts"
+      "index.ts",
+      "main.ts"
     ],
     "coveragePathIgnorePatterns": [
       "node_modules/",
@@ -158,11 +157,13 @@
       "client",
       "dtos",
       "index.ts",
+      "main.ts",
       ".dto.ts",
       ".entity.ts",
       ".interface.ts",
       ".enum.ts",
       ".constant.ts",
+      ".repository.ts",
       "/src/system/database/migrations",
       "/src/system/database/config"
     ],
@@ -171,9 +172,9 @@
     },
     "coverageThreshold": {
       "global": {
-        "branches": 20,
-        "functions": 40,
-        "lines": 40
+        "branches": 45,
+        "functions": 65,
+        "lines": 70
       }
     }
   },
