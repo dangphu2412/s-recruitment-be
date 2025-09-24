@@ -27,7 +27,7 @@ export class ActivityRepository extends Repository<Activity> {
     // And the author is still active
 
     queryBuilder
-      .leftJoinAndSelect('activity.author', 'author')
+      .innerJoinAndSelect('activity.author', 'author')
       .leftJoinAndSelect('activity.timeOfDay', 'timeOfDay')
       .leftJoinAndSelect('activity.dayOfWeek', 'dayOfWeek')
       .andWhere(
