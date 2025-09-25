@@ -14,24 +14,24 @@ import {
 import {
   ActivityRequestService,
   ActivityRequestServiceToken,
-} from './interfaces/activity-request.service';
-import { CreateActivityRequestRequest } from './dtos/presentation/create-activity-request.request';
-import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
-import { Permissions } from '../../account-service/authorization/access-definition.constant';
-import { CurrentUser } from '../../account-service/management/user.decorator';
-import { JwtPayload } from '../../account-service/registration/jwt-payload';
-import { UpdateApprovalActivityRequestRequest } from './dtos/presentation/update-approval-activity-request.request';
-import { UpdateMyActivityRequestRequest } from './dtos/presentation/update-my-activity.request';
-import { FindRequestedActivityRequestDTO } from './dtos/presentation/find-requested-activity-request.dto';
-import { Identified } from '../../account-service/registration/identified.decorator';
+} from '../use-cases/interfaces/activity-request.service';
+import { CreateActivityRequestRequest } from './presentation/create-activity-request.request';
+import { CanAccessBy } from '../../../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../../../account-service/authorization/access-definition.constant';
+import { CurrentUser } from '../../../account-service/management/user.decorator';
+import { JwtPayload } from '../../../account-service/registration/jwt-payload';
+import { UpdateApprovalActivityRequestRequest } from './presentation/update-approval-activity-request.request';
+import { UpdateMyActivityRequestRequest } from './presentation/update-my-activity.request';
+import { FindRequestedActivityRequestDTO } from './presentation/find-requested-activity-request.dto';
+import { Identified } from '../../../account-service/registration/identified.decorator';
 import {
   FileInterceptor,
   InternalFile,
-} from '../../system/file/file.interceptor';
+} from '../../../system/file/file.interceptor';
 import { ApiConsumes } from '@nestjs/swagger';
-import { FileActivityRequestDTO } from './dtos/core/file-create-activity-request.dto';
+import { FileActivityRequestDTO } from '../use-cases/dtos/file-create-activity-request.dto';
 import { UploadRequestActivityFileValidatorPipe } from './upload-activity-request-file.pipe';
-import { FindMyRequestedActivitiesRequest } from './dtos/presentation/find-my-requested-activities.request';
+import { FindMyRequestedActivitiesRequest } from './presentation/find-my-requested-activities.request';
 
 @Controller('activity-requests')
 export class ActivityRequestController {

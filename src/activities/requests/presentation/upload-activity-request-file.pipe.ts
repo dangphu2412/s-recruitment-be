@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
-import { InternalFile } from '../../system/file/file.interceptor';
+import { InternalFile } from '../../../system/file/file.interceptor';
 
 @Injectable()
 export class UploadRequestActivityFileValidatorPipe implements PipeTransform {

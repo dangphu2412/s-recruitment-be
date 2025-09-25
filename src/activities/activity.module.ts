@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ActivityRequest } from '../system/database/entities/activity-request.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActivityController } from './managements/activity.controller';
-import { ActivityRequestServiceImpl } from './requests/activity-request.service';
-import { ActivityRequestServiceToken } from './requests/interfaces/activity-request.service';
+import { ActivityRequestServiceImpl } from './requests/use-cases/activity-request.service';
+import { ActivityRequestServiceToken } from './requests/use-cases/interfaces/activity-request.service';
 import { Activity } from '../system/database/entities/activity.entity';
 import { ActivityServiceImpl } from './managements/activity.service';
 import { ActivityServiceToken } from './managements/interfaces/activity.service';
@@ -18,15 +18,17 @@ import {
 } from './work-logs/device-user.controller';
 import { ActivityMatcher } from './work-logs/work-status-evaluator.service';
 import { MasterDataServiceModule } from '../master-data-service/master-data-service.module';
-import { ActivityRequestController } from './requests/activity-request.controller';
+import { ActivityRequestController } from './requests/presentation/activity-request.controller';
 import { AccountServiceModule } from '../account-service/account-service.module';
 import { DeviceUser } from '../system/database/entities/user-log.entity';
 import { LogFileService } from './work-logs/log-file.service';
 import {
   ActivityRequestRepository,
   ActivityRequestRepositoryImpl,
-} from './requests/repositories/activity-request.repository';
+} from './requests/infras/repositories/activity-request.repository';
 import { MailModule } from '../system/mail/mail.module';
+import { ActivityRequestAggregateRepositoryImpl } from './requests/infras/repositories/activity-request-aggregate.repository';
+import { ActivityRequestAggregateRepository } from './requests/domain/repositories/activity-request-aggregate.repository';
 
 @Module({
   imports: [
@@ -58,6 +60,10 @@ import { MailModule } from '../system/mail/mail.module';
     {
       provide: ActivityRequestRepository,
       useClass: ActivityRequestRepositoryImpl,
+    },
+    {
+      provide: ActivityRequestAggregateRepository,
+      useClass: ActivityRequestAggregateRepositoryImpl,
     },
     DeviceUserCRUDService.createProvider(),
     ActivityRepository,

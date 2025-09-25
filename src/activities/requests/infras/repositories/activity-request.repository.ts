@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ActivityRequest } from '../../../system/database/entities/activity-request.entity';
+import { ActivityRequest } from '../../../../system/database/entities/activity-request.entity';
 import {
   FindRequestedActivitiesResponseDTO,
   FindRequestedActivityQueryDTO,
-} from '../dtos/core/find-requested-acitivities.dto';
-import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
-import { OffsetPaginationResponse } from '../../../system/pagination';
+} from '../../use-cases/dtos/find-requested-acitivities.dto';
+import { OffsetPaginationRequest } from '../../../../system/pagination/offset-pagination-request';
+import { OffsetPaginationResponse } from '../../../../system/pagination';
 
 export const ActivityRequestRepository = Symbol('ActivityRequestRepository');
 export interface ActivityRequestRepository extends Repository<ActivityRequest> {
