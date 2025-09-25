@@ -24,16 +24,7 @@ import { read, utils } from 'xlsx';
 import { FileCreateUsersDto } from '../../../src/account-service/management/dtos/presentations/file-create-users.dto';
 
 jest.mock('typeorm-transactional', () => ({
-  Transactional: () => {
-    return function (
-      target: unknown,
-      propertyKey: string,
-      descriptor: PropertyDescriptor,
-    ) {
-      // leave the method unchanged → just return descriptor
-      return descriptor;
-    };
-  },
+  Transactional: () => () => {},
 }));
 
 jest.mock('xlsx', () => ({

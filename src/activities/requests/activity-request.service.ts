@@ -38,6 +38,12 @@ import {
 } from './dtos/core/find-my-requested-acitivities.dto';
 import { SystemRoles } from '../../account-service/authorization/access-definition.constant';
 import { ActivityRequestRepository } from './repositories/activity-request.repository';
+import {
+  MAIL_SERVICE_TOKEN,
+  MailService,
+} from '../../system/mail/mail.interface';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { AssignedRequestEmailTemplate } from './assigned-request-email-template';
 
 type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
 
@@ -55,6 +61,8 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     private readonly activityService: ActivityService,
     @Inject(UserService)
     private readonly userService: UserService,
+    @Inject(MAIL_SERVICE_TOKEN)
+    private readonly mailService: MailService,
   ) {}
 
   async createRequestActivityByFile({
@@ -185,9 +193,23 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   async createRequestActivity(dto: CreateActivityRequestDTO): Promise<void> {
     const entity = this.mapRequestActivityToEntity(dto);
 
-    entity.assigneeId = (await this.getAssignee()).id;
+    const assignee = await this.getAssignee();
+    entity.assigneeId = assignee.id;
 
-    await this.activityRequestRepository.insert(entity);
+    const { identifiers } = await this.activityRequestRepository.insert(entity);
+    const detailRequest = await this.activityRequestRepository.findDetailById(
+      identifiers[0].id,
+    );
+
+    await this.mailService.sendMail({
+      to: [assignee.email],
+      subject: '[S-Group] Yêu cầu hoạt động',
+      html: renderToStaticMarkup(
+        AssignedRequestEmailTemplate({
+          request: detailRequest,
+        }),
+      ),
+    });
   }
 
   private mapRequestActivityToEntity(

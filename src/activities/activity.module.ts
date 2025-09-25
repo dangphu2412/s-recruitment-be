@@ -26,6 +26,7 @@ import {
   ActivityRequestRepository,
   ActivityRequestRepositoryImpl,
 } from './requests/repositories/activity-request.repository';
+import { MailModule } from '../system/mail/mail.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import {
     ]),
     MasterDataServiceModule,
     AccountServiceModule,
+    MailModule,
   ],
   controllers: [
     ActivityController,
