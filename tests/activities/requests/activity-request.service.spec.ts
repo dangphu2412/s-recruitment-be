@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from '../../../src/account-service/management/interfaces/user-service.interface';
 
 import { InternalFile } from '../../../src/system/file/file.interceptor';
-import { ActivityRequestServiceImpl } from '../../../src/activities/requests/activity-request.service';
-import { ActivityRequestRepository } from '../../../src/activities/requests/repositories/activity-request.repository';
+import { ActivityRequestServiceImpl } from '../../../src/activities/requests/use-cases/activity-request.service';
+import { ActivityRequestRepository } from '../../../src/activities/requests/infras/repositories/activity-request.repository';
 import { ActivityServiceToken } from '../../../src/activities/managements/interfaces/activity.service';
 import {
   ApprovalRequestAction,
@@ -15,6 +15,7 @@ import { User } from '../../../src/system/database/entities/user.entity';
 import { read, utils } from 'xlsx';
 import { MAIL_SERVICE_TOKEN } from '../../../src/system/mail/mail.interface';
 import { InsertResult } from 'typeorm';
+import { ActivityRequestAggregateRepository } from '../../../src/activities/requests/domain/repositories/activity-request-aggregate.repository';
 
 jest.mock('react-dom/server');
 jest.mock('typeorm-transactional', () => ({
@@ -26,11 +27,14 @@ jest.mock('xlsx', () => ({
     sheet_to_json: jest.fn(),
   },
 }));
-jest.mock('../../../src/activities/requests/assigned-request-email-template');
+jest.mock(
+  '../../../src/activities/requests/use-cases/assigned-request-email-template',
+);
 
 describe('ActivityRequestServiceImpl', () => {
   let service: ActivityRequestServiceImpl;
   let activityRequestRepository: ActivityRequestRepository;
+  let activityRequestAggregateRepository: ActivityRequestAggregateRepository;
   let activityService: any;
   let userService: UserService;
 
@@ -69,11 +73,20 @@ describe('ActivityRequestServiceImpl', () => {
             sendMail: jest.fn(),
           },
         },
+        {
+          provide: ActivityRequestAggregateRepository,
+          useValue: {
+            createNew: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get(ActivityRequestServiceImpl);
     activityRequestRepository = module.get(ActivityRequestRepository);
+    activityRequestAggregateRepository = module.get(
+      ActivityRequestAggregateRepository,
+    );
     activityService = module.get(ActivityServiceToken);
     userService = module.get(UserService);
   });
@@ -104,7 +117,7 @@ describe('ActivityRequestServiceImpl', () => {
       await service.createRequestActivity(dto as any);
 
       expect(userService.findUsers).toHaveBeenCalled();
-      expect(activityRequestRepository.insert).toHaveBeenCalledWith(
+      expect(activityRequestAggregateRepository.createNew).toHaveBeenCalledWith(
         expect.objectContaining({
           authorId: 'u1',
           assigneeId: 'hr-1',

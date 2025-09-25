@@ -100,7 +100,7 @@ describe('UserController', () => {
   });
 
   describe('updateUser', () => {
-    it('should call service.updateUser with dto + id', async () => {
+    it('should call service.updateUser with dtos + id', async () => {
       const dto = { fullName: 'Updated' } as UpdateUserRequest;
       await controller.updateUser('u1', dto);
       expect(userService.updateUser).toHaveBeenCalledWith({
@@ -111,7 +111,7 @@ describe('UserController', () => {
   });
 
   describe('updateMyProfile', () => {
-    it('should call service.updateMyProfile with dto + current user id', async () => {
+    it('should call service.updateMyProfile with dtos + current user id', async () => {
       const dto = { fullName: 'Me' } as UpdateMyProfileRequest;
       await controller.updateMyProfile('u1', dto);
       expect(userService.updateMyProfile).toHaveBeenCalledWith({
@@ -138,7 +138,7 @@ describe('UserController', () => {
   });
 
   describe('createUsersByFile', () => {
-    it('should call service.createUsersByFile with dto+file', async () => {
+    it('should call service.createUsersByFile with dtos+file', async () => {
       const dto = { some: 'meta' } as unknown as FileCreateUsersDto;
       const file = { buffer: Buffer.from('fake') } as any;
       await controller.createUsersByFile(dto, file);

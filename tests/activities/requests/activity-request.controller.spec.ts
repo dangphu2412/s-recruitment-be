@@ -1,18 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ActivityRequestController } from '../../../src/activities/requests/activity-request.controller';
+import { ActivityRequestController } from '../../../src/activities/requests/presentation/activity-request.controller';
 import {
   ActivityRequestService,
   ActivityRequestServiceToken,
-} from '../../../src/activities/requests/interfaces/activity-request.service';
-import { FindRequestedActivityRequestDTO } from '../../../src/activities/requests/dtos/presentation/find-requested-activity-request.dto';
+} from '../../../src/activities/requests/use-cases/interfaces/activity-request.service';
+import { FindRequestedActivityRequestDTO } from '../../../src/activities/requests/presentation/presentation/find-requested-activity-request.dto';
 import { JwtPayload } from '../../../src/account-service/registration/jwt-payload';
-import { CreateActivityRequestRequest } from '../../../src/activities/requests/dtos/presentation/create-activity-request.request';
-import { UpdateMyActivityRequestRequest } from '../../../src/activities/requests/dtos/presentation/update-my-activity.request';
-import { UpdateApprovalActivityRequestRequest } from '../../../src/activities/requests/dtos/presentation/update-approval-activity-request.request';
-import { FindRequestedActivitiesResponseDTO } from '../../../src/activities/requests/dtos/core/find-requested-acitivities.dto';
-import { FindRequestedMyActivityResponseDTO } from '../../../src/activities/requests/dtos/core/find-requested-my-acitivity.dto';
+import { CreateActivityRequestRequest } from '../../../src/activities/requests/presentation/presentation/create-activity-request.request';
+import { UpdateMyActivityRequestRequest } from '../../../src/activities/requests/presentation/presentation/update-my-activity.request';
+import { UpdateApprovalActivityRequestRequest } from '../../../src/activities/requests/presentation/presentation/update-approval-activity-request.request';
+import { FindRequestedActivitiesResponseDTO } from '../../../src/activities/requests/use-cases/dtos/find-requested-acitivities.dto';
+import { FindRequestedMyActivityResponseDTO } from '../../../src/activities/requests/use-cases/dtos/find-requested-my-acitivity.dto';
 import { ApprovalRequestAction } from '../../../src/activities/shared/request-activity-status.enum';
-import { FindRequestedMyActivitiesResponseDTO } from '../../../src/activities/requests/dtos/core/find-my-requested-acitivities.dto';
+import { FindRequestedMyActivitiesResponseDTO } from '../../../src/activities/requests/use-cases/dtos/find-my-requested-acitivities.dto';
 
 describe('ActivityRequestController', () => {
   let controller: ActivityRequestController;

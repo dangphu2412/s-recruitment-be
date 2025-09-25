@@ -1,49 +1,47 @@
-import {
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { ActivityRequestService } from './interfaces/activity-request.service';
-import { ActivityRequest } from '../../system/database/entities/activity-request.entity';
+import { ActivityRequest } from '../../../system/database/entities/activity-request.entity';
 import {
   ApprovalRequestAction,
   RequestActivityStatus,
   RequestTypes,
-} from '../shared/request-activity-status.enum';
-import { CreateActivityRequestDTO } from './dtos/core/create-activity-request.dto';
-import { OffsetPaginationResponse } from '../../system/pagination';
+} from '../../shared/request-activity-status.enum';
+import { CreateActivityRequestDTO } from './dtos/create-activity-request.dto';
+import { OffsetPaginationResponse } from '../../../system/pagination';
 import {
   FindRequestedActivitiesResponseDTO,
   FindRequestedActivityQueryDTO,
-} from './dtos/core/find-requested-acitivities.dto';
-import { UpdateApprovalActivityRequestDTO } from './dtos/core/update-approval-activity-request.dto';
+} from './dtos/find-requested-acitivities.dto';
+import { UpdateApprovalActivityRequestDTO } from './dtos/update-approval-activity-request.dto';
 import { Transactional } from 'typeorm-transactional';
 import {
   ActivityService,
   ActivityServiceToken,
-} from '../managements/interfaces/activity.service';
-import { FindRequestedMyActivityResponseDTO } from './dtos/core/find-requested-my-acitivity.dto';
-import { UpdateMyActivityRequestDTO } from './dtos/core/update-my-activity-request.dto';
+} from '../../managements/interfaces/activity.service';
+import { FindRequestedMyActivityResponseDTO } from './dtos/find-requested-my-acitivity.dto';
+import { UpdateMyActivityRequestDTO } from './dtos/update-my-activity-request.dto';
 import {
   FileActivityRequestDTO,
   FileActivityRequestRow,
-} from './dtos/core/file-create-activity-request.dto';
+} from './dtos/file-create-activity-request.dto';
 import { read, utils } from 'xlsx';
-import { UserService } from '../../account-service/management/interfaces/user-service.interface';
+import { UserService } from '../../../account-service/management/interfaces/user-service.interface';
 import { keyBy } from 'lodash';
 import {
   FindMyRequestedActivityQueryDTO,
   FindRequestedMyActivitiesResponseDTO,
-} from './dtos/core/find-my-requested-acitivities.dto';
-import { SystemRoles } from '../../account-service/authorization/access-definition.constant';
-import { ActivityRequestRepository } from './repositories/activity-request.repository';
+} from './dtos/find-my-requested-acitivities.dto';
+import { SystemRoles } from '../../../account-service/authorization/access-definition.constant';
+import { ActivityRequestRepository } from '../infras/repositories/activity-request.repository';
 import {
   MAIL_SERVICE_TOKEN,
   MailService,
-} from '../../system/mail/mail.interface';
+} from '../../../system/mail/mail.interface';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { AssignedRequestEmailTemplate } from './assigned-request-email-template';
+import { ActivityRequestAggregate } from '../domain/aggregates/activity-request.aggregate';
+import { ActivityRequestAggregateRepository } from '../domain/repositories/activity-request-aggregate.repository';
 
 type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
 
@@ -63,6 +61,8 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     private readonly userService: UserService,
     @Inject(MAIL_SERVICE_TOKEN)
     private readonly mailService: MailService,
+    @Inject(ActivityRequestAggregateRepository)
+    private readonly activityRequestAggregateRepository: ActivityRequestAggregateRepository,
   ) {}
 
   async createRequestActivityByFile({
@@ -191,15 +191,18 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
   }
 
   async createRequestActivity(dto: CreateActivityRequestDTO): Promise<void> {
-    const entity = this.mapRequestActivityToEntity(dto);
-
     const assignee = await this.getAssignee();
-    entity.assigneeId = assignee.id;
+    const newActivityRequest = ActivityRequestAggregate.createNew({
+      ...dto,
+      assigneeId: assignee.id,
+    });
+    const id =
+      await this.activityRequestAggregateRepository.createNew(
+        newActivityRequest,
+      );
 
-    const { identifiers } = await this.activityRequestRepository.insert(entity);
-    const detailRequest = await this.activityRequestRepository.findDetailById(
-      identifiers[0].id,
-    );
+    const detailRequest =
+      await this.activityRequestRepository.findDetailById(id);
 
     await this.mailService.sendMail({
       to: [assignee.email],
@@ -210,47 +213,6 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
         }),
       ),
     });
-  }
-
-  private mapRequestActivityToEntity(
-    dto: CreateActivityRequestDTO,
-  ): ActivityRequest {
-    if (dto.requestType === RequestTypes.WORKING) {
-      const entity = new ActivityRequest();
-      entity.authorId = dto.authorId;
-      entity.requestType = dto.requestType;
-      entity.timeOfDayId = dto.timeOfDayId;
-      entity.dayOfWeekId = dto.dayOfWeekId;
-      entity.approvalStatus = RequestActivityStatus.PENDING;
-      return entity;
-    }
-
-    if (dto.requestType === RequestTypes.LATE) {
-      const entity = new ActivityRequest();
-      entity.authorId = dto.authorId;
-      entity.requestType = dto.requestType;
-      entity.timeOfDayId = dto.timeOfDayId;
-      entity.requestChangeDay = dto.requestChangeDay;
-      entity.reason = dto.reason;
-      entity.approvalStatus = RequestActivityStatus.PENDING;
-
-      return entity;
-    }
-
-    if (dto.requestType === RequestTypes.ABSENCE) {
-      const entity = new ActivityRequest();
-      entity.authorId = dto.authorId;
-      entity.requestType = dto.requestType;
-      entity.timeOfDayId = dto.timeOfDayId;
-      entity.requestChangeDay = dto.requestChangeDay;
-      entity.compensatoryDay = dto.compensatoryDay;
-      entity.reason = dto.reason;
-      entity.approvalStatus = RequestActivityStatus.PENDING;
-
-      return entity;
-    }
-
-    throw new InternalServerErrorException('Invalid request type');
   }
 
   async getAssignee() {

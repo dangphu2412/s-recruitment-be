@@ -9,7 +9,7 @@ import {
   Section,
   Text,
 } from '@react-email/components';
-import { ActivityRequest } from '../../system/database/entities/activity-request.entity';
+import { ActivityRequest } from '../../../system/database/entities/activity-request.entity';
 import { format } from 'date-fns';
 
 type AssignedRequestEmailProps = {

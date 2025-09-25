@@ -8,9 +8,21 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
-import { RequestActivityStatus } from '../../../activities/shared/request-activity-status.enum';
 import { TimeOfDay } from './time-of-day.entity';
 import { DayOfWeek } from './day-of-week.entity';
+
+export enum RequestActivityStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  REVISE = 'REVISE',
+}
+
+export enum RequestTypes {
+  WORKING = 'Working',
+  LATE = 'Late',
+  ABSENCE = 'Absence',
+}
 
 @Entity({
   name: 'activity_requests',
