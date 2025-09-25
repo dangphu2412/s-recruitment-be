@@ -13,26 +13,20 @@ import {
 import { ActivityRequest } from '../../../src/system/database/entities/activity-request.entity';
 import { User } from '../../../src/system/database/entities/user.entity';
 import { read, utils } from 'xlsx';
+import { MAIL_SERVICE_TOKEN } from '../../../src/system/mail/mail.interface';
+import { InsertResult } from 'typeorm';
 
+jest.mock('react-dom/server');
 jest.mock('typeorm-transactional', () => ({
-  Transactional: () => {
-    return function (
-      target: unknown,
-      propertyKey: string,
-      descriptor: PropertyDescriptor,
-    ) {
-      // leave the method unchanged → just return descriptor
-      return descriptor;
-    };
-  },
+  Transactional: () => () => {},
 }));
-
 jest.mock('xlsx', () => ({
   read: jest.fn(),
   utils: {
     sheet_to_json: jest.fn(),
   },
 }));
+jest.mock('../../../src/activities/requests/assigned-request-email-template');
 
 describe('ActivityRequestServiceImpl', () => {
   let service: ActivityRequestServiceImpl;
@@ -69,6 +63,12 @@ describe('ActivityRequestServiceImpl', () => {
             findUsersByFullNames: jest.fn(),
           },
         },
+        {
+          provide: MAIL_SERVICE_TOKEN,
+          useValue: {
+            sendMail: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -91,8 +91,15 @@ describe('ActivityRequestServiceImpl', () => {
         items: [{ id: 'hr-1' }],
       } as any);
       jest
-        .spyOn(activityRequestRepository, 'insert')
-        .mockResolvedValue(undefined);
+        .spyOn(activityRequestRepository, 'findDetailById')
+        .mockResolvedValue({
+          id: 1,
+        } as ActivityRequest);
+      jest.spyOn(activityRequestRepository, 'insert').mockResolvedValue({
+        identifiers: [{ id: 1 }],
+        generatedMaps: [],
+        raw: '',
+      } as InsertResult);
 
       await service.createRequestActivity(dto as any);
 
