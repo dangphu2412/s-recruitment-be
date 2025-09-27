@@ -1,10 +1,18 @@
-import { AggregateRoot } from '../../../../system/data-domain-driven/aggregate';
+import { AggregateRoot } from '../../../../system/data-domain-driven/aggregate.interface';
 import {
   RequestActivityStatus,
   RequestTypes,
 } from '../../../../system/database/entities/activity-request.entity';
 import { NewRequestInvalidInputException } from '../exceptions/new-request.exception';
 import { InvalidStateError } from '../../../../system/data-domain-driven/invalid-state.exception';
+import { DomainEvent } from '../../../../system/data-domain-driven/domain-event.interface';
+import {
+  ActivityRequestApprovedEvent,
+  ActivityRequestRejectedEvent,
+  ActivityRequestRevisedEvent,
+  AuthorUpdateActivityRequestEvent,
+} from '../events/activiy-request.event';
+import { ApprovalRequestAction } from '../../../shared/request-activity-status.enum';
 
 type NewActivityRequestAggregate = {
   authorId: string;
@@ -15,6 +23,18 @@ type NewActivityRequestAggregate = {
   compensatoryDay?: string;
   reason?: string;
   assigneeId: string;
+};
+
+type UpdateApprovalStatusActivityRequestAggregate = {
+  action: ApprovalRequestAction;
+  approverId: string;
+  rejectReason?: string;
+  reviseNote?: string;
+};
+
+type AuthorUpdatesActivityRequestAggregate = {
+  timeOfDayId: string;
+  dayOfWeekId?: string;
 };
 
 export class ActivityRequestAggregate implements AggregateRoot<number> {
@@ -33,6 +53,21 @@ export class ActivityRequestAggregate implements AggregateRoot<number> {
   authorId: string;
   assigneeId: string;
   approverId: string | null;
+
+  private domainEvents: DomainEvent<number>[] = [];
+
+  // Domain events management
+  getDomainEvents(): DomainEvent<number>[] {
+    return [...this.domainEvents];
+  }
+
+  clearDomainEvents(): void {
+    this.domainEvents = [];
+  }
+
+  private addDomainEvent(event: DomainEvent<number>): void {
+    this.domainEvents.push(event);
+  }
 
   static createNew(
     newActivityRequestAggregate: NewActivityRequestAggregate,
@@ -102,5 +137,155 @@ export class ActivityRequestAggregate implements AggregateRoot<number> {
         break;
       default:
     }
+  }
+
+  updateApprovalStatus({
+    approverId,
+    reviseNote,
+    rejectReason,
+    action,
+  }: UpdateApprovalStatusActivityRequestAggregate): void {
+    const nextStatus = this.getNextApprovalStatusByAction(action);
+
+    if (!nextStatus) {
+      throw new InvalidStateError(
+        `Cannot transition from ${this.approvalStatus} with action ${action}`,
+      );
+    }
+
+    this.approvalStatus = nextStatus;
+    this.updatedAt = new Date();
+
+    switch (action) {
+      case ApprovalRequestAction.APPROVE:
+        this.approverId = approverId;
+        this.addDomainEvent(
+          new ActivityRequestApprovedEvent(
+            this.id,
+            {
+              authorId: this.authorId,
+              requestType: this.requestType,
+              timeOfDayId: this.timeOfDayId,
+              dayOfWeekId: this.dayOfWeekId,
+              requestChangeDay: this.requestChangeDay,
+              compensatoryDay: this.compensatoryDay,
+            },
+            approverId,
+          ),
+        );
+        break;
+
+      case ApprovalRequestAction.REJECT:
+        if (!rejectReason) {
+          throw new InvalidStateError(
+            'Reject reason is required for rejection',
+          );
+        }
+        this.rejectReason = rejectReason;
+        this.addDomainEvent(
+          new ActivityRequestRejectedEvent(
+            this.id,
+            this.authorId,
+            rejectReason,
+          ),
+        );
+        break;
+
+      case ApprovalRequestAction.REVISE:
+        if (!reviseNote) {
+          throw new InvalidStateError('Revise note is required for revision');
+        }
+        this.reviseNote = reviseNote;
+        this.addDomainEvent(
+          new ActivityRequestRevisedEvent(this.id, this.authorId, reviseNote),
+        );
+        break;
+    }
+  }
+
+  private getNextApprovalStatusByAction(
+    action: ApprovalRequestAction,
+  ): RequestActivityStatus | null {
+    const currentStatus: RequestActivityStatus = this.approvalStatus;
+    const transitions = {
+      [RequestActivityStatus.PENDING]: {
+        [ApprovalRequestAction.APPROVE]: {
+          nextState: RequestActivityStatus.APPROVED,
+        },
+        [ApprovalRequestAction.REJECT]: {
+          nextState: RequestActivityStatus.REJECTED,
+        },
+        [ApprovalRequestAction.REVISE]: {
+          nextState: RequestActivityStatus.REVISE,
+        },
+      },
+      [RequestActivityStatus.REJECTED]: {
+        [ApprovalRequestAction.REVISE]: {
+          nextState: RequestActivityStatus.REVISE,
+        },
+      },
+      [RequestActivityStatus.REVISE]: {
+        [ApprovalRequestAction.AUTHOR_UPDATE]: {
+          nextState: RequestActivityStatus.PENDING,
+        },
+      },
+    };
+
+    const transition = transitions[currentStatus];
+
+    if (!transition) {
+      return null;
+    }
+
+    if (!transition[action]) {
+      return null;
+    }
+
+    return transition[action].nextState;
+  }
+
+  needsActivityCreation(): boolean {
+    return (
+      this.approvalStatus === RequestActivityStatus.APPROVED &&
+      [RequestTypes.WORKING, RequestTypes.LATE, RequestTypes.ABSENCE].includes(
+        this.requestType,
+      )
+    );
+  }
+
+  updateByAuthor({
+    dayOfWeekId,
+    timeOfDayId,
+  }: AuthorUpdatesActivityRequestAggregate) {
+    if (RequestActivityStatus.REVISE !== this.approvalStatus) {
+      throw new Error('Request must be in revise status');
+    }
+
+    const nextStatus = this.getNextApprovalStatusByAction(
+      ApprovalRequestAction.AUTHOR_UPDATE,
+    );
+
+    if (!nextStatus) {
+      throw new InvalidStateError(
+        `Cannot transition from ${this.approvalStatus} with action ${ApprovalRequestAction.AUTHOR_UPDATE}`,
+      );
+    }
+
+    this.approvalStatus = nextStatus;
+    this.updatedAt = new Date();
+    this.timeOfDayId = timeOfDayId;
+
+    if (dayOfWeekId) {
+      this.dayOfWeekId = dayOfWeekId;
+    }
+
+    this.addDomainEvent(
+      new AuthorUpdateActivityRequestEvent(
+        this.id,
+        this.authorId,
+        this.timeOfDayId,
+        this.dayOfWeekId,
+      ),
+    );
   }
 }

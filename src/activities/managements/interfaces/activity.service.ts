@@ -9,5 +9,5 @@ export const ActivityServiceToken = createProviderToken('ActivityService');
 
 export interface ActivityService {
   findActivities(dto: FindActivitiesDTO): Promise<FindActivitiesResponseDTO>;
-  createActivity(dto: CreateActivityDTO): Promise<void>;
+  createActivities(dto: CreateActivityDTO[]): Promise<void>;
 }

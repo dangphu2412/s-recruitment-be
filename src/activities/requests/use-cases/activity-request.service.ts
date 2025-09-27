@@ -1,9 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { In } from 'typeorm';
 import { ActivityRequestService } from './interfaces/activity-request.service';
 import { ActivityRequest } from '../../../system/database/entities/activity-request.entity';
 import {
-  ApprovalRequestAction,
   RequestActivityStatus,
   RequestTypes,
 } from '../../shared/request-activity-status.enum';
@@ -32,6 +30,9 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { AssignedRequestEmailTemplate } from './assigned-request-email-template';
 import { ActivityRequestAggregate } from '../domain/aggregates/activity-request.aggregate';
 import { ActivityRequestAggregateRepository } from '../domain/repositories/activity-request-aggregate.repository';
+import { ActivityRequestApprovedEvent } from '../domain/events/activiy-request.event';
+import { CreateActivityDTO } from '../../managements/dtos/core/create-activity.dto';
+import { BusinessException } from '../../../system/exception/exception.service';
 
 type ActivitySheetRequest = { dayOfWeekId: number; timeOfDayId: string };
 
@@ -169,112 +170,79 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
     return items[Math.floor(Math.random() * items.length)];
   }
 
-  /**
-   * TODO: Batch update instead of single update
-   */
   @Transactional()
   async updateApprovalRequestActivity(
     dto: UpdateApprovalActivityRequestDTO,
   ): Promise<void> {
     const { ids, action, rejectReason, reviseNote } = dto;
 
-    const activityRequests = await this.activityRequestRepository.findBy({
-      id: In(ids),
+    const activityRequestAggregates =
+      await this.activityRequestAggregateRepository.findByIds(ids);
+
+    if (!activityRequestAggregates.length) {
+      return;
+    }
+
+    activityRequestAggregates.forEach((aggregate) => {
+      aggregate.updateApprovalStatus({
+        approverId: dto.authorId,
+        action,
+        reviseNote,
+        rejectReason,
+      });
     });
 
-    if (!activityRequests.length) {
-      throw new Error('Activity request not found');
-    }
-
-    await Promise.all(
-      activityRequests.map(async (activityRequest) => {
-        const nextStatus = this.getNextState(
-          activityRequest.approvalStatus,
-          action,
-        );
-
-        if (!nextStatus) {
-          return;
-        }
-
-        await this.activityRequestRepository.update(activityRequest.id, {
-          approvalStatus: nextStatus,
-          ...(rejectReason ? { rejectReason } : {}),
-          ...(reviseNote ? { reviseNote } : {}),
-        });
-
-        if (RequestActivityStatus.APPROVED === nextStatus) {
-          await this.activityService.createActivity({
-            authorId: activityRequest.authorId,
-            requestType: activityRequest.requestType,
-            timeOfDayId: activityRequest.timeOfDayId,
-            dayOfWeekId: activityRequest.dayOfWeekId,
-            requestChangeDay: activityRequest.requestChangeDay,
-            compensatoryDay: activityRequest.compensatoryDay,
-          });
-          await this.activityRequestRepository.update(activityRequest.id, {
-            approverId: dto.authorId,
-          });
-        }
-      }),
+    await this.activityRequestAggregateRepository.updateMany(
+      activityRequestAggregates,
     );
-  }
 
-  private getNextState(
-    currentStatus: RequestActivityStatus,
-    action: ApprovalRequestAction,
-  ): RequestActivityStatus | null {
-    const transitions = {
-      [RequestActivityStatus.PENDING]: {
-        [ApprovalRequestAction.APPROVE]: {
-          nextState: RequestActivityStatus.APPROVED,
-        },
-        [ApprovalRequestAction.REJECT]: {
-          nextState: RequestActivityStatus.REJECTED,
-        },
-        [ApprovalRequestAction.REVISE]: {
-          nextState: RequestActivityStatus.REVISE,
-        },
-      },
-      [RequestActivityStatus.REJECTED]: {
-        [ApprovalRequestAction.REVISE]: {
-          nextState: RequestActivityStatus.REVISE,
-        },
-      },
-    };
+    const newActivities: CreateActivityDTO[] = [];
 
-    const transition = transitions[currentStatus];
+    activityRequestAggregates.forEach((aggregate) => {
+      const domainEvents = aggregate.getDomainEvents();
 
-    if (!transition) {
-      return null;
+      domainEvents.forEach((domainEvent) => {
+        if (domainEvent instanceof ActivityRequestApprovedEvent) {
+          // Create activity when request is approved
+          if (aggregate.needsActivityCreation()) {
+            newActivities.push({
+              authorId: domainEvent.activityData.authorId,
+              requestType: domainEvent.activityData.requestType,
+              timeOfDayId: domainEvent.activityData.timeOfDayId,
+              dayOfWeekId: domainEvent.activityData.dayOfWeekId,
+              requestChangeDay: domainEvent.activityData.requestChangeDay,
+              compensatoryDay: domainEvent.activityData.compensatoryDay,
+            });
+          }
+        }
+      });
+
+      aggregate.clearDomainEvents();
+    });
+
+    if (newActivities.length) {
+      await this.activityService.createActivities(newActivities);
     }
-
-    if (!transition[action]) {
-      return null;
-    }
-
-    return transition[action].nextState;
   }
 
   async updateMyRequestActivity(dto: UpdateMyActivityRequestDTO) {
-    const request = await this.activityRequestRepository.findOne({
-      where: {
-        id: dto.id,
-        authorId: dto.authorId,
-      },
-    });
+    const activityRequestAggregate =
+      await this.activityRequestAggregateRepository.findMyUpdateRequestById(
+        dto.id,
+        dto.authorId,
+      );
 
-    if (!request) {
-      throw new Error('Request not found');
+    if (!activityRequestAggregate) {
+      throw new BusinessException({
+        code: 'ACTIVITY_REQUEST_NOT_FOUND',
+        message: 'Request not found',
+      });
     }
 
-    if (RequestActivityStatus.REVISE !== request.approvalStatus) {
-      throw new Error('Request is not in revise status');
-    }
+    activityRequestAggregate.updateByAuthor(dto);
 
-    await this.activityRequestRepository.update(dto.id, {
-      ...dto,
-      approvalStatus: RequestActivityStatus.PENDING,
-    });
+    await this.activityRequestAggregateRepository.updateMany([
+      activityRequestAggregate,
+    ]);
   }
 }

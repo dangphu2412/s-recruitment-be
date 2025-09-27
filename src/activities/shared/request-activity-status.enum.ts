@@ -9,6 +9,7 @@ export enum ApprovalRequestAction {
   REVISE = 'REVISE',
   APPROVE = 'APPROVE',
   REJECT = 'REJECT',
+  AUTHOR_UPDATE = 'AUTHOR_UPDATE',
 }
 
 export enum RequestTypes {

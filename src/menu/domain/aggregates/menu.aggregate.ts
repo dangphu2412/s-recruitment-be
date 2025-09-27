@@ -1,4 +1,4 @@
-import { AggregateRoot } from '../../../system/data-domain-driven/aggregate';
+import { AggregateRoot } from '../../../system/data-domain-driven/aggregate.interface';
 
 export class MenuAggregate implements AggregateRoot {
   id: string;

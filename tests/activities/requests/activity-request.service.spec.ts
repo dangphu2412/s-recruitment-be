@@ -16,6 +16,7 @@ import { read, utils } from 'xlsx';
 import { MAIL_SERVICE_TOKEN } from '../../../src/system/mail/mail.interface';
 import { InsertResult } from 'typeorm';
 import { ActivityRequestAggregateRepository } from '../../../src/activities/requests/domain/repositories/activity-request-aggregate.repository';
+import { ActivityRequestAggregate } from '../../../src/activities/requests/domain/aggregates/activity-request.aggregate';
 
 jest.mock('react-dom/server');
 jest.mock('typeorm-transactional', () => ({
@@ -57,7 +58,7 @@ describe('ActivityRequestServiceImpl', () => {
         {
           provide: ActivityServiceToken,
           useValue: {
-            createActivity: jest.fn(),
+            createActivities: jest.fn(),
           },
         },
         {
@@ -77,6 +78,8 @@ describe('ActivityRequestServiceImpl', () => {
           provide: ActivityRequestAggregateRepository,
           useValue: {
             createNew: jest.fn(),
+            findByIds: jest.fn(),
+            updateMany: jest.fn(),
           },
         },
       ],
@@ -129,24 +132,22 @@ describe('ActivityRequestServiceImpl', () => {
 
   describe('updateApprovalRequestActivity', () => {
     it('should approve and create activity', async () => {
-      const requests = [
-        {
-          id: 1,
-          authorId: 'u1',
-          approvalStatus: RequestActivityStatus.PENDING,
-          requestType: RequestTypes.WORKING,
-          timeOfDayId: 'MORN',
-          dayOfWeekId: '1',
-        },
-      ] as ActivityRequest[];
+      const aggregate = new ActivityRequestAggregate();
+      aggregate.id = 1;
+      aggregate.authorId = 'u1';
+      aggregate.approvalStatus = RequestActivityStatus.PENDING;
+      aggregate.requestType = RequestTypes.WORKING;
+      aggregate.timeOfDayId = 'MORN';
+      aggregate.dayOfWeekId = '1';
+      const requests = [aggregate];
       jest
-        .spyOn(activityRequestRepository, 'findBy')
+        .spyOn(activityRequestAggregateRepository, 'findByIds')
         .mockResolvedValue(requests);
       jest
-        .spyOn(activityRequestRepository, 'update')
+        .spyOn(activityRequestAggregateRepository, 'updateMany')
         .mockResolvedValue(undefined);
       jest
-        .spyOn(activityService, 'createActivity')
+        .spyOn(activityService, 'createActivities')
         .mockResolvedValue(undefined);
 
       await service.updateApprovalRequestActivity({
@@ -155,25 +156,35 @@ describe('ActivityRequestServiceImpl', () => {
         authorId: 'approver-1',
       } as any);
 
-      expect(activityService.createActivity).toHaveBeenCalled();
-      expect(activityRequestRepository.update).toHaveBeenCalledWith(
-        1,
+      expect(activityService.createActivities).toHaveBeenCalled();
+      expect(
+        activityRequestAggregateRepository.updateMany,
+      ).toHaveBeenCalledWith([
         expect.objectContaining({
-          approvalStatus: RequestActivityStatus.APPROVED,
+          approvalStatus: 'APPROVED',
+          approverId: 'approver-1',
+          authorId: 'u1',
+          dayOfWeekId: '1',
+          domainEvents: [],
+          id: 1,
+          requestType: 'Working',
+          timeOfDayId: 'MORN',
         }),
-      );
+      ]);
     });
 
-    it('should throw if no requests found', async () => {
-      jest.spyOn(activityRequestRepository, 'findBy').mockResolvedValue([]);
+    it('should early stop if no requests found', async () => {
+      jest
+        .spyOn(activityRequestAggregateRepository, 'findByIds')
+        .mockResolvedValue([]);
 
-      await expect(
-        service.updateApprovalRequestActivity({
-          ids: [99],
-          action: ApprovalRequestAction.REJECT,
-          authorId: 'hr',
-        } as any),
-      ).rejects.toThrow('Activity request not found');
+      await service.updateApprovalRequestActivity({
+        ids: [99],
+        action: ApprovalRequestAction.REJECT,
+        authorId: 'hr',
+      });
+
+      expect(activityRequestRepository.update).not.toHaveBeenCalledWith();
     });
   });
 

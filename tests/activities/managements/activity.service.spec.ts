@@ -61,9 +61,9 @@ describe(ActivityServiceImpl.name, () => {
         dayOfWeekId: 'test',
       };
 
-      await activityService.createActivity(dto);
+      await activityService.createActivities([dto]);
 
-      expect(activityRepository.insert).toHaveBeenCalledWith(dto);
+      expect(activityRepository.insert).toHaveBeenCalledWith([dto]);
     });
   });
 });
