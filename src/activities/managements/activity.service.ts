@@ -15,7 +15,7 @@ export class ActivityServiceImpl implements ActivityService {
     return this.activityRepository.findActivities(dto);
   }
 
-  async createActivity(dto: CreateActivityDTO): Promise<void> {
+  async createActivities(dto: CreateActivityDTO[]): Promise<void> {
     await this.activityRepository.insert(dto);
   }
 }
