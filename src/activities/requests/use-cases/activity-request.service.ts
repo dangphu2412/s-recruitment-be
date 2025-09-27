@@ -8,18 +8,12 @@ import {
   RequestTypes,
 } from '../../shared/request-activity-status.enum';
 import { CreateActivityRequestDTO } from './dtos/create-activity-request.dto';
-import { OffsetPaginationResponse } from '../../../system/pagination';
-import {
-  FindRequestedActivitiesResponseDTO,
-  FindRequestedActivityQueryDTO,
-} from './dtos/find-requested-acitivities.dto';
 import { UpdateApprovalActivityRequestDTO } from './dtos/update-approval-activity-request.dto';
 import { Transactional } from 'typeorm-transactional';
 import {
   ActivityService,
   ActivityServiceToken,
 } from '../../managements/interfaces/activity.service';
-import { FindRequestedMyActivityResponseDTO } from './dtos/find-requested-my-acitivity.dto';
 import { UpdateMyActivityRequestDTO } from './dtos/update-my-activity-request.dto';
 import {
   FileActivityRequestDTO,
@@ -28,10 +22,6 @@ import {
 import { read, utils } from 'xlsx';
 import { UserService } from '../../../account-service/management/interfaces/user-service.interface';
 import { keyBy } from 'lodash';
-import {
-  FindMyRequestedActivityQueryDTO,
-  FindRequestedMyActivitiesResponseDTO,
-} from './dtos/find-my-requested-acitivities.dto';
 import { SystemRoles } from '../../../account-service/authorization/access-definition.constant';
 import { ActivityRequestRepository } from '../infras/repositories/activity-request.repository';
 import {
@@ -141,53 +131,6 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       }
     }
     return user;
-  }
-
-  async findMyRequestedActivities({
-    userId,
-    status,
-  }: FindMyRequestedActivityQueryDTO): Promise<FindRequestedMyActivitiesResponseDTO> {
-    const items = await this.activityRequestRepository.find({
-      where: {
-        authorId: userId,
-        ...(status ? { approvalStatus: In(status) } : {}),
-      },
-      relations: ['author', 'dayOfWeek', 'timeOfDay'],
-    });
-
-    return OffsetPaginationResponse.of({
-      items,
-      totalRecords: items.length,
-      query: {
-        page: 1,
-        size: 10,
-      },
-    });
-  }
-
-  async findRequestedActivities(
-    dto: FindRequestedActivityQueryDTO,
-  ): Promise<FindRequestedActivitiesResponseDTO> {
-    return this.activityRequestRepository.findOverviewRequests(dto);
-  }
-
-  findMyRequestedActivity(
-    id: number,
-    userId: string,
-  ): Promise<FindRequestedMyActivityResponseDTO> {
-    return this.activityRequestRepository.findOne({
-      where: {
-        id,
-        authorId: userId,
-      },
-      relations: ['author', 'dayOfWeek', 'timeOfDay'],
-    });
-  }
-
-  findRequestedActivity(
-    id: number,
-  ): Promise<FindRequestedMyActivityResponseDTO> {
-    return this.activityRequestRepository.findDetailById(id);
   }
 
   async createRequestActivity(dto: CreateActivityRequestDTO): Promise<void> {
