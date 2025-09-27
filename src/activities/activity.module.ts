@@ -3,7 +3,7 @@ import { ActivityRequest } from '../system/database/entities/activity-request.en
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActivityController } from './managements/activity.controller';
 import { ActivityRequestServiceImpl } from './requests/use-cases/activity-request.service';
-import { ActivityRequestServiceToken } from './requests/use-cases/interfaces/activity-request.service';
+import { ActivityRequestService } from './requests/use-cases/interfaces/activity-request.service';
 import { Activity } from '../system/database/entities/activity.entity';
 import { ActivityServiceImpl } from './managements/activity.service';
 import { ActivityServiceToken } from './managements/interfaces/activity.service';
@@ -29,6 +29,8 @@ import {
 import { MailModule } from '../system/mail/mail.module';
 import { ActivityRequestAggregateRepositoryImpl } from './requests/infras/repositories/activity-request-aggregate.repository';
 import { ActivityRequestAggregateRepository } from './requests/domain/repositories/activity-request-aggregate.repository';
+import { ActivityRequestQueryService } from './requests/use-cases/interfaces/activity-request-query.service';
+import { ActivityRequestQueryServiceImpl } from './requests/use-cases/activity-request-query.service';
 
 @Module({
   imports: [
@@ -50,8 +52,12 @@ import { ActivityRequestAggregateRepository } from './requests/domain/repositori
   ],
   providers: [
     {
-      provide: ActivityRequestServiceToken,
+      provide: ActivityRequestService,
       useClass: ActivityRequestServiceImpl,
+    },
+    {
+      provide: ActivityRequestQueryService,
+      useClass: ActivityRequestQueryServiceImpl,
     },
     {
       provide: ActivityServiceToken,
