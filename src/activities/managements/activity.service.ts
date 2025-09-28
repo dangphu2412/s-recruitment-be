@@ -6,6 +6,7 @@ import {
   FindActivitiesResponseDTO,
 } from './dtos/core/find-activities.dto';
 import { ActivityRepository } from './activity.repository';
+import { SearchMyActivitiesDTO } from './dtos/core/search-my-activities.dto';
 
 @Injectable()
 export class ActivityServiceImpl implements ActivityService {
@@ -17,5 +18,9 @@ export class ActivityServiceImpl implements ActivityService {
 
   async createActivities(dto: CreateActivityDTO[]): Promise<void> {
     await this.activityRepository.insert(dto);
+  }
+
+  searchMy(dto: SearchMyActivitiesDTO): Promise<FindActivitiesResponseDTO> {
+    return this.activityRepository.searchMy(dto);
   }
 }

@@ -23,6 +23,7 @@ type NewActivityRequestAggregate = {
   compensatoryDay?: string;
   reason?: string;
   assigneeId: string;
+  activityReferenceId?: string;
 };
 
 type UpdateApprovalStatusActivityRequestAggregate = {
@@ -53,6 +54,7 @@ export class ActivityRequestAggregate implements AggregateRoot<number> {
   authorId: string;
   assigneeId: string;
   approverId: string | null;
+  activityReferenceId: string | null;
 
   private domainEvents: DomainEvent<number>[] = [];
 
@@ -94,6 +96,11 @@ export class ActivityRequestAggregate implements AggregateRoot<number> {
       aggregate.reason = newActivityRequestAggregate.reason;
     }
 
+    if (newActivityRequestAggregate.activityReferenceId) {
+      aggregate.activityReferenceId =
+        newActivityRequestAggregate.activityReferenceId;
+    }
+
     aggregate.assigneeId = newActivityRequestAggregate.assigneeId;
     aggregate.approvalStatus = RequestActivityStatus.PENDING;
 
@@ -121,7 +128,8 @@ export class ActivityRequestAggregate implements AggregateRoot<number> {
         if (
           !aggregate.timeOfDayId ||
           !aggregate.requestChangeDay ||
-          !aggregate.reason
+          !aggregate.reason ||
+          !aggregate.activityReferenceId
         ) {
           throw new InvalidStateError('Missing info of late request');
         }
@@ -130,7 +138,8 @@ export class ActivityRequestAggregate implements AggregateRoot<number> {
         if (
           !aggregate.timeOfDayId ||
           !aggregate.requestChangeDay ||
-          !aggregate.compensatoryDay
+          !aggregate.compensatoryDay ||
+          !aggregate.activityReferenceId
         ) {
           throw new InvalidStateError('Missing info of absense request');
         }
