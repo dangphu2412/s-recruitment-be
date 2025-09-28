@@ -6,4 +6,5 @@ export type CreateActivityRequestDTO = {
   requestChangeDay?: string;
   compensatoryDay?: string;
   reason?: string;
+  activityReferenceId?: string;
 };

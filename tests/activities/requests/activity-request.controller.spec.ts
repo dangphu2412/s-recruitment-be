@@ -1,40 +1,42 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ActivityRequestController } from '../../../src/activities/requests/activity-request.controller';
-import {
-  ActivityRequestService,
-  ActivityRequestServiceToken,
-} from '../../../src/activities/requests/interfaces/activity-request.service';
-import { FindRequestedActivityRequestDTO } from '../../../src/activities/requests/dtos/presentation/find-requested-activity-request.dto';
+import { ActivityRequestController } from '../../../src/activities/requests/presentation/activity-request.controller';
+import { ActivityRequestService } from '../../../src/activities/requests/use-cases/interfaces/activity-request.service';
+import { FindRequestedActivityRequestDTO } from '../../../src/activities/requests/presentation/presentation/find-requested-activity-request.dto';
 import { JwtPayload } from '../../../src/account-service/registration/jwt-payload';
-import { CreateActivityRequestRequest } from '../../../src/activities/requests/dtos/presentation/create-activity-request.request';
-import { UpdateMyActivityRequestRequest } from '../../../src/activities/requests/dtos/presentation/update-my-activity.request';
-import { UpdateApprovalActivityRequestRequest } from '../../../src/activities/requests/dtos/presentation/update-approval-activity-request.request';
-import { FindRequestedActivitiesResponseDTO } from '../../../src/activities/requests/dtos/core/find-requested-acitivities.dto';
-import { FindRequestedMyActivityResponseDTO } from '../../../src/activities/requests/dtos/core/find-requested-my-acitivity.dto';
+import { CreateActivityRequestRequest } from '../../../src/activities/requests/presentation/presentation/create-activity-request.request';
+import { UpdateMyActivityRequestRequest } from '../../../src/activities/requests/presentation/presentation/update-my-activity.request';
+import { UpdateApprovalActivityRequestRequest } from '../../../src/activities/requests/presentation/presentation/update-approval-activity-request.request';
+import { FindRequestedActivitiesResponseDTO } from '../../../src/activities/requests/use-cases/dtos/find-requested-acitivities.dto';
+import { FindRequestedMyActivityResponseDTO } from '../../../src/activities/requests/use-cases/dtos/find-requested-my-acitivity.dto';
 import { ApprovalRequestAction } from '../../../src/activities/shared/request-activity-status.enum';
-import { FindRequestedMyActivitiesResponseDTO } from '../../../src/activities/requests/dtos/core/find-my-requested-acitivities.dto';
+import { FindRequestedMyActivitiesResponseDTO } from '../../../src/activities/requests/use-cases/dtos/find-my-requested-acitivities.dto';
+import { ActivityRequestQueryService } from '../../../src/activities/requests/use-cases/interfaces/activity-request-query.service';
 
 describe('ActivityRequestController', () => {
   let controller: ActivityRequestController;
-  let service: ActivityRequestService;
+  let activityRequestService: ActivityRequestService;
+  let activityRequestQueryService: ActivityRequestQueryService;
 
   beforeEach(async () => {
-    const serviceMock = {
-      findRequestedActivities: jest.fn(),
-      findRequestedActivity: jest.fn(),
-      findMyRequestedActivities: jest.fn(),
-      findMyRequestedActivity: jest.fn(),
-      createRequestActivity: jest.fn(),
-      updateMyRequestActivity: jest.fn(),
-      updateApprovalRequestActivity: jest.fn(),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ActivityRequestController],
       providers: [
         {
-          provide: ActivityRequestServiceToken,
-          useValue: serviceMock,
+          provide: ActivityRequestService,
+          useValue: {
+            createRequestActivity: jest.fn(),
+            updateMyRequestActivity: jest.fn(),
+            updateApprovalRequestActivity: jest.fn(),
+          },
+        },
+        {
+          provide: ActivityRequestQueryService,
+          useValue: {
+            search: jest.fn(),
+            searchMy: jest.fn(),
+            findById: jest.fn(),
+            findMyById: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -42,7 +44,12 @@ describe('ActivityRequestController', () => {
     controller = module.get<ActivityRequestController>(
       ActivityRequestController,
     );
-    service = module.get<ActivityRequestService>(ActivityRequestServiceToken);
+    activityRequestService = module.get<ActivityRequestService>(
+      ActivityRequestService,
+    );
+    activityRequestQueryService = module.get<ActivityRequestQueryService>(
+      ActivityRequestQueryService,
+    );
   });
 
   it('should be defined', () => {
@@ -67,12 +74,12 @@ describe('ActivityRequestController', () => {
       } as FindRequestedActivitiesResponseDTO;
 
       jest
-        .spyOn(service, 'findRequestedActivities')
+        .spyOn(activityRequestQueryService, 'search')
         .mockResolvedValue(expectedResponse);
 
-      const result = await controller.findRequestedActivities(query);
+      const result = await controller.search(query);
 
-      expect(service.findRequestedActivities).toHaveBeenCalledWith(query);
+      expect(activityRequestQueryService.search).toHaveBeenCalledWith(query);
       expect(result).toEqual(expectedResponse);
     });
   });
@@ -91,14 +98,14 @@ describe('ActivityRequestController', () => {
       } as FindRequestedMyActivitiesResponseDTO;
 
       jest
-        .spyOn(service, 'findMyRequestedActivities')
+        .spyOn(activityRequestQueryService, 'searchMy')
         .mockResolvedValue(expectedResponse);
 
-      const result = await controller.findMyRequestedActivities(user, {
+      const result = await controller.searchMy(user, {
         status: [],
       });
 
-      expect(service.findMyRequestedActivities).toHaveBeenCalledWith({
+      expect(activityRequestQueryService.searchMy).toHaveBeenCalledWith({
         status: [],
         userId: user.sub,
       });
@@ -128,12 +135,12 @@ describe('ActivityRequestController', () => {
       } as FindRequestedMyActivityResponseDTO;
 
       jest
-        .spyOn(service, 'findMyRequestedActivity')
+        .spyOn(activityRequestQueryService, 'findMyById')
         .mockResolvedValue(expectedResponse);
 
-      const result = await controller.findMyRequestedActivity(id, user);
+      const result = await controller.findMyById(id, '12345');
 
-      expect(service.findMyRequestedActivity).toHaveBeenCalledWith(
+      expect(activityRequestQueryService.findMyById).toHaveBeenCalledWith(
         id,
         user.sub,
       );
@@ -162,12 +169,12 @@ describe('ActivityRequestController', () => {
       } as FindRequestedMyActivityResponseDTO;
 
       jest
-        .spyOn(service, 'findRequestedActivity')
+        .spyOn(activityRequestQueryService, 'findById')
         .mockResolvedValue(expectedResponse);
 
-      const result = await controller.findRequestedActivity(id);
+      const result = await controller.findById(id);
 
-      expect(service.findRequestedActivity).toHaveBeenCalledWith(id);
+      expect(activityRequestQueryService.findById).toHaveBeenCalledWith(id);
       expect(result).toEqual(expectedResponse);
     });
   });
@@ -179,14 +186,15 @@ describe('ActivityRequestController', () => {
         timeOfDayId: 'string',
         dayOfWeekId: 'string',
       };
-      const user: JwtPayload = { sub: '12345' };
 
-      await controller.createRequestedActivity(dto, user);
+      await controller.createRequestedActivity(dto, '12345');
 
-      expect(service.createRequestActivity).toHaveBeenCalledWith({
-        ...dto,
-        authorId: user.sub,
-      });
+      expect(activityRequestService.createRequestActivity).toHaveBeenCalledWith(
+        {
+          ...dto,
+          authorId: '12345',
+        },
+      );
     });
   });
 
@@ -197,14 +205,15 @@ describe('ActivityRequestController', () => {
         timeOfDayId: '1',
         dayOfWeekId: '1',
       };
-      const user: JwtPayload = { sub: '12345' };
 
-      await controller.updateRequestedActivity(id, dto, user);
+      await controller.updateRequestedActivity(id, dto, '12345');
 
-      expect(service.updateMyRequestActivity).toHaveBeenCalledWith({
+      expect(
+        activityRequestService.updateMyRequestActivity,
+      ).toHaveBeenCalledWith({
         id,
         ...dto,
-        authorId: user.sub,
+        authorId: '12345',
       });
     });
   });
@@ -215,13 +224,14 @@ describe('ActivityRequestController', () => {
         action: ApprovalRequestAction.APPROVE,
         ids: [1],
       };
-      const user: JwtPayload = { sub: '12345' };
 
-      await controller.updateApprovalRequestedActivity(dto, user);
+      await controller.updateApprovalRequestedActivity(dto, '12345');
 
-      expect(service.updateApprovalRequestActivity).toHaveBeenCalledWith({
+      expect(
+        activityRequestService.updateApprovalRequestActivity,
+      ).toHaveBeenCalledWith({
         ...dto,
-        authorId: user.sub,
+        authorId: '12345',
       });
     });
   });

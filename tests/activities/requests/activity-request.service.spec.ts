@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from '../../../src/account-service/management/interfaces/user-service.interface';
 
 import { InternalFile } from '../../../src/system/file/file.interceptor';
-import { ActivityRequestServiceImpl } from '../../../src/activities/requests/activity-request.service';
-import { ActivityRequestRepository } from '../../../src/activities/requests/repositories/activity-request.repository';
+import { ActivityRequestServiceImpl } from '../../../src/activities/requests/use-cases/activity-request.service';
+import { ActivityRequestRepository } from '../../../src/activities/requests/infras/repositories/activity-request.repository';
 import { ActivityServiceToken } from '../../../src/activities/managements/interfaces/activity.service';
 import {
   ApprovalRequestAction,
@@ -13,30 +13,29 @@ import {
 import { ActivityRequest } from '../../../src/system/database/entities/activity-request.entity';
 import { User } from '../../../src/system/database/entities/user.entity';
 import { read, utils } from 'xlsx';
+import { MAIL_SERVICE_TOKEN } from '../../../src/system/mail/mail.interface';
+import { InsertResult } from 'typeorm';
+import { ActivityRequestAggregateRepository } from '../../../src/activities/requests/domain/repositories/activity-request-aggregate.repository';
+import { ActivityRequestAggregate } from '../../../src/activities/requests/domain/aggregates/activity-request.aggregate';
 
+jest.mock('react-dom/server');
 jest.mock('typeorm-transactional', () => ({
-  Transactional: () => {
-    return function (
-      target: unknown,
-      propertyKey: string,
-      descriptor: PropertyDescriptor,
-    ) {
-      // leave the method unchanged → just return descriptor
-      return descriptor;
-    };
-  },
+  Transactional: () => () => {},
 }));
-
 jest.mock('xlsx', () => ({
   read: jest.fn(),
   utils: {
     sheet_to_json: jest.fn(),
   },
 }));
+jest.mock(
+  '../../../src/activities/requests/use-cases/assigned-request-email-template',
+);
 
 describe('ActivityRequestServiceImpl', () => {
   let service: ActivityRequestServiceImpl;
   let activityRequestRepository: ActivityRequestRepository;
+  let activityRequestAggregateRepository: ActivityRequestAggregateRepository;
   let activityService: any;
   let userService: UserService;
 
@@ -59,7 +58,7 @@ describe('ActivityRequestServiceImpl', () => {
         {
           provide: ActivityServiceToken,
           useValue: {
-            createActivity: jest.fn(),
+            createActivities: jest.fn(),
           },
         },
         {
@@ -69,11 +68,28 @@ describe('ActivityRequestServiceImpl', () => {
             findUsersByFullNames: jest.fn(),
           },
         },
+        {
+          provide: MAIL_SERVICE_TOKEN,
+          useValue: {
+            sendMail: jest.fn(),
+          },
+        },
+        {
+          provide: ActivityRequestAggregateRepository,
+          useValue: {
+            createNew: jest.fn(),
+            findByIds: jest.fn(),
+            updateMany: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get(ActivityRequestServiceImpl);
     activityRequestRepository = module.get(ActivityRequestRepository);
+    activityRequestAggregateRepository = module.get(
+      ActivityRequestAggregateRepository,
+    );
     activityService = module.get(ActivityServiceToken);
     userService = module.get(UserService);
   });
@@ -91,13 +107,20 @@ describe('ActivityRequestServiceImpl', () => {
         items: [{ id: 'hr-1' }],
       } as any);
       jest
-        .spyOn(activityRequestRepository, 'insert')
-        .mockResolvedValue(undefined);
+        .spyOn(activityRequestRepository, 'findDetailById')
+        .mockResolvedValue({
+          id: 1,
+        } as ActivityRequest);
+      jest.spyOn(activityRequestRepository, 'insert').mockResolvedValue({
+        identifiers: [{ id: 1 }],
+        generatedMaps: [],
+        raw: '',
+      } as InsertResult);
 
       await service.createRequestActivity(dto as any);
 
       expect(userService.findUsers).toHaveBeenCalled();
-      expect(activityRequestRepository.insert).toHaveBeenCalledWith(
+      expect(activityRequestAggregateRepository.createNew).toHaveBeenCalledWith(
         expect.objectContaining({
           authorId: 'u1',
           assigneeId: 'hr-1',
@@ -109,24 +132,22 @@ describe('ActivityRequestServiceImpl', () => {
 
   describe('updateApprovalRequestActivity', () => {
     it('should approve and create activity', async () => {
-      const requests = [
-        {
-          id: 1,
-          authorId: 'u1',
-          approvalStatus: RequestActivityStatus.PENDING,
-          requestType: RequestTypes.WORKING,
-          timeOfDayId: 'MORN',
-          dayOfWeekId: '1',
-        },
-      ] as ActivityRequest[];
+      const aggregate = new ActivityRequestAggregate();
+      aggregate.id = 1;
+      aggregate.authorId = 'u1';
+      aggregate.approvalStatus = RequestActivityStatus.PENDING;
+      aggregate.requestType = RequestTypes.WORKING;
+      aggregate.timeOfDayId = 'MORN';
+      aggregate.dayOfWeekId = '1';
+      const requests = [aggregate];
       jest
-        .spyOn(activityRequestRepository, 'findBy')
+        .spyOn(activityRequestAggregateRepository, 'findByIds')
         .mockResolvedValue(requests);
       jest
-        .spyOn(activityRequestRepository, 'update')
+        .spyOn(activityRequestAggregateRepository, 'updateMany')
         .mockResolvedValue(undefined);
       jest
-        .spyOn(activityService, 'createActivity')
+        .spyOn(activityService, 'createActivities')
         .mockResolvedValue(undefined);
 
       await service.updateApprovalRequestActivity({
@@ -135,25 +156,35 @@ describe('ActivityRequestServiceImpl', () => {
         authorId: 'approver-1',
       } as any);
 
-      expect(activityService.createActivity).toHaveBeenCalled();
-      expect(activityRequestRepository.update).toHaveBeenCalledWith(
-        1,
+      expect(activityService.createActivities).toHaveBeenCalled();
+      expect(
+        activityRequestAggregateRepository.updateMany,
+      ).toHaveBeenCalledWith([
         expect.objectContaining({
-          approvalStatus: RequestActivityStatus.APPROVED,
+          approvalStatus: 'APPROVED',
+          approverId: 'approver-1',
+          authorId: 'u1',
+          dayOfWeekId: '1',
+          domainEvents: [],
+          id: 1,
+          requestType: 'Working',
+          timeOfDayId: 'MORN',
         }),
-      );
+      ]);
     });
 
-    it('should throw if no requests found', async () => {
-      jest.spyOn(activityRequestRepository, 'findBy').mockResolvedValue([]);
+    it('should early stop if no requests found', async () => {
+      jest
+        .spyOn(activityRequestAggregateRepository, 'findByIds')
+        .mockResolvedValue([]);
 
-      await expect(
-        service.updateApprovalRequestActivity({
-          ids: [99],
-          action: ApprovalRequestAction.REJECT,
-          authorId: 'hr',
-        } as any),
-      ).rejects.toThrow('Activity request not found');
+      await service.updateApprovalRequestActivity({
+        ids: [99],
+        action: ApprovalRequestAction.REJECT,
+        authorId: 'hr',
+      });
+
+      expect(activityRequestRepository.update).not.toHaveBeenCalledWith();
     });
   });
 

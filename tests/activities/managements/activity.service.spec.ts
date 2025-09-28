@@ -4,23 +4,23 @@ import { ActivityRepository } from '../../../src/activities/managements/activity
 import { FindActivitiesDTO } from '../../../src/activities/managements/dtos/core/find-activities.dto';
 import { CreateActivityDTO } from '../../../src/activities/managements/dtos/core/create-activity.dto';
 import { Activity } from '../../../src/system/database/entities/activity.entity';
+import { SearchMyActivitiesDTO } from '../../../src/activities/managements/dtos/core/search-my-activities.dto';
 
 describe(ActivityServiceImpl.name, () => {
   let activityService: ActivityServiceImpl;
   let activityRepository: ActivityRepository;
 
   beforeEach(async () => {
-    const activityRepositoryMock = {
-      findActivities: jest.fn(),
-      insert: jest.fn(),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ActivityServiceImpl,
         {
           provide: ActivityRepository,
-          useValue: activityRepositoryMock,
+          useValue: {
+            findActivities: jest.fn(),
+            insert: jest.fn(),
+            searchMy: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -52,6 +52,24 @@ describe(ActivityServiceImpl.name, () => {
     });
   });
 
+  describe('searchMy', () => {
+    it('should call activityRepository.searchMy with correct parameters', async () => {
+      const dto: SearchMyActivitiesDTO = {
+        userId: 'userId',
+      };
+      const expectedResponse: Activity[] = [{ id: 1 }] as Activity[];
+
+      jest
+        .spyOn(activityRepository, 'searchMy')
+        .mockResolvedValue(expectedResponse);
+
+      const result = await activityService.searchMy(dto);
+
+      expect(activityRepository.searchMy).toHaveBeenCalledWith(dto);
+      expect(result).toEqual(expectedResponse);
+    });
+  });
+
   describe('createActivity', () => {
     it('should call activityRepository.insert with correct parameters', async () => {
       const dto: CreateActivityDTO = {
@@ -61,9 +79,9 @@ describe(ActivityServiceImpl.name, () => {
         dayOfWeekId: 'test',
       };
 
-      await activityService.createActivity(dto);
+      await activityService.createActivities([dto]);
 
-      expect(activityRepository.insert).toHaveBeenCalledWith(dto);
+      expect(activityRepository.insert).toHaveBeenCalledWith([dto]);
     });
   });
 });

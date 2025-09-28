@@ -132,12 +132,13 @@
     "moduleFileExtensions": [
       "js",
       "json",
-      "ts"
+      "ts",
+      "tsx"
     ],
     "rootDir": "./",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)(s|sx)$": "ts-jest"
     },
     "collectCoverageFrom": [
       "src/**/*.(t|j)s"
@@ -149,7 +150,8 @@
       ".module.ts",
       ".exception.ts",
       "index.ts",
-      "main.ts"
+      "main.ts",
+      ".d.ts"
     ],
     "coveragePathIgnorePatterns": [
       "node_modules/",
@@ -164,6 +166,7 @@
       ".enum.ts",
       ".constant.ts",
       ".repository.ts",
+      ".d.ts",
       "/src/system/database/migrations",
       "/src/system/database/config"
     ],
