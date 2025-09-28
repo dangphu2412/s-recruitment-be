@@ -3,13 +3,17 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { TimeOfDay } from './time-of-day.entity';
 import { DayOfWeek } from './day-of-week.entity';
+import { ActivityRequest } from './activity-request.entity';
 
 @Entity({
   name: 'activities',
@@ -87,10 +91,23 @@ export class Activity {
   })
   dayOfWeek: DayOfWeek;
 
-  // @OneToMany(() => ActivityLog, (log) => log.activity)
-  // @JoinColumn({
-  //   name: 'id',
-  //   referencedColumnName: 'activity_id',
-  // })
-  // logs: ActivityLog[];
+  @OneToMany(
+    () => ActivityRequest,
+    (activityRequest) => activityRequest.activityReference,
+  )
+  activityRequests?: ActivityRequest[];
+
+  @ManyToMany(() => User, (user) => user.sessions)
+  @JoinTable({
+    name: 'attendees_sessions',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'activity_id',
+      referencedColumnName: 'id',
+    },
+  })
+  attendees?: User[];
 }

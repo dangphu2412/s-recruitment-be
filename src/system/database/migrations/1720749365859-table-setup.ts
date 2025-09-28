@@ -9,16 +9,17 @@ import {
 } from 'typeorm';
 
 export class TableSetup1720749365859 implements MigrationInterface {
-  private UNIQUE_USERNAME_KEY = 'UQ_users_username_key';
-  private UNIQUE_EMAIL_KEY = 'UQ_users_email_key';
-  private INDEX_USERNAME_KEY = 'IDX_users_username_key';
-  private UNIQUE_ROLE_NAME_KEY = 'UQ_roles_name_key';
-  private INDEX_USER_KEY = 'IDX_FK_users_roles_users_key';
-  private INDEX_ROLE_KEY = 'IDX_FK_users_roles_roles_key';
-  private FK_MENU_PARENT_KEY = 'FK_menus_parent_id_key';
-  private UNIQUE_PERMISSION_CODE_KEY = 'UQ_permissions_code_key';
-  private INDEX_MENU_SETTING_MENU_KEY = 'IDX_FK_menus_settings_menus_key';
-  private INDEX_MENU_SETTING_PERMISSION_KEY =
+  private readonly UNIQUE_USERNAME_KEY = 'UQ_users_username_key';
+  private readonly UNIQUE_EMAIL_KEY = 'UQ_users_email_key';
+  private readonly INDEX_USERNAME_KEY = 'IDX_users_username_key';
+  private readonly UNIQUE_ROLE_NAME_KEY = 'UQ_roles_name_key';
+  private readonly INDEX_USER_KEY = 'IDX_FK_users_roles_users_key';
+  private readonly INDEX_ROLE_KEY = 'IDX_FK_users_roles_roles_key';
+  private readonly FK_MENU_PARENT_KEY = 'FK_menus_parent_id_key';
+  private readonly UNIQUE_PERMISSION_CODE_KEY = 'UQ_permissions_code_key';
+  private readonly INDEX_MENU_SETTING_MENU_KEY =
+    'IDX_FK_menus_settings_menus_key';
+  private readonly INDEX_MENU_SETTING_PERMISSION_KEY =
     'IDX_FK_menus_settings_permissions_key';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

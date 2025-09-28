@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { Activity } from '../../system/database/entities/activity.entity';
 import { FindActivitiesDTO } from './dtos/core/find-activities.dto';
 import { RequestTypes } from '../shared/request-activity-status.enum';
+import { SearchMyActivitiesDTO } from './dtos/core/search-my-activities.dto';
 
 @Injectable()
 export class ActivityRepository extends Repository<Activity> {
@@ -92,6 +93,19 @@ export class ActivityRepository extends Repository<Activity> {
       .leftJoinAndSelect('activity.dayOfWeek', 'dayOfWeek')
       .andWhere('author.trackingId IN (:...deviceUserIds)', {
         deviceUserIds: deviceUserIds,
+      })
+      .getMany();
+  }
+
+  searchMy(dto: SearchMyActivitiesDTO) {
+    return this.createQueryBuilder('activity')
+      .leftJoinAndSelect('activity.timeOfDay', 'timeOfDay')
+      .leftJoinAndSelect('activity.dayOfWeek', 'dayOfWeek')
+      .andWhere('activity.authorId = :authorId', {
+        authorId: dto.userId,
+      })
+      .andWhere('activity.requestType = :requestType', {
+        requestType: RequestTypes.WORKING,
       })
       .getMany();
   }

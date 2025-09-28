@@ -20,6 +20,7 @@ import { Department } from './department.entity';
 import { Period } from './period.entity';
 import { ActivityRequest } from './activity-request.entity';
 import { ActivityLog } from './activity-log.entity';
+import { Activity } from './activity.entity';
 
 @Entity({
   name: 'users',
@@ -144,6 +145,9 @@ export class User {
 
   @OneToMany(() => ActivityRequest, (activityRequest) => activityRequest.author)
   activityRequests?: ActivityRequest[];
+
+  @ManyToMany(() => Activity, (activity) => activity.attendees)
+  sessions?: Activity[];
 
   @OneToMany(() => ActivityLog, (activityLog) => activityLog.author)
   activityLogs: ActivityLog[];

@@ -10,6 +10,7 @@ import {
 import { User } from './user.entity';
 import { TimeOfDay } from './time-of-day.entity';
 import { DayOfWeek } from './day-of-week.entity';
+import { Activity } from './activity.entity';
 
 export enum RequestActivityStatus {
   PENDING = 'PENDING',
@@ -22,6 +23,7 @@ export enum RequestTypes {
   WORKING = 'Working',
   LATE = 'Late',
   ABSENCE = 'Absence',
+  TRAINING = 'Training',
 }
 
 @Entity({
@@ -104,6 +106,13 @@ export class ActivityRequest {
   })
   approverId: string;
 
+  @Column({
+    name: 'activity_reference_id',
+    type: 'int',
+    nullable: true,
+  })
+  activityReferenceId: string | null;
+
   @CreateDateColumn({
     name: 'created_at',
   })
@@ -113,6 +122,15 @@ export class ActivityRequest {
     name: 'updated_at',
   })
   updatedAt: Date;
+
+  @ManyToOne(() => Activity, (activity) => activity.activityRequests, {
+    nullable: true,
+  })
+  @JoinColumn({
+    name: 'activity_reference_id',
+    referencedColumnName: 'id',
+  })
+  activityReference: Activity | null;
 
   @ManyToOne(() => User, (user) => user.activityRequests)
   @JoinColumn({

@@ -29,6 +29,7 @@ export class ActivityRequestAggregateTestBuilder {
   static aLateRequest(): ActivityRequestAggregateTestBuilder {
     return new ActivityRequestAggregateTestBuilder()
       .withRequestType(RequestTypes.LATE)
+      .withActivityRef('act-id-1')
       .withRequestChangeDay('2024-01-15')
       .withReason('Traffic jam');
   }
@@ -36,6 +37,7 @@ export class ActivityRequestAggregateTestBuilder {
   static anAbsenceRequest(): ActivityRequestAggregateTestBuilder {
     return new ActivityRequestAggregateTestBuilder()
       .withRequestType(RequestTypes.ABSENCE)
+      .withActivityRef('act-id-1')
       .withRequestChangeDay('2024-01-15')
       .withCompensatoryDay('2024-01-16');
   }
@@ -49,6 +51,11 @@ export class ActivityRequestAggregateTestBuilder {
     requestType: RequestTypes,
   ): ActivityRequestAggregateTestBuilder {
     this.data.requestType = requestType;
+    return this;
+  }
+
+  withActivityRef(ref): ActivityRequestAggregateTestBuilder {
+    this.data.activityReferenceId = ref;
     return this;
   }
 
@@ -463,11 +470,17 @@ describe('ActivityRequestAggregate - Edge Cases', () => {
         },
         {
           type: RequestTypes.LATE,
-          requiredFields: ['timeOfDayId', 'requestChangeDay', 'reason'],
+          requiredFields: [
+            'timeOfDayId',
+            'requestChangeDay',
+            'reason',
+            'activityReferenceId',
+          ],
           validData: {
             timeOfDayId: 'morning',
             requestChangeDay: '2024-01-15',
             reason: 'Traffic',
+            activityReferenceId: 'act-2',
           },
           missingFieldTest: {
             timeOfDayId: 'morning',
@@ -480,11 +493,13 @@ describe('ActivityRequestAggregate - Edge Cases', () => {
             'timeOfDayId',
             'requestChangeDay',
             'compensatoryDay',
+            'activityReferenceId',
           ],
           validData: {
             timeOfDayId: 'morning',
             requestChangeDay: '2024-01-15',
             compensatoryDay: '2024-01-16',
+            activityReferenceId: 'act-2',
           },
           missingFieldTest: {
             timeOfDayId: 'morning',
