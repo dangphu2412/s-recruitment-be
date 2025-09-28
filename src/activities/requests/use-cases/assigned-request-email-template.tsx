@@ -54,8 +54,7 @@ export function AssignedRequestEmailTemplate({
               Loại yêu cầu: {request.requestType}
             </Text>
             <Text style={{ fontWeight: 'bold', color: '#1e40af' }}>
-              Ca đăng ký: {request.timeOfDay.fromTime} -{' '}
-              {request.timeOfDay.toTime}
+              Ca đăng ký: {request.timeOfDay.name}
             </Text>
             {request.dayOfWeekId && (
               <Text style={{ fontWeight: 'bold', color: '#1e40af' }}>
