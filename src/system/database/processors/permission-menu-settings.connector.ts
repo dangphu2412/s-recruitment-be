@@ -31,4 +31,26 @@ export class PermissionMenuSettingsConnector {
 
     await this.manager.query(batches.join(';'));
   }
+
+  async unlink(settings: MenuSettings) {
+    const batches: string[] = [];
+
+    await Promise.all(
+      Object.keys(settings).map(async (menuKey) => {
+        const permissions = await this.permissionRepository.find({
+          where: {
+            code: In(settings[menuKey]),
+          },
+        });
+
+        permissions.forEach((permission) => {
+          batches.push(
+            `DELETE FROM menu_settings WHERE menu_id = '${menuKey}' AND permission_id = '${permission.id}'`,
+          );
+        });
+      }),
+    );
+
+    await this.manager.query(batches.join(';'));
+  }
 }
