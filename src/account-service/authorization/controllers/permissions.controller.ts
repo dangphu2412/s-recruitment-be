@@ -3,6 +3,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { CanAccessBy } from '../can-access-by.decorator';
 import { Permissions } from '../access-definition.constant';
 import { PermissionService } from '../interfaces/permission-service.interface';
+import { Identified } from '../../registration/identified.decorator';
+import { CurrentUserId } from '../../management/user.decorator';
 
 @ApiTags('permissions')
 @Controller({
@@ -19,5 +21,11 @@ export class PermissionController {
   @Get()
   findAll() {
     return this.permissionService.findAll();
+  }
+
+  @Identified
+  @Get('/my')
+  findMy(@CurrentUserId userId: string) {
+    return this.permissionService.findMy(userId);
   }
 }

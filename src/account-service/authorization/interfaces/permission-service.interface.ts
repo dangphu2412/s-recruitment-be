@@ -4,4 +4,5 @@ export const PermissionService = Symbol('PermissionService');
 
 export interface PermissionService {
   findAll(): Promise<Permission[]>;
+  findMy(userId: string): Promise<Permission[]>;
 }

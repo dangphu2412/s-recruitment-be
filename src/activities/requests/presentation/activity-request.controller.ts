@@ -120,7 +120,7 @@ export class ActivityRequestController {
     });
   }
 
-  @CanAccessBy(Permissions.WRITE_ACTIVITIES)
+  @CanAccessBy(Permissions.PROCESS_ACTIVITY_REQUESTS)
   @Patch('approval-status')
   updateApprovalRequestedActivity(
     @Body() dto: UpdateApprovalActivityRequestRequest,
