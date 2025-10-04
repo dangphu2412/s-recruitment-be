@@ -1,21 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StreamableFile } from '@nestjs/common';
-import { ActivityLogServiceImpl } from '../../../src/activities/work-logs/application/activity-log.service';
 import { ActivitiesLogController } from '../../../src/activities/work-logs/presentation/activities-log.controller';
 import { FindLogsRequest } from '../../../src/activities/work-logs/presentation/dtos/find-logs.request';
 import { OffsetPaginationResponse } from '../../../src/system/pagination';
 import { ActivityLog } from '../../../src/system/database/entities/activity-log.entity';
+import { ActivityLogService } from '../../../src/activities/work-logs/application/interfaces/activity-log.service';
 
 describe('ActivitiesLogController', () => {
   let controller: ActivitiesLogController;
-  let service: ActivityLogServiceImpl;
+  let service: ActivityLogService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ActivitiesLogController],
       providers: [
         {
-          provide: ActivityLogServiceImpl,
+          provide: ActivityLogService,
           useValue: {
             findLogs: jest.fn(),
             runUserLogComplianceCheck: jest.fn(),
@@ -26,7 +26,7 @@ describe('ActivitiesLogController', () => {
     }).compile();
 
     controller = module.get<ActivitiesLogController>(ActivitiesLogController);
-    service = module.get<ActivityLogServiceImpl>(ActivityLogServiceImpl);
+    service = module.get<ActivityLogService>(ActivityLogService);
   });
 
   describe('findLogs', () => {

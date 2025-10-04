@@ -2,14 +2,15 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { ActivityLog } from '../../../system/database/entities/activity-log.entity';
-import { FindLogsRequest } from '../presentation/dtos/find-logs.request';
 import { subMonths, subWeeks } from 'date-fns';
 import { LogWorkStatus } from '../log-work-status.enum';
 import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
 import {
-  ReportLogAggregate,
-  ReportLogQueryResult,
-} from '../../shared/aggregates/report-log.aggregate';
+  LateReportViewDTO,
+  LateReportViewItemDTO,
+} from '../domain/view/late-report-view.dto';
+import { ReportLateResultDTO } from './dtos/report-late-result.dto';
+import { FindLogQueryDTO } from '../application/dtos/find-log-query.dto';
 
 @Injectable()
 export class ActivityLogRepository extends Repository<ActivityLog> {
@@ -20,7 +21,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  findLogs(findLogsRequest: FindLogsRequest) {
+  findLogs(findLogsRequest: FindLogQueryDTO) {
     const {
       workStatus,
       fromDate = subWeeks(new Date(), 1).toISOString(),
@@ -82,7 +83,7 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
       .getManyAndCount();
   }
 
-  async findLateReportLogs(): Promise<ReportLogAggregate[]> {
+  async findLateReportLogs(): Promise<LateReportViewDTO> {
     const [sql, params] = this.createQueryBuilder('activityLog')
       .leftJoinAndSelect('activityLog.author', 'author')
       .leftJoinAndSelect('activityLog.deviceAuthor', 'deviceAuthor')
@@ -101,12 +102,12 @@ export class ActivityLogRepository extends Repository<ActivityLog> {
       .addGroupBy('author.fullName')
       .getQueryAndParameters();
 
-    const rawItems = await this.manager.query<ReportLogQueryResult[]>(
+    const rawItems = await this.manager.query<ReportLateResultDTO[]>(
       sql,
       params,
     );
 
-    return rawItems.map<ReportLogAggregate>((item) => {
+    return rawItems.map<LateReportViewItemDTO>((item) => {
       return {
         id: item.author_id,
         email: item.author_email,

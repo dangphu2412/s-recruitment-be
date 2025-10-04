@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { WorkLogExtractor } from '../src/activities/work-logs/application/work-log-extractor'; // assuming you export `main` from your file
+import { WorkLogExtractor } from '../src/activities/work-logs/infras/work-log-extractor'; // assuming you export `main` from your file
 import { main } from 'src/upload-fingerprint-trigger';
 
 // --- mocks ---
@@ -36,7 +36,7 @@ jest.mock('@google-cloud/storage', () => {
 jest.spyOn(Logger, 'log').mockImplementation(() => {});
 
 // Mock extractor
-jest.mock('../src/activities/work-logs/application/work-log-extractor', () => ({
+jest.mock('../src/activities/work-logs/infras/work-log-extractor', () => ({
   WorkLogExtractor: {
     extractLogsFromLastHalfYear: jest.fn(),
   },
