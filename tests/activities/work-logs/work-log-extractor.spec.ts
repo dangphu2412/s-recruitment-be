@@ -1,6 +1,6 @@
 import { subMonths, format } from 'date-fns';
-import { WorkTimeUtils } from '../../../src/activities/work-logs/work-status-evaluator.service';
-import { WorkLogExtractor } from '../../../src/activities/work-logs/work-log-extractor';
+import { WorkTimeUtils } from '../../../src/activities/work-logs/application/work-status-evaluator.service';
+import { WorkLogExtractor } from '../../../src/activities/work-logs/application/work-log-extractor';
 
 type LogDTO = {
   userSn: number;

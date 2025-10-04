@@ -1,15 +1,15 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { ActivityLog } from '../../system/database/entities/activity-log.entity';
-import { FindLogsRequest } from './dtos/presentation/find-logs.request';
+import { ActivityLog } from '../../../system/database/entities/activity-log.entity';
+import { FindLogsRequest } from '../presentation/dtos/find-logs.request';
 import { subMonths, subWeeks } from 'date-fns';
-import { LogWorkStatus } from './log-work-status.enum';
-import { OffsetPaginationRequest } from '../../system/pagination/offset-pagination-request';
+import { LogWorkStatus } from '../log-work-status.enum';
+import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
 import {
   ReportLogAggregate,
   ReportLogQueryResult,
-} from '../shared/aggregates/report-log.aggregate';
+} from '../../shared/aggregates/report-log.aggregate';
 
 @Injectable()
 export class ActivityLogRepository extends Repository<ActivityLog> {

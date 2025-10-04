@@ -8,11 +8,11 @@ import {
 import {
   createCRUDService,
   ResourceCRUDService,
-} from '../../system/resource-templates/resource-service-template';
-import { DeviceUser } from '../../system/database/entities/user-log.entity';
-import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
-import { Permissions } from '../../account-service/authorization/access-definition.constant';
-import { LogFileService } from './log-file.service';
+} from '../../../system/resource-templates/resource-service-template';
+import { DeviceUser } from '../../../system/database/entities/user-log.entity';
+import { CanAccessBy } from '../../../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../../../account-service/authorization/access-definition.constant';
+import { LogFileService } from '../infras/log-file.service';
 
 export const DeviceUserCRUDService = createCRUDService(DeviceUser);
 

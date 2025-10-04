@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Query, StreamableFile } from '@nestjs/common';
-import { ActivityLogService } from './activity-log.service';
-import { FindLogsRequest } from './dtos/presentation/find-logs.request';
-import { CanAccessBy } from '../../account-service/authorization/can-access-by.decorator';
-import { Permissions } from '../../account-service/authorization/access-definition.constant';
+import { ActivityLogServiceImpl } from '../application/activity-log.service';
+import { FindLogsRequest } from './dtos/find-logs.request';
+import { CanAccessBy } from '../../../account-service/authorization/can-access-by.decorator';
+import { Permissions } from '../../../account-service/authorization/access-definition.constant';
 
 @Controller('activity-logs')
 export class ActivitiesLogController {
-  constructor(private readonly activityLogService: ActivityLogService) {}
+  constructor(private readonly activityLogService: ActivityLogServiceImpl) {}
 
   @CanAccessBy(Permissions.READ_ACTIVITY_LOGS)
   @Get()
@@ -16,14 +16,14 @@ export class ActivitiesLogController {
 
   @CanAccessBy(Permissions.WRITE_ACTIVITY_LOGS)
   @Post()
-  uploadActivityLogs() {
-    return this.activityLogService.uploadActivityLogs();
+  runUserLogComplianceCheck() {
+    return this.activityLogService.runUserLogComplianceCheck();
   }
 
   @CanAccessBy(Permissions.WRITE_ACTIVITY_LOGS)
   @Post('/reports')
   async downloadReportFile() {
-    const fileStream = await this.activityLogService.downloadReportFile();
+    const fileStream = await this.activityLogService.downloadLateReportFile();
 
     return new StreamableFile(fileStream, {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

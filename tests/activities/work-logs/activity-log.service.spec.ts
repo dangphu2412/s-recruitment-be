@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { utils, write } from 'xlsx';
-import { ActivityLogService } from '../../../src/activities/work-logs/activity-log.service';
-import { ActivityLogRepository } from '../../../src/activities/work-logs/activity-log.repository';
+import { ActivityLogServiceImpl } from '../../../src/activities/work-logs/application/activity-log.service';
+import { ActivityLogRepository } from '../../../src/activities/work-logs/infras/activity-log.repository';
 import { ActivityRepository } from '../../../src/activities/managements/activity.repository';
-import { ActivityMatcher } from '../../../src/activities/work-logs/work-status-evaluator.service';
-import { LogFileService } from '../../../src/activities/work-logs/log-file.service';
+import { ActivityMatcher } from '../../../src/activities/work-logs/application/work-status-evaluator.service';
+import { LogFileService } from '../../../src/activities/work-logs/infras/log-file.service';
 import { OffsetPaginationResponse } from '../../../src/system/pagination';
 import { ActivityLog } from '../../../src/system/database/entities/activity-log.entity';
 import { ReportLogAggregate } from '../../../src/activities/shared/aggregates/report-log.aggregate';
 
-jest.mock('../../../src/activities/work-logs/work-log-extractor');
+jest.mock('../../../src/activities/work-logs/application/work-log-extractor');
 jest.mock('xlsx', () => ({
   utils: {
     json_to_sheet: jest.fn(),
@@ -20,13 +20,13 @@ jest.mock('xlsx', () => ({
 }));
 
 describe('ActivityLogService', () => {
-  let service: ActivityLogService;
+  let service: ActivityLogServiceImpl;
   let activityLogRepository: jest.Mocked<ActivityLogRepository>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ActivityLogService,
+        ActivityLogServiceImpl,
         {
           provide: ActivityLogRepository,
           useValue: {
@@ -56,7 +56,7 @@ describe('ActivityLogService', () => {
       ],
     }).compile();
 
-    service = module.get(ActivityLogService);
+    service = module.get(ActivityLogServiceImpl);
     activityLogRepository = module.get(
       ActivityLogRepository,
     ) as jest.Mocked<ActivityLogRepository>;
@@ -98,7 +98,7 @@ describe('ActivityLogService', () => {
       (write as jest.Mock).mockReturnValue(Buffer.from('excel-data'));
 
       // Act
-      const result = await service.downloadReportFile();
+      const result = await service.downloadLateReportFile();
 
       // Assert
       expect(activityLogRepository.findLateReportLogs).toHaveBeenCalled();
