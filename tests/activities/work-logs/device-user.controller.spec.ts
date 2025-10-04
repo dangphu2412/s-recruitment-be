@@ -3,10 +3,10 @@ import { BadRequestException } from '@nestjs/common';
 import {
   DeviceUserController,
   DeviceUserCRUDService,
-} from '../../../src/activities/work-logs/device-user.controller';
+} from '../../../src/activities/work-logs/presentation/device-user.controller';
 import { ResourceCRUDService } from '../../../src/system/resource-templates/resource-service-template';
 import { DeviceUser } from '../../../src/system/database/entities/user-log.entity';
-import { LogFileService } from '../../../src/activities/work-logs/log-file.service';
+import { LogFileService } from '../../../src/activities/work-logs/infras/log-file.service';
 import { OffsetPaginationResponse } from '../../../src/system/pagination';
 
 describe('DeviceUserController', () => {

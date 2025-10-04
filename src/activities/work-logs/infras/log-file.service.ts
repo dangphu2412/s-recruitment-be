@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
+import { LogDTO } from '../application/activity-log.service';
 
 @Injectable()
 export class LogFileService implements OnModuleInit {
@@ -32,7 +33,7 @@ export class LogFileService implements OnModuleInit {
   /**
    * TODO: Lock file writing while concurrent occur
    */
-  async getLogs(): Promise<Buffer> {
+  async getLogs(): Promise<LogDTO[]> {
     const bucket = this.storage.bucket('sgroup-bucket');
     const file = bucket.file('attendances.json');
 
@@ -47,12 +48,12 @@ export class LogFileService implements OnModuleInit {
 
       await writeFile(this.logsFilePath, newFile);
       await writeFile(this.logsFileMetaPath, JSON.stringify(metadata), 'utf-8');
-      return newFile;
+      return JSON.parse(newFile.toString('utf-8')) as LogDTO[];
     }
 
     this.logger.log('Utilize cached logs');
 
-    return readFile(this.logsFilePath);
+    return JSON.parse(await readFile(this.logsFilePath, 'utf-8')) as LogDTO[];
   }
 
   private async getLastCachedMetadata(): Promise<FileMetadata> {

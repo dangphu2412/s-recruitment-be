@@ -3,7 +3,7 @@ import { Storage } from '@google-cloud/storage';
 import * as process from 'node:process';
 import { config } from 'dotenv';
 import { Logger } from '@nestjs/common';
-import { WorkLogExtractor } from './activities/work-logs/work-log-extractor';
+import { WorkLogExtractor } from './activities/work-logs/application/work-log-extractor';
 
 // https://github.com/caobo171/node-zklib
 export async function main() {

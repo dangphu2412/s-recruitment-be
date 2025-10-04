@@ -1,32 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StreamableFile } from '@nestjs/common';
-import { ActivityLogService } from '../../../src/activities/work-logs/activity-log.service';
-import { ActivitiesLogController } from '../../../src/activities/work-logs/activities-log.controller';
-import { FindLogsRequest } from '../../../src/activities/work-logs/dtos/presentation/find-logs.request';
+import { ActivityLogServiceImpl } from '../../../src/activities/work-logs/application/activity-log.service';
+import { ActivitiesLogController } from '../../../src/activities/work-logs/presentation/activities-log.controller';
+import { FindLogsRequest } from '../../../src/activities/work-logs/presentation/dtos/find-logs.request';
 import { OffsetPaginationResponse } from '../../../src/system/pagination';
 import { ActivityLog } from '../../../src/system/database/entities/activity-log.entity';
 
 describe('ActivitiesLogController', () => {
   let controller: ActivitiesLogController;
-  let service: ActivityLogService;
+  let service: ActivityLogServiceImpl;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ActivitiesLogController],
       providers: [
         {
-          provide: ActivityLogService,
+          provide: ActivityLogServiceImpl,
           useValue: {
             findLogs: jest.fn(),
-            uploadActivityLogs: jest.fn(),
-            downloadReportFile: jest.fn(),
+            runUserLogComplianceCheck: jest.fn(),
+            downloadLateReportFile: jest.fn(),
           },
         },
       ],
     }).compile();
 
     controller = module.get<ActivitiesLogController>(ActivitiesLogController);
-    service = module.get<ActivityLogService>(ActivityLogService);
+    service = module.get<ActivityLogServiceImpl>(ActivityLogServiceImpl);
   });
 
   describe('findLogs', () => {
@@ -60,13 +60,15 @@ describe('ActivitiesLogController', () => {
   describe('uploadActivityLogs', () => {
     it('should call service.uploadActivityLogs and return result', async () => {
       // Arrange
-      jest.spyOn(service, 'uploadActivityLogs').mockResolvedValue(undefined);
+      jest
+        .spyOn(service, 'runUserLogComplianceCheck')
+        .mockResolvedValue(undefined);
 
       // Act
-      const result = await controller.uploadActivityLogs();
+      const result = await controller.runUserLogComplianceCheck();
 
       // Assert
-      expect(service.uploadActivityLogs).toHaveBeenCalled();
+      expect(service.runUserLogComplianceCheck).toHaveBeenCalled();
       expect(result).toEqual(undefined);
     });
   });
@@ -75,13 +77,15 @@ describe('ActivitiesLogController', () => {
     it('should return a StreamableFile with correct headers', async () => {
       // Arrange
       const fakeStream = Buffer.from('fake-report');
-      jest.spyOn(service, 'downloadReportFile').mockResolvedValue(fakeStream);
+      jest
+        .spyOn(service, 'downloadLateReportFile')
+        .mockResolvedValue(fakeStream);
 
       // Act
       const result = await controller.downloadReportFile();
 
       // Assert
-      expect(service.downloadReportFile).toHaveBeenCalled();
+      expect(service.downloadLateReportFile).toHaveBeenCalled();
       expect(result).toBeInstanceOf(StreamableFile);
 
       // Check headers

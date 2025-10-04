@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import {
   ActivityMatcher,
   WorkTimeUtils,
-} from '../../../src/activities/work-logs/work-status-evaluator.service';
+} from '../../../src/activities/work-logs/application/work-status-evaluator.service';
 import { TimeOfDay } from '../../../src/system/database/entities/time-of-day.entity';
 import { DayOfWeek } from '../../../src/system/database/entities/day-of-week.entity';
 import { User } from '../../../src/system/database/entities/user.entity';
