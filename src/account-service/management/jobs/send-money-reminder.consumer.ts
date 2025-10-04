@@ -20,11 +20,11 @@ import { MessageConsumer } from '../../../system/message-queue/message-consumer'
 export class SendMoneyReminderConsumer
   implements MessageConsumer<SendReminderMessage>
 {
-  private logger = new Logger(SendMoneyReminderConsumer.name);
+  private readonly logger = new Logger(SendMoneyReminderConsumer.name);
 
   constructor(
     @Inject(MAIL_SERVICE_TOKEN)
-    private mailService: MailService,
+    private readonly mailService: MailService,
   ) {}
 
   async consume({ to, debtMonths }: SendReminderMessage): Promise<void> {
