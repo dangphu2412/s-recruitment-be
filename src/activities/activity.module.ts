@@ -21,7 +21,7 @@ import { MasterDataServiceModule } from '../master-data-service/master-data-serv
 import { ActivityRequestController } from './requests/presentation/activity-request.controller';
 import { AccountServiceModule } from '../account-service/account-service.module';
 import { DeviceUser } from '../system/database/entities/user-log.entity';
-import { LogFileService } from './work-logs/infras/log-file.service';
+import { GCSFingerPrintRepository } from './work-logs/infras/gcs-fingerprint-repository';
 import {
   ActivityRequestRepository,
   ActivityRequestRepositoryImpl,
@@ -32,6 +32,7 @@ import { ActivityRequestAggregateRepository } from './requests/domain/repositori
 import { ActivityRequestQueryService } from './requests/use-cases/interfaces/activity-request-query.service';
 import { ActivityRequestQueryServiceImpl } from './requests/use-cases/activity-request-query.service';
 import { ActivityLogService } from './work-logs/application/interfaces/activity-log.service';
+import { FingerPrintLogsRepository } from './work-logs/application/interfaces/finger-print-logs.repository';
 
 @Module({
   imports: [
@@ -80,7 +81,10 @@ import { ActivityLogService } from './work-logs/application/interfaces/activity-
       useClass: ActivityLogServiceImpl,
     },
     ActivityMatcher,
-    LogFileService,
+    {
+      provide: FingerPrintLogsRepository,
+      useClass: GCSFingerPrintRepository,
+    },
   ],
 })
 export class ActivityModule {}

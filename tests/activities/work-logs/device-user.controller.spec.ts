@@ -1,18 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
 import {
   DeviceUserController,
   DeviceUserCRUDService,
 } from '../../../src/activities/work-logs/presentation/device-user.controller';
 import { ResourceCRUDService } from '../../../src/system/resource-templates/resource-service-template';
 import { DeviceUser } from '../../../src/system/database/entities/user-log.entity';
-import { LogFileService } from '../../../src/activities/work-logs/infras/log-file.service';
 import { OffsetPaginationResponse } from '../../../src/system/pagination';
+import { FingerPrintLogsRepository } from '../../../src/activities/work-logs/application/interfaces/finger-print-logs.repository';
 
 describe('DeviceUserController', () => {
   let controller: DeviceUserController;
   let deviceUserService: jest.Mocked<ResourceCRUDService<DeviceUser>>;
-  let logFileService: jest.Mocked<LogFileService>;
+  let fingerPrintLogsRepository: jest.Mocked<FingerPrintLogsRepository>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,10 +25,10 @@ describe('DeviceUserController', () => {
           },
         },
         {
-          provide: LogFileService,
+          provide: FingerPrintLogsRepository,
           useValue: {
-            getUsers: jest.fn(),
-          },
+            findUsers: jest.fn(),
+          } as Partial<FingerPrintLogsRepository>,
         },
       ],
     }).compile();
@@ -38,7 +37,7 @@ describe('DeviceUserController', () => {
     deviceUserService = module.get(DeviceUserCRUDService.token) as jest.Mocked<
       ResourceCRUDService<DeviceUser>
     >;
-    logFileService = module.get(LogFileService) as jest.Mocked<LogFileService>;
+    fingerPrintLogsRepository = module.get(FingerPrintLogsRepository);
   });
 
   describe('findDeviceUsers', () => {
@@ -67,16 +66,15 @@ describe('DeviceUserController', () => {
   describe('uploadTrackFile', () => {
     it('should map valid data to DeviceUser and call upsertMany', async () => {
       // Arrange
-      const fakeUsers = {
-        data: [
-          { userId: '123', name: 'Alice' },
-          { userId: '456', name: 'Bob' },
-        ],
-      };
-      const buffer = Buffer.from(JSON.stringify(fakeUsers));
-      jest.spyOn(logFileService, 'getUsers').mockResolvedValue(buffer);
+      const fakeUsers = [
+        { userId: '123', name: 'Alice' },
+        { userId: '456', name: 'Bob' },
+      ];
+      jest
+        .spyOn(fingerPrintLogsRepository, 'findUsers')
+        .mockResolvedValue(fakeUsers);
 
-      const expectedEntities = fakeUsers.data.map((u) => {
+      const expectedEntities = fakeUsers.map((u) => {
         const deviceUser = new DeviceUser();
         deviceUser.trackingId = u.userId;
         deviceUser.name = u.name;
@@ -86,37 +84,14 @@ describe('DeviceUserController', () => {
       jest.spyOn(deviceUserService, 'upsertMany').mockResolvedValue(undefined);
 
       // Act
-      const result = await controller.uploadTrackFile();
+      const result = await controller.runFingerprintSynchronization();
 
       // Assert
-      expect(logFileService.getUsers).toHaveBeenCalled();
+      expect(fingerPrintLogsRepository.findUsers).toHaveBeenCalled();
       expect(deviceUserService.upsertMany).toHaveBeenCalledWith(
         expect.arrayContaining(expectedEntities),
       );
       expect(result).toEqual(undefined);
-    });
-
-    it('should throw BadRequestException if data property is missing', async () => {
-      // Arrange
-      const buffer = Buffer.from(JSON.stringify({ foo: 'bar' }));
-      jest.spyOn(logFileService, 'getUsers').mockResolvedValue(buffer);
-
-      // Act + Assert
-      await expect(controller.uploadTrackFile()).rejects.toThrow(
-        BadRequestException,
-      );
-    });
-
-    it('should throw BadRequestException if userId or name is missing', async () => {
-      // Arrange
-      const badUsers = { data: [{ userId: '123' }] }; // missing name
-      const buffer = Buffer.from(JSON.stringify(badUsers));
-      jest.spyOn(logFileService, 'getUsers').mockResolvedValue(buffer);
-
-      // Act + Assert
-      await expect(controller.uploadTrackFile()).rejects.toThrow(
-        BadRequestException,
-      );
     });
   });
 });

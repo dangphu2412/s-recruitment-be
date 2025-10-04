@@ -1,12 +1,22 @@
-import { Controller, Get, Post, Query, StreamableFile } from '@nestjs/common';
-import { ActivityLogServiceImpl } from '../application/activity-log.service';
+import {
+  Controller,
+  Get,
+  Inject,
+  Post,
+  Query,
+  StreamableFile,
+} from '@nestjs/common';
 import { FindLogsRequest } from './dtos/find-logs.request';
 import { CanAccessBy } from '../../../account-service/authorization/can-access-by.decorator';
 import { Permissions } from '../../../account-service/authorization/access-definition.constant';
+import { ActivityLogService } from '../application/interfaces/activity-log.service';
 
 @Controller('activity-logs')
 export class ActivitiesLogController {
-  constructor(private readonly activityLogService: ActivityLogServiceImpl) {}
+  constructor(
+    @Inject(ActivityLogService)
+    private readonly activityLogService: ActivityLogService,
+  ) {}
 
   @CanAccessBy(Permissions.READ_ACTIVITY_LOGS)
   @Get()

@@ -1,6 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ActivityLogRepository } from '../infras/activity-log.repository';
-import { FindLogsRequest } from '../presentation/dtos/find-logs.request';
 import { OffsetPaginationResponse } from '../../../system/pagination';
 import { ActivityRepository } from '../../managements/activity.repository';
 import { LogWorkStatus } from '../log-work-status.enum';
@@ -9,18 +8,16 @@ import {
   ActivityMatcher,
   WorkTimeUtils,
 } from './work-status-evaluator.service';
-import { LogFileService } from '../infras/log-file.service';
 import { utils, write } from 'xlsx';
-import { WorkLogExtractor } from './work-log-extractor';
 import { ActivityLogService } from './interfaces/activity-log.service';
+import { FingerPrintLogViewDTO } from '../domain/view/finger-print-view.dto';
+import { FingerPrintLogsRepository } from './interfaces/finger-print-logs.repository';
+import { FindLogQueryDTO } from './dtos/find-log-query.dto';
 
-export type LogDTO = {
-  userSn: number;
-  deviceUserId: string;
-  recordTime: string;
-};
-
-type SegmentedLogByDatePerUser = Map<string, Map<string, LogDTO[]>>;
+type SegmentedLogByDatePerUser = Map<
+  string,
+  Map<string, FingerPrintLogViewDTO[]>
+>;
 
 @Injectable()
 export class ActivityLogServiceImpl implements ActivityLogService {
@@ -30,26 +27,28 @@ export class ActivityLogServiceImpl implements ActivityLogService {
     private readonly activityLogRepository: ActivityLogRepository,
     private readonly activityRepository: ActivityRepository,
     private readonly workStatusEvaluator: ActivityMatcher,
-    private readonly logFileService: LogFileService,
+    @Inject(FingerPrintLogsRepository)
+    private readonly fingerPrintLogsRepository: FingerPrintLogsRepository,
   ) {}
 
-  async findLogs(findLogsRequest: FindLogsRequest) {
+  async findLogs(findLogQueryDTO: FindLogQueryDTO) {
     const [items, totalRecords] =
-      await this.activityLogRepository.findLogs(findLogsRequest);
+      await this.activityLogRepository.findLogs(findLogQueryDTO);
 
     return OffsetPaginationResponse.of({
       items,
       totalRecords,
-      query: findLogsRequest,
+      query: findLogQueryDTO,
     });
   }
 
   async runUserLogComplianceCheck() {
-    const logDTOS = await this.logFileService.getLogs();
+    const sixMonthFingerPrintLogs =
+      await this.fingerPrintLogsRepository.findLogsOfSixMonth();
 
-    const lastHalfYearLogs =
-      WorkLogExtractor.extractLogsFromLastHalfYear(logDTOS);
-    const logsByDatePerUser = this.segmentLogByDatePerUser(lastHalfYearLogs);
+    const logsByDatePerUser = this.segmentLogByDatePerUser(
+      sixMonthFingerPrintLogs,
+    );
 
     for (const [deviceUserId, dateMapToLogs] of logsByDatePerUser.entries()) {
       const activities =
@@ -114,7 +113,7 @@ export class ActivityLogServiceImpl implements ActivityLogService {
   }
 
   private segmentLogByDatePerUser(
-    logDTOs: LogDTO[],
+    logDTOs: FingerPrintLogViewDTO[],
   ): SegmentedLogByDatePerUser {
     const segmentedLogByDatePerUser: SegmentedLogByDatePerUser = new Map();
 
