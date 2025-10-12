@@ -1,7 +1,10 @@
 export const PAYMENT_CREATED_EVENT = 'payment-created';
 export type PaymentCreatedEvent = {
   id: number;
-  operationFeeId: number;
+  /**
+   * @deprecated should use userId instead
+   */
+  operationFeeId: string;
   amount: number;
   note: string;
   paidAt: string;

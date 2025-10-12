@@ -1,13 +1,13 @@
 import * as React from 'react';
 import {
+  Body,
   Container,
   Head,
   Heading,
   Html,
-  Text,
-  Body,
-  Section,
   Link,
+  Section,
+  Text,
 } from '@react-email/components';
 
 type MonthlyReminderEmailProps = {
@@ -18,7 +18,7 @@ type MonthlyReminderEmailProps = {
 export function MonthlyReminderEmailTemplate({
   missingMonths,
   sheetUrl = 'https://docs.google.com/spreadsheets/d/1pV0wIAdUzKZxRUxIH5fxZPFN_F7siAaqTW54PC7wEsI/edit?fbclid=IwY2xjawGK48dleHRuA2FlbQIxMQABHYldS18rDEOOjQFQ_My8Bcd8cRkTIciqPTvdlJTi8SLidZVuvRddyf6CRQ_aem_nyAFAPo6fMGM_7tdmmYhKw&gid=636234062#gid=636234062',
-}: MonthlyReminderEmailProps) {
+}: Readonly<MonthlyReminderEmailProps>) {
   const bankInfo = {
     bankName: 'MBBank',
     accountNumber: '4016092002',

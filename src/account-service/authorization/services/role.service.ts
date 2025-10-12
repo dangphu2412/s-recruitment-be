@@ -22,14 +22,14 @@ import { ConfigService } from '@nestjs/config';
 export class RoleServiceImpl implements RoleService {
   private readonly ttl: number;
 
-  private static genKey = (userId: string): string => {
+  private static readonly genKey = (userId: string): string => {
     return `RK-${userId}`;
   };
 
   private static toRights(roles: Role[]): string[] {
-    return roles
-      .map((role) => role.permissions.map((permission) => permission.code))
-      .flat();
+    return roles.flatMap((role) =>
+      role.permissions.map((permission) => permission.code),
+    );
   }
 
   constructor(
@@ -39,7 +39,7 @@ export class RoleServiceImpl implements RoleService {
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     configService: ConfigService,
-    private userRepository: UserRepository,
+    private readonly userRepository: UserRepository,
   ) {
     this.ttl = ms(configService.getOrThrow<string>('REFRESH_TOKEN_EXPIRATION'));
   }

@@ -167,6 +167,17 @@ export class ActivityRequestServiceImpl implements ActivityRequestService {
       roleNames: [SystemRoles.HR] as string[],
     });
 
+    if (!items.length) {
+      const { items } = await this.userService.findUsers({
+        page: 1,
+        search: '',
+        size: 1,
+        roleNames: [SystemRoles.SUPER_ADMIN] as string[],
+      });
+
+      return items[0];
+    }
+
     return items[Math.floor(Math.random() * items.length)];
   }
 

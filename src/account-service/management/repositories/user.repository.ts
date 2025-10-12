@@ -39,6 +39,7 @@ export class UserRepository extends Repository<User> {
         'users.username',
         'users.fullName',
         'users.email',
+        'users.leaveAt',
         'users.createdAt',
         'users.joinedAt',
         'users.deletedAt',
@@ -139,7 +140,7 @@ export class UserRepository extends Repository<User> {
            "monthlyConfig".month_range
          ) - COALESCE("operationFee"."paid_months", 0) AS "debtMonths"
       FROM "users" "users"
-         LEFT JOIN "operation_fees" "operationFee" ON "operationFee"."id"="users"."operation_fee_id"
+         LEFT JOIN "operation_fees" "operationFee" ON "operationFee"."id"="users"."id"
          LEFT JOIN "monthly_money_configs" "monthlyConfig" ON "monthlyConfig"."id"="operationFee"."monthly_config_id"`;
 
     return this.manager.query<ReminderUserDTO[]>(sql, []);

@@ -11,7 +11,7 @@ import { ACCESS_RIGHT_META_DATA_KEY } from '../can-access-by.decorator';
 
 @Injectable()
 export class AccessRightGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRights = this.reflector.getAllAndOverride<string[]>(
