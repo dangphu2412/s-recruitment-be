@@ -12,7 +12,7 @@ export class TokenGeneratorImpl implements TokenFactory {
 
   constructor(
     private readonly jwtService: JwtService,
-    private configService: ConfigService,
+    private readonly configService: ConfigService,
   ) {
     this.accessTokenExpiration = this.configService.getOrThrow(
       'ACCESS_TOKEN_EXPIRATION',

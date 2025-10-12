@@ -1,4 +1,3 @@
-import { createProviderToken } from 'src/system/nestjs-extensions';
 import { OffsetPaginationResponse } from 'src/system/pagination';
 import { CreateUsersRequestDTO } from '../dtos/presentations/create-users.request';
 import { FileCreateUsersDto } from '../dtos/presentations/file-create-users.dto';
@@ -11,10 +10,9 @@ import { UpgradeUserMemberDTO } from '../dtos/core/upgrade-user-member.dto';
 import { GetUserDTO } from '../dtos/core/get-users.dto';
 import { UpdateUserDTO } from '../dtos/core/update-user.dto';
 import { GetUsersQueryDTO } from '../dtos/core/get-users-query.dto';
-import { CreatePaymentRequest } from '../dtos/presentations/create-payment.request';
 import { UserManagementViewDTO } from '../dtos/presentations/get-users-query.request';
+import { MarkUserLeaveDTO } from '../dtos/core/mark-leave.dto';
 
-export const UserServiceToken = createProviderToken('UserServiceToken');
 export const UserService = Symbol('UserServiceToken');
 
 export interface UserService {
@@ -38,10 +36,10 @@ export interface UserService {
    */
   createUser(dto: CreateUsersRequestDTO): Promise<void>;
   createUsersByFile(dto: FileCreateUsersDto): Promise<void>;
-  createUserPayment(id: string, dto: CreatePaymentRequest): Promise<void>;
 
   updateUserRoles(id: string, payload: UpdateUserRolesDto): Promise<void>;
   updateUser(dto: UpdateUserDTO): Promise<void>;
+  markUserAsLeave(dto: MarkUserLeaveDTO): Promise<void>;
   updateMyProfile(dto: UpdateUserDTO): Promise<void>;
   upgradeToMembers(upgradeUserMemberInput: UpgradeUserMemberDTO): Promise<void>;
   toggleUserIsActive(id: string): Promise<void>;

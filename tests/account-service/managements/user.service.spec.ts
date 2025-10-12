@@ -3,7 +3,6 @@ import { RoleService } from '../../../src/account-service/authorization/interfac
 import { UserServiceImpl } from '../../../src/account-service/management/services/user.service';
 import { UserRepository } from '../../../src/account-service/management/repositories/user.repository';
 import { PasswordManager } from '../../../src/account-service/registration/services/password-manager';
-import { PaymentService } from '../../../src/monthly-money/internal/payment.service';
 import { ResourceCRUDService } from '../../../src/system/resource-templates/resource-service-template';
 import { Period } from '../../../src/system/database/entities/period.entity';
 import {
@@ -22,6 +21,7 @@ import { CreateUserDTO } from '../../../src/account-service/management/dtos/core
 import { User } from '../../../src/system/database/entities/user.entity';
 import { read, utils } from 'xlsx';
 import { FileCreateUsersDto } from '../../../src/account-service/management/dtos/presentations/file-create-users.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 jest.mock('typeorm-transactional', () => ({
   Transactional: () => () => {},
@@ -40,7 +40,6 @@ describe('UserServiceImpl', () => {
   let userRepository: UserRepository;
   let passwordManager: PasswordManager;
   let roleService: RoleService;
-  let paymentService: PaymentService;
   let periodService: ResourceCRUDService<Period>;
   let moneyOperationService: MonthlyMoneyOperationService;
 
@@ -81,16 +80,18 @@ describe('UserServiceImpl', () => {
           },
         },
         {
-          provide: PaymentService,
-          useValue: { createPayment: jest.fn() },
-        },
-        {
           provide: PeriodCRUDService.token,
           useValue: { upsertMany: jest.fn() },
         },
         {
           provide: MonthlyMoneyOperationServiceToken,
           useValue: { createOperationFee: jest.fn() },
+        },
+        {
+          provide: EventEmitter2,
+          useValue: {
+            emit: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -100,7 +101,6 @@ describe('UserServiceImpl', () => {
     userRepository = module.get(UserRepository);
     passwordManager = module.get(PasswordManager);
     roleService = module.get(RoleService);
-    paymentService = module.get(PaymentService);
     periodService = module.get<ResourceCRUDService<Period>>(
       PeriodCRUDService.token,
     );
@@ -333,6 +333,7 @@ describe('UserServiceImpl', () => {
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'u10' },
         relations: ['department', 'period', 'roles', 'operationFee'],
+        withDeleted: true,
       });
       expect(result).toEqual({
         department: {
@@ -479,7 +480,6 @@ describe('UserServiceImpl', () => {
         username: fakeUser.username,
         estimatedPaidMonths: expect.any(Number),
         paidMonths: 3,
-        debtMonths: expect.any(Number),
         remainMonths: 2,
         isProbation: false,
       });
@@ -515,7 +515,6 @@ describe('UserServiceImpl', () => {
       // Assert
       expect(result.items[0].isProbation).toBe(true);
       expect(result.items[0].estimatedPaidMonths).toBe(0);
-      expect(result.items[0].debtMonths).toBe(0);
     });
   });
 
@@ -580,8 +579,8 @@ describe('UserServiceImpl', () => {
     const dto = { ids: ['u1', 'u2'], monthlyConfigId: 1 };
 
     const users = [
-      { id: 'u1', roles: [], operationFeeId: null },
-      { id: 'u2', roles: [{ id: 'r0', name: 'VIEWER' }], operationFeeId: null },
+      { id: 'u1', roles: [] },
+      { id: 'u2', roles: [{ id: 'r0', name: 'VIEWER' }] },
     ] as unknown as User[];
 
     const memberRole = { id: 'r1', name: SystemRoles.MEMBER };
@@ -596,20 +595,12 @@ describe('UserServiceImpl', () => {
       );
     });
 
-    it('should assign operationFeeId and member role if missing', async () => {
+    it('should assign member role if missing', async () => {
       // Arrange
       jest.spyOn(userRepository, 'findBy').mockResolvedValue([...users]);
       jest
         .spyOn(roleService, 'findByName')
         .mockResolvedValue(memberRole as any);
-      jest
-        .spyOn(moneyOperationService, 'createOperationFee')
-        .mockResolvedValue({
-          items: [
-            { userId: 'u1', operationFeeId: 1 },
-            { userId: 'u2', operationFeeId: 2 },
-          ],
-        });
       jest.spyOn(userRepository, 'save').mockResolvedValue(undefined);
 
       // Act
@@ -628,7 +619,6 @@ describe('UserServiceImpl', () => {
         [
           {
             id: 'u1',
-            operationFeeId: 1,
             roles: [
               {
                 id: 'r1',
@@ -638,11 +628,14 @@ describe('UserServiceImpl', () => {
           },
           {
             id: 'u2',
-            operationFeeId: 2,
             roles: [
               {
                 id: 'r0',
                 name: 'VIEWER',
+              },
+              {
+                id: 'r1',
+                name: 'Member',
               },
             ],
           },
@@ -651,28 +644,6 @@ describe('UserServiceImpl', () => {
           chunk: 10,
         },
       );
-    });
-  });
-
-  describe('createUserPayment', () => {
-    const dto = { amount: 1000 } as any;
-
-    it('should call paymentService with merged payload', async () => {
-      // Arrange
-      const user = { id: 'u1', operationFeeId: 'of1' } as unknown as User;
-      jest.spyOn(userRepository, 'findOneBy').mockResolvedValue(user);
-      jest.spyOn(paymentService, 'createPayment').mockResolvedValue(undefined);
-
-      // Act
-      await service.createUserPayment('u1', dto);
-
-      // Assert
-      expect(userRepository.findOneBy).toHaveBeenCalledWith({ id: 'u1' });
-      expect(paymentService.createPayment).toHaveBeenCalledWith({
-        ...dto,
-        operationFeeId: 'of1',
-        userId: 'u1',
-      });
     });
   });
 

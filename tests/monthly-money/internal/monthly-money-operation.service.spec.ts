@@ -6,10 +6,7 @@ import {
   MonthlyMoneyConfigServiceToken,
 } from '../../../src/monthly-money/domain/core/services/monthly-money-config.service';
 import { OperationFee } from '../../../src/system/database/entities/operation-fee.entity';
-import {
-  CreateMoneyFeeDTO,
-  CreateMoneyFeeResultsDTO,
-} from '../../../src/monthly-money/domain/core/dto/create-money-fee.dto';
+import { CreateMoneyFeeDTO } from '../../../src/monthly-money/domain/core/dto/create-money-fee.dto';
 
 describe('MonthlyMoneyOperationServiceImpl', () => {
   let service: MonthlyMoneyOperationServiceImpl;
@@ -26,6 +23,7 @@ describe('MonthlyMoneyOperationServiceImpl', () => {
           useValue: {
             findOne: jest.fn(),
             insert: jest.fn(),
+            save: jest.fn(),
           },
         },
         {
@@ -45,7 +43,7 @@ describe('MonthlyMoneyOperationServiceImpl', () => {
   describe('findOperationFeeWithMoneyConfigById', () => {
     it('should return operation fee with monthlyConfig relation', async () => {
       // Arrange
-      const id = 1;
+      const id = '1';
       const expectedFee = { id, monthlyConfig: { id: 10 } } as OperationFee;
       operationFeeRepository.findOne.mockResolvedValue(expectedFee);
 
@@ -76,22 +74,30 @@ describe('MonthlyMoneyOperationServiceImpl', () => {
       } as any);
 
       // Act
-      const result: CreateMoneyFeeResultsDTO =
-        await service.createOperationFee(dto);
-
+      await service.createOperationFee(dto);
       // Assert
       expect(moneyConfigService.findById).toHaveBeenCalledWith(
         dto.monthlyConfigId,
       );
-      expect(operationFeeRepository.insert).toHaveBeenCalledTimes(
-        dto.userIds.length,
+      expect(operationFeeRepository.save).toHaveBeenCalledWith(
+        [
+          {
+            id: 'user-1',
+            monthlyConfigId: 99,
+            paidMoney: 0,
+            paidMonths: 0,
+            remainMonths: 12,
+          },
+          {
+            id: 'user-2',
+            monthlyConfigId: 99,
+            paidMoney: 0,
+            paidMonths: 0,
+            remainMonths: 12,
+          },
+        ],
+        { reload: false },
       );
-
-      expect(result.items).toHaveLength(2);
-      expect(result.items[0]).toEqual({
-        userId: 'user-1',
-        operationFeeId: 123,
-      });
     });
   });
 });

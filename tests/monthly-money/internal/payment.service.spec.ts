@@ -60,11 +60,10 @@ describe('PaymentService', () => {
         userId: 'user-1',
         note: 'First payment',
         paidAt,
-        operationFeeId: 10,
       };
 
       const mockOperationFee = {
-        id: 10,
+        id: 'user-1',
         monthlyConfig: { id: 99 },
       } as any;
 
@@ -81,7 +80,7 @@ describe('PaymentService', () => {
       // Assert
       expect(
         operationFeeService.findOperationFeeWithMoneyConfigById,
-      ).toHaveBeenCalledWith(dto.operationFeeId);
+      ).toHaveBeenCalledWith('user-1');
       expect(paymentRepository.insert).toHaveBeenCalledWith(
         expect.any(Payment),
       );

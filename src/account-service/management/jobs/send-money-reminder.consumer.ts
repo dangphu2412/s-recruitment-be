@@ -35,7 +35,7 @@ export class SendMoneyReminderConsumer
       subject: '[S-Group] NHẮC NHỞ TIỀN THÁNG',
       html: renderToStaticMarkup(
         MonthlyReminderEmailTemplate({
-          missingMonths: parseInt(String(debtMonths)),
+          missingMonths: Number.parseInt(String(debtMonths)),
         }),
       ),
     });

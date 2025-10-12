@@ -25,7 +25,7 @@ export class PaymentService {
   async createPayment(dto: CreatePaymentDTO) {
     const operationFee =
       await this.operationFeeService.findOperationFeeWithMoneyConfigById(
-        dto.operationFeeId,
+        dto.userId,
       );
     const entity = new Payment();
 
@@ -43,7 +43,7 @@ export class PaymentService {
       note: entity.note,
       paidAt: entity.paidAt.toISOString(),
       userId: entity.userId,
-      operationFeeId: operationFee.id,
+      operationFeeId: entity.userId,
     };
 
     this.eventEmitter.emit(PAYMENT_CREATED_EVENT, paymentCreatedEvent);

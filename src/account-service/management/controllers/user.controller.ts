@@ -43,6 +43,7 @@ import { Identified } from '../../registration/identified.decorator';
 import { OffsetPaginationResponse } from '../../../system/pagination';
 import { UploadUserFileValidatorPipe } from '../upload-user-file.pipe';
 import { UpdateMyProfileRequest } from '../dtos/presentations/update-my-profile.request';
+import { MarkLeaveRequest } from '../dtos/presentations/mark-leave.request';
 
 @ApiTags('users')
 @Controller({
@@ -117,6 +118,19 @@ export class UserController {
     });
   }
 
+  @CanAccessBy(Permissions.WRITE_USERS)
+  @Patch('/:id/leave')
+  @ApiNoContentResponse()
+  async markUserAsLeave(
+    @Param('id') userId: string,
+    @Body() dto: MarkLeaveRequest,
+  ) {
+    await this.userService.markUserAsLeave({
+      ...dto,
+      id: userId,
+    });
+  }
+
   @Identified
   @Patch('/me')
   @ApiNoContentResponse()
@@ -165,7 +179,10 @@ export class UserController {
     @Body() createPaymentDto: CreatePaymentRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
   ) {
-    await this.userService.createUserPayment(userId, createPaymentDto);
+    await this.paymentService.createPayment({
+      ...createPaymentDto,
+      userId: userId,
+    });
   }
 
   @CanAccessBy(Permissions.READ_PAYMENTS)

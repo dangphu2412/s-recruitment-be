@@ -42,6 +42,7 @@ describe('UserController', () => {
           provide: PaymentService,
           useValue: {
             findUserPaymentsByUserId: jest.fn(),
+            createPayment: jest.fn(),
           },
         },
       ],
@@ -153,7 +154,10 @@ describe('UserController', () => {
     it('should call service.createUserPayment', async () => {
       const dto = { amount: 100 } as CreatePaymentRequest;
       await controller.createUserPayment(dto, 'u1');
-      expect(userService.createUserPayment).toHaveBeenCalledWith('u1', dto);
+      expect(paymentService.createPayment).toHaveBeenCalledWith({
+        amount: 100,
+        userId: 'u1',
+      });
     });
   });
 
