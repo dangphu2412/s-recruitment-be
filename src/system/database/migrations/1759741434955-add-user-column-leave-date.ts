@@ -22,6 +22,18 @@ export class AddUserColumnLeaveDate1759741434955 implements MigrationInterface {
       }),
     ]);
 
+    /**
+     * PROD issue: some data of operation_fees is not populate to users.
+     */
+    await queryRunner.query(`
+      DELETE FROM operation_fees
+      WHERE id NOT IN (
+        SELECT operation_fee_id
+        FROM users
+        WHERE operation_fee_id IS NOT NULL
+      );
+    `);
+
     // New id reference 1-1 to users, but temporary let it null to backfill step
     await queryRunner.addColumns('operation_fees', [
       new TableColumn({
