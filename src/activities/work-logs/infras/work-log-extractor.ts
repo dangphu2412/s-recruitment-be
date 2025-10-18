@@ -1,17 +1,14 @@
 import { format, subMonths } from 'date-fns';
-import { WorkTimeUtils } from './work-status-evaluator.service';
-
-type LogDTO = {
-  userSn: number;
-  deviceUserId: string;
-  recordTime: string;
-};
+import { WorkTimeUtils } from '../application/work-status-evaluator.service';
+import { FingerPrintLogViewDTO } from '../domain/view/finger-print-view.dto';
 
 export class WorkLogExtractor {
   /**
    * Apply binary search to find logs from the previous year
    */
-  static extractLogsFromLastHalfYear(logs: LogDTO[]): LogDTO[] {
+  static extractLogsFromLastHalfYear(
+    logs: FingerPrintLogViewDTO[],
+  ): FingerPrintLogViewDTO[] {
     const START_OF_PREVIOUS_YEAR = format(
       subMonths(new Date(), 6),
       'yyyy-MM-dd',

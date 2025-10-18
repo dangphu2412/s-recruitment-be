@@ -44,7 +44,6 @@ export type UserManagementViewDTO = {
   paidMonths: number;
   remainMonths: number;
   estimatedPaidMonths: number;
-  debtMonths: number;
   isProbation: boolean;
   department: {
     id: string;

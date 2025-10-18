@@ -59,7 +59,7 @@ estimated_paid AS (
           COALESCE(mmc.month_range, 0)
         ) * mmc.amount AS value
       FROM users u
-        LEFT JOIN operation_fees of ON u.operation_fee_id = of.id
+        LEFT JOIN operation_fees of ON u.id = of.id
         LEFT JOIN monthly_money_configs mmc ON of.monthly_config_id = mmc.id
       WHERE u.id = $3
         ),

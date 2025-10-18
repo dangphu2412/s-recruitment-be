@@ -39,6 +39,7 @@ export class UserRepository extends Repository<User> {
         'users.username',
         'users.fullName',
         'users.email',
+        'users.leaveAt',
         'users.createdAt',
         'users.joinedAt',
         'users.deletedAt',
@@ -134,13 +135,22 @@ export class UserRepository extends Repository<User> {
         "users"."id" AS "id",
         "users"."email" AS "email",
         "users"."joined_at" AS "joinedAt",
-         LEAST(
-           DATE_PART('year', AGE(NOW(), "users"."joined_at")) * 12 + DATE_PART('month', AGE(NOW(), "users"."joined_at")),
-           "monthlyConfig".month_range
-         ) - COALESCE("operationFee"."paid_months", 0) AS "debtMonths"
+        CASE
+          WHEN "users"."leave_at" is not null
+            THEN
+                LEAST(
+                  DATE_PART('year', age("users"."leave_at", "users"."joined_at")) * 12 + DATE_PART('month', age("users"."leave_at", "users"."joined_at")),
+                  DATE_PART('year', age(NOW(), "users"."joined_at")) + DATE_PART('month', age(NOW(), "users"."joined_at"))
+                ) - COALESCE("operationFee"."paid_months", 0)
+          ELSE
+            LEAST(
+              DATE_PART('year', AGE(NOW(), "users"."joined_at")) * 12 + DATE_PART('month', AGE(NOW(), "users"."joined_at")),
+              "monthlyConfig".month_range
+            ) - COALESCE("operationFee"."paid_months", 0)
+          END AS "debtMonths"
       FROM "users" "users"
-         LEFT JOIN "operation_fees" "operationFee" ON "operationFee"."id"="users"."operation_fee_id"
-         LEFT JOIN "monthly_money_configs" "monthlyConfig" ON "monthlyConfig"."id"="operationFee"."monthly_config_id"`;
+         INNER JOIN "operation_fees" "operationFee" ON "operationFee"."id"="users"."id"
+         INNER JOIN "monthly_money_configs" "monthlyConfig" ON "monthlyConfig"."id"="operationFee"."monthly_config_id"`;
 
     return this.manager.query<ReminderUserDTO[]>(sql, []);
   }

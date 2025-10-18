@@ -18,9 +18,9 @@ export class MoneyReminderJob {
   private readonly logger = new Logger(MoneyReminderJob.name);
 
   constructor(
-    private userRepository: UserRepository,
-    private featureFlagsService: FeatureFlagsService,
-    private messageQueueClient: MessageQueueClient,
+    private readonly userRepository: UserRepository,
+    private readonly featureFlagsService: FeatureFlagsService,
+    private readonly messageQueueClient: MessageQueueClient,
   ) {}
 
   @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_NOON)
@@ -33,29 +33,18 @@ export class MoneyReminderJob {
 
     const groupedUsersByDebtMonths = await this.getGroupedUsersByDebtMonths();
 
-    const results = await Promise.allSettled(
-      Array.from(groupedUsersByDebtMonths.entries()).map(
-        ([debtMonths, users]) => {
-          const to = (users as ReminderUserDTO[]).map((user) => user.email);
-          this.logger.debug({ message: `Emitting ${debtMonths}`, to });
+    Array.from(groupedUsersByDebtMonths.entries()).forEach(
+      ([debtMonths, users]) => {
+        const to = users.map((user) => user.email);
+        this.logger.debug({ message: `Emitting ${debtMonths}`, to });
 
-          this.messageQueueClient.emit<SendReminderMessage>(
-            MAIL_REMINDER_TOPIC,
-            {
-              id: debtMonths,
-              debtMonths,
-              to,
-            },
-          );
-        },
-      ),
+        this.messageQueueClient.emit<SendReminderMessage>(MAIL_REMINDER_TOPIC, {
+          id: debtMonths,
+          debtMonths,
+          to,
+        });
+      },
     );
-
-    if (results.some((result) => result.status === 'rejected')) {
-      this.logger.error(
-        'Error while remind debt, please check: https://resend.com/emails',
-      );
-    }
 
     this.logger.log('Finished reminder job');
   }

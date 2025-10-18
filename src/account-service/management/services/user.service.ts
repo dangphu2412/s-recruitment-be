@@ -35,13 +35,14 @@ import {
 import { UpgradeUserMemberDTO } from '../dtos/core/upgrade-user-member.dto';
 import { CreateUserDTO } from '../dtos/core/create-user.dto';
 import { UpdateUserDTO } from '../dtos/core/update-user.dto';
-import { CreatePaymentRequest } from '../dtos/presentations/create-payment.request';
-import { PaymentService } from '../../../monthly-money/internal/payment.service';
 import { ResourceCRUDService } from '../../../system/resource-templates/resource-service-template';
 import { Period } from '../../../system/database/entities/period.entity';
 import { PeriodCRUDService } from '../../../master-data-service/periods/period.controller';
 import { OffsetPaginationRequest } from '../../../system/pagination/offset-pagination-request';
 import { GetUsersQueryDTO } from '../dtos/core/get-users-query.dto';
+import { MarkUserLeaveDTO } from '../dtos/core/mark-leave.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { USER_LEAVE_EVENT, UserLeaveEvent } from '../events/user-leave.event';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -52,9 +53,9 @@ export class UserServiceImpl implements UserService {
     private readonly moneyOperationService: MonthlyMoneyOperationService,
     @Inject(RoleService)
     private readonly roleService: RoleService,
-    private readonly paymentService: PaymentService,
     @Inject(PeriodCRUDService.token)
     private readonly periodService: ResourceCRUDService<Period>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   findUsersByFullNames(fullNames: string[]): Promise<User[]> {
@@ -82,17 +83,29 @@ export class UserServiceImpl implements UserService {
         operationFee,
         department,
         period,
+        leaveAt,
       } = user;
 
-      // Subtract today with created date to get estimated paid months using date-fns
-      const estimatedPaidMonths = operationFee
-        ? Math.min(
-            differenceInMonths(new Date(), joinedAt),
-            operationFee.monthlyConfig.monthRange,
-          )
-        : 0;
-      const paidMonths = operationFee?.paidMonths ?? 0;
-      const debtMonths = estimatedPaidMonths - paidMonths;
+      function getEstimatedPaid() {
+        if (!operationFee) {
+          return 0;
+        }
+
+        if (leaveAt) {
+          const today = new Date();
+
+          return today.getTime() > leaveAt.getTime()
+            ? differenceInMonths(leaveAt, joinedAt)
+            : differenceInMonths(today, joinedAt);
+        }
+
+        return Math.min(
+          differenceInMonths(new Date(), joinedAt),
+          operationFee.monthlyConfig.monthRange,
+        );
+      }
+
+      const estimatedPaidMonths = Math.abs(getEstimatedPaid());
 
       return {
         username,
@@ -107,7 +120,6 @@ export class UserServiceImpl implements UserService {
         paidMonths: operationFee?.paidMonths ?? 0,
         estimatedPaidMonths,
         isProbation: !operationFee,
-        debtMonths,
         department,
         period,
       };
@@ -161,6 +173,7 @@ export class UserServiceImpl implements UserService {
         id,
       },
       relations: ['department', 'period', 'roles', 'operationFee'],
+      withDeleted: true,
     });
 
     return {
@@ -177,6 +190,8 @@ export class UserServiceImpl implements UserService {
       createdAt: user.createdAt,
       isProbation: !user.operationFee,
       joinedAt: user.joinedAt,
+      leaveAt: user.leaveAt,
+      leaveReason: user.leaveReason,
     };
   }
 
@@ -346,7 +361,7 @@ export class UserServiceImpl implements UserService {
 
     // 3. Validate Year (same logic as before)
     const year = parseInt(yearString, 10);
-    if (isNaN(year) || !/^\d{4}$/.test(yearString)) {
+    if (Number.isNaN(year) || !/^\d{4}$/.test(yearString)) {
       Logger.error(`Invalid year: "${yearString}". Expected a 4-digit year.`);
       return null;
     }
@@ -373,23 +388,20 @@ export class UserServiceImpl implements UserService {
     return parse(`${dayMonth}-${year}`, 'dd-MM-yyyy', new Date());
   }
 
-  async createUserPayment(
-    id: string,
-    dto: CreatePaymentRequest,
-  ): Promise<void> {
-    const user = await this.userRepository.findOneBy({
-      id,
-    });
-
-    await this.paymentService.createPayment({
-      ...dto,
-      operationFeeId: user.operationFeeId,
-      userId: id,
-    });
-  }
-
   async updateUser(dto: UpdateUserDTO): Promise<void> {
     await this.userRepository.update({ id: dto.id }, pickBy(dto, identity));
+  }
+
+  async markUserAsLeave(dto: MarkUserLeaveDTO): Promise<void> {
+    await this.userRepository.update({ id: dto.id }, pickBy(dto, identity));
+    const user = await this.userRepository.findOneBy({ id: dto.id });
+
+    this.eventEmitter.emit(USER_LEAVE_EVENT, {
+      id: dto.id,
+      leaveAt: dto.leaveAt,
+      leaveReason: dto.leaveReason,
+      joinedAt: user.joinedAt,
+    } as UserLeaveEvent);
   }
 
   async updateMyProfile({ id, ...dto }: UpdateUserDTO): Promise<void> {
@@ -429,19 +441,17 @@ export class UserServiceImpl implements UserService {
     }
     const memberRole = await this.roleService.findByName(SystemRoles.MEMBER);
 
-    const { items } = await this.moneyOperationService.createOperationFee({
+    await this.moneyOperationService.createOperationFee({
       monthlyConfigId: dto.monthlyConfigId,
       userIds: dto.ids,
     });
 
-    items.forEach((item) => {
-      const user = users.find((u) => u.id === item.userId);
-      user.operationFeeId = item.operationFeeId;
-
+    users.forEach((user) => {
       if (!user.roles?.length) {
         user.roles = [];
-        user.roles.push(memberRole);
       }
+
+      user.roles.push(memberRole);
     });
 
     await this.userRepository.save(users, {

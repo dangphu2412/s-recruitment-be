@@ -1,7 +1,12 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from './user.entity';
-import { LogWorkStatus } from '../../../activities/work-logs/log-work-status.enum';
 import { DeviceUser } from './user-log.entity';
+
+export enum LogWorkStatus {
+  ON_TIME = 'O',
+  LATE = 'L',
+  NOT_FINISHED = 'N',
+}
 
 @Entity({
   name: 'activity_logs',

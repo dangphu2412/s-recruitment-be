@@ -13,8 +13,10 @@ import { User } from './user.entity';
   name: 'operation_fees',
 })
 export class OperationFee {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+  @PrimaryGeneratedColumn('uuid', {
+    name: 'id',
+  })
+  id: string;
 
   @Column({
     name: 'paid_money',

@@ -1,7 +1,7 @@
-import { Activity } from '../../system/database/entities/activity.entity';
+import { Activity } from '../../../system/database/entities/activity.entity';
 import { addMinutes, compareAsc, format, parseISO, subMinutes } from 'date-fns';
-import { LogWorkStatus } from './log-work-status.enum';
-import { RequestTypes } from '../shared/request-activity-status.enum';
+import { LogWorkStatus } from '../log-work-status.enum';
+import { RequestTypes } from '../../shared/request-activity-status.enum';
 import { Injectable } from '@nestjs/common';
 
 type WorkEvaluateDTO = {

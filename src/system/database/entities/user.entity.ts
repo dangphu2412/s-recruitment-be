@@ -81,11 +81,6 @@ export class User {
   periodId: string;
 
   @Column({
-    name: 'operation_fee_id',
-  })
-  operationFeeId: number;
-
-  @Column({
     name: 'tracking_id',
   })
   trackingId: string;
@@ -100,6 +95,19 @@ export class User {
     default: 'now()',
   })
   joinedAt: Date;
+
+  @Column({
+    name: 'leave_at',
+    default: null,
+  })
+  leaveAt: Date | null;
+
+  @Column({
+    name: 'leave_reason',
+    default: null,
+    nullable: true,
+  })
+  leaveReason?: string;
 
   @UpdateDateColumn({
     name: 'updated_at',
@@ -127,7 +135,7 @@ export class User {
 
   @OneToOne(() => OperationFee, (operationFee) => operationFee.user)
   @JoinColumn({
-    name: 'operation_fee_id',
+    name: 'id',
     referencedColumnName: 'id',
   })
   operationFee?: OperationFee;
