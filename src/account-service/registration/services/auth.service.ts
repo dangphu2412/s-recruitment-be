@@ -10,7 +10,6 @@ import { extractJwtPayload } from './jwt.utils';
 import isEmpty from 'lodash/isEmpty';
 import { PasswordManager } from './password-manager';
 import { UserCredentialsDTO } from '../dtos/core/login-credentials.dto';
-import { UserService } from '../../management/interfaces/user-service.interface';
 import { JwtPayload } from '../jwt-payload';
 import { RoleService } from '../../authorization/interfaces/role-service.interface';
 import { BasicLoginRequestDto } from '../dtos/presentations/basic-login.request.dto';
@@ -18,39 +17,45 @@ import { TokenFactory } from '../interfaces/token-factory.interface';
 import { AuthService } from '../interfaces/auth-service.interface';
 import { UpdateMyPasswordRequest } from '../dtos/presentations/update-my-password.request';
 import { LogOutRequiredException } from '../exceptions/log-out-required.exception';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../../../system/database/entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
   constructor(
-    @Inject(UserService)
-    private readonly userService: UserService,
     @Inject(RoleService)
     private readonly roleService: RoleService,
     @Inject(TokenFactory)
     private readonly tokenFactory: TokenFactory,
     private readonly jwtService: JwtService,
     private readonly passwordManager: PasswordManager,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  logOut(refreshToken: string): Promise<void> {
+  async logOut(refreshToken: string): Promise<void> {
     const jwtPayload = extractJwtPayload(refreshToken);
+
     if (!jwtPayload) {
       return;
     }
 
-    return this.roleService.clean(jwtPayload.sub);
+    await this.roleService.clean(jwtPayload.sub);
   }
 
   async login({
     username,
     password,
   }: BasicLoginRequestDto): Promise<UserCredentialsDTO> {
-    const user = await this.userService.findOne({
-      username,
+    const user = await this.userRepository.findOne({
+      where: {
+        username,
+      },
     });
 
     if (
-      isEmpty(user) ||
+      !user ||
       !(await this.passwordManager.compare(password, user.password))
     ) {
       throw new NotFoundException('Incorrect username or password');
@@ -93,7 +98,9 @@ export class AuthServiceImpl implements AuthService {
     myId: string,
     updateMyPassword: UpdateMyPasswordRequest,
   ): Promise<void> {
-    const user = await this.userService.findById(myId);
+    const user = await this.userRepository.findOneBy({
+      id: myId,
+    });
 
     if (
       isEmpty(user) ||
@@ -109,11 +116,13 @@ export class AuthServiceImpl implements AuthService {
       throw new BadRequestException('New password should not be the same');
     }
 
-    await this.userService.updateUser({
-      id: user.id,
-      password: await this.passwordManager.generate(
-        updateMyPassword.newPassword,
-      ),
-    });
+    await this.userRepository.update(
+      { id: user.id },
+      {
+        password: await this.passwordManager.generate(
+          updateMyPassword.newPassword,
+        ),
+      },
+    );
   }
 }

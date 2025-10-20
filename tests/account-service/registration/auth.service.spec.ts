@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { RoleService } from '../../../src/account-service/authorization/interfaces/role-service.interface';
 import { AuthServiceImpl } from '../../../src/account-service/registration/services/auth.service';
-import { UserService } from '../../../src/account-service/management/interfaces/user-service.interface';
 import { PasswordManager } from '../../../src/account-service/registration/services/password-manager';
 import { BasicLoginRequestDto } from '../../../src/account-service/registration/dtos/presentations/basic-login.request.dto';
 
@@ -14,6 +13,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { LogOutRequiredException } from '../../../src/account-service/registration/exceptions/log-out-required.exception';
+import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 // Mock extractJwtPayload utility
 jest.mock(
@@ -25,7 +26,7 @@ jest.mock(
 
 describe('AuthServiceImpl', () => {
   let authService: AuthServiceImpl;
-  let userService: jest.Mocked<UserService>;
+  let userRepository: jest.Mocked<Repository<User>>;
   let roleService: jest.Mocked<RoleService>;
   let tokenFactory: jest.Mocked<TokenFactory>;
   let jwtService: jest.Mocked<JwtService>;
@@ -36,7 +37,7 @@ describe('AuthServiceImpl', () => {
       providers: [
         AuthServiceImpl,
         {
-          provide: UserService,
+          provide: getRepositoryToken(User),
           useValue: {
             findOne: jest.fn(),
           },
@@ -70,7 +71,7 @@ describe('AuthServiceImpl', () => {
     }).compile();
 
     authService = module.get<AuthServiceImpl>(AuthServiceImpl);
-    userService = module.get(UserService);
+    userRepository = module.get(getRepositoryToken(User));
     roleService = module.get(RoleService);
     tokenFactory = module.get(TokenFactory);
     jwtService = module.get(JwtService);
@@ -100,15 +101,17 @@ describe('AuthServiceImpl', () => {
         },
       ];
 
-      userService.findOne.mockResolvedValue(user);
+      userRepository.findOne.mockResolvedValue(user);
       passwordManager.compare.mockResolvedValue(true);
       tokenFactory.create.mockResolvedValue(tokens);
-      roleService.findPermissionsByUserId.mockResolvedValue(undefined);
+      roleService.findPermissionsByUserId.mockResolvedValue([]);
 
       const result = await authService.login(dto);
 
-      expect(userService.findOne).toHaveBeenCalledWith({
-        username: 'john',
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          username: 'john',
+        },
       });
       expect(passwordManager.compare).toHaveBeenCalledWith('secret', 'hashed');
       expect(tokenFactory.create).toHaveBeenCalledWith('user-id');
@@ -119,7 +122,7 @@ describe('AuthServiceImpl', () => {
     });
 
     it('should throw NotFoundException if user not found', async () => {
-      userService.findOne.mockResolvedValue(null);
+      userRepository.findOne.mockResolvedValue(null);
       await expect(
         authService.login({ username: 'john', password: 'wrong' }),
       ).rejects.toThrow(NotFoundException);
@@ -131,7 +134,7 @@ describe('AuthServiceImpl', () => {
         password: 'hashed',
         roles: [],
       } as unknown as User;
-      userService.findOne.mockResolvedValue(user);
+      userRepository.findOne.mockResolvedValue(user);
       passwordManager.compare.mockResolvedValue(false);
 
       await expect(

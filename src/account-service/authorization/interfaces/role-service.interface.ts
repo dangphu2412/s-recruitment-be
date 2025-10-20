@@ -14,7 +14,7 @@ export interface RoleService {
   findMyRoles(userId: string): Promise<Role[]>;
   findByIds(ids: number[]): Promise<Role[]>;
   findPermissionsByUserId(userId: string): Promise<string[]>;
-  findByName(name: string): Promise<Role>;
+  findByName(name: string): Promise<Role | null>;
   createRole(createRoleRequestDTO: CreateRoleRequestDTO): Promise<void>;
   updateRole(id: number, dto: UpdateRoleDto): Promise<void>;
   updateAssignedPersonsToRole(
