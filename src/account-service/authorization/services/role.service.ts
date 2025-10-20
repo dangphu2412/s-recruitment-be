@@ -66,7 +66,7 @@ export class RoleServiceImpl implements RoleService {
     await this.roleRepository.insert(createRoleRequestDTO);
   }
 
-  findByName(name: string): Promise<Role> {
+  findByName(name: string): Promise<Role | null> {
     return this.roleRepository.findOne({ where: { name } });
   }
 
@@ -194,6 +194,6 @@ export class RoleServiceImpl implements RoleService {
       ? idOrIds.map(RoleServiceImpl.genKey)
       : [RoleServiceImpl.genKey(idOrIds)];
 
-    await this.cacheManager.store.del<string>(ids);
+    await this.cacheManager.store.del<string>?.(ids);
   }
 }
