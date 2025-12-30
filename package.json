@@ -47,7 +47,7 @@
     "@nestjs/event-emitter": "^2.1.1",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
-    "@nestjs/platform-fastify": "^10.4.13",
+    "@nestjs/platform-fastify": "^11.1.10",
     "@nestjs/schedule": "^6.0.0",
     "@nestjs/serve-static": "4.0.2",
     "@nestjs/swagger": "^7.4.2",
