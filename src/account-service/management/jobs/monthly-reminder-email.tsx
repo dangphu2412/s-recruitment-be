@@ -17,12 +17,12 @@ type MonthlyReminderEmailProps = {
 
 export function MonthlyReminderEmailTemplate({
   missingMonths,
-  sheetUrl = 'https://docs.google.com/spreadsheets/d/1pV0wIAdUzKZxRUxIH5fxZPFN_F7siAaqTW54PC7wEsI/edit?fbclid=IwY2xjawGK48dleHRuA2FlbQIxMQABHYldS18rDEOOjQFQ_My8Bcd8cRkTIciqPTvdlJTi8SLidZVuvRddyf6CRQ_aem_nyAFAPo6fMGM_7tdmmYhKw&gid=636234062#gid=636234062',
+  sheetUrl = 'https://docs.google.com/spreadsheets/d/1pV0wIAdUzKZxRUxIH5fxZPFN_F7siAaqTW54PC7wEsI/edit?gid=1115838130#gid=1115838130',
 }: Readonly<MonthlyReminderEmailProps>) {
   const bankInfo = {
     bankName: 'MBBank',
-    accountNumber: '4016092002',
-    accountHolder: 'TRAN DUC MANH',
+    accountNumber: '0000016346999',
+    accountHolder: 'DUONG VAN CHI BAO',
   };
   const currentMonth = new Date().getMonth() + 1;
 
